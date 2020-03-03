@@ -47,6 +47,7 @@ Objetivos:
 2. Añadir bindings a listas de objetos
 3. Añadir bindings de datasets
 4. Análisis de bindings del motor de grijjy/dsharp/knockoff para ver qué ideas buenas pueden incorporarse
+5. Trabajar la parte del View
 
 ### Prototipo 2
 
