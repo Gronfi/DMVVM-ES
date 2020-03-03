@@ -29,9 +29,9 @@ https://delphisorcery.blogspot.com/2011/12/putting-pieces-together-dsharp.html
 
 ***
 
-### Prototipo 0
+### Prototipo 0 (finalizado)
 
-Objetivos en esta práctica:
+Objetivos:
 1. El objetivo no es crear unos modelo-viewmodel-vista maravillosos, por lo que puede no tener excesivo sentido el ejemplo en si mismo
 2. El core MVVM debe ser **agnóstico** de la plataforma (vcl/fmx)
 3. Debe haber **servicios (UI)** propios a la plataforma, que pueden ser invocados desde cualquiera de los niveles (lo normal desde el VM), se ha creado un servicio sencillo
@@ -40,5 +40,16 @@ Objetivos en esta práctica:
 6. En este caso concreto el viewmodel tiene unas funcionalidades similares al propio modelo, vamos que casi hace de puente, por lo que los propios test unitarios son similares
 7. A un modelo puede estar linkado un viewmodel (o varios), y este viewmodel puede dar soporte a tantas vistas como se le enganchen
 
+### Prototipo 1 (en curso)
 
+Objetivos:
+1. Añadir Motor de Mensajes al sistema: analizar si es mejor que el patrón observer para el modelo
+2. Añadir bindings a listas de objetos
+3. Añadir bindings de datasets
+4. Análisis de bindings del motor de grijjy/dsharp/knockoff para ver qué ideas buenas pueden incorporarse
+
+### Prototipo 2
+
+Objetivos:
+1. Crear cliente REST y ver encaje al modelo, qué se puede automatizar, qué no, dificultades,...
 
