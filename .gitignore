@@ -38,3 +38,14 @@
 /Source/CSV.View.FMX/*.res
 /Source/CSV.View.VCL/*.res
 /Source/MVVM.Core/*.res
+/Source/MVVM.FMX/MVVM.Platform.FMX.dproj.local
+/Source/MVVM.FMX/MVVM.Platform.FMX.identcache
+/Source/MVVM.FMX/MVVM.Platform.FMX.res
+/Source/MVVM.FMX/Obj/Win32/Debug/MVVM.Servicios.Platform.FMX.dcu
+/Source/MVVM.FMX/Src/__history/MVVM.Servicios.Platform.FMX.pas.~1~
+/Source/MVVM.FMX/Src/__history/MVVM.Servicios.Platform.FMX.pas.~2~
+/Source/MVVM.FMX/Src/__history/MVVM.Servicios.Platform.FMX.pas.~3~
+/Source/MVVM.FMX/Src/__history/MVVM.Servicios.Platform.FMX.pas.~4~
+/Source/MVVM.FMX/__history/MVVM.Platform.FMX.dpk.~1~
+/Source/MVVM.FMX/__history/MVVM.Platform.FMX.dpk.~2~
+/Source/MVVM.FMX/__history/MVVM.Platform.FMX.dpk.~3~
