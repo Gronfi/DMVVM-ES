@@ -1,0 +1,96 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{B2BAB623-FC1E-4590-B104-5458BF8CE24C}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="MVVM.Core\MVVM.Core.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CSV.Core\CSV.Core.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CSV.View.VCL\CSV.View.VCL.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CSV.View.FMX\CSV.View.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CSV.VCL.Exe\App.CSV.VCL.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CSV.FMX.Exe\App.CSV.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="MVVM_Core">
+        <MSBuild Projects="MVVM.Core\MVVM.Core.dproj"/>
+    </Target>
+    <Target Name="MVVM_Core:Clean">
+        <MSBuild Projects="MVVM.Core\MVVM.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MVVM_Core:Make">
+        <MSBuild Projects="MVVM.Core\MVVM.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CSV_Core">
+        <MSBuild Projects="CSV.Core\CSV.Core.dproj"/>
+    </Target>
+    <Target Name="CSV_Core:Clean">
+        <MSBuild Projects="CSV.Core\CSV.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_Core:Make">
+        <MSBuild Projects="CSV.Core\CSV.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CSV_View_VCL">
+        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj"/>
+    </Target>
+    <Target Name="CSV_View_VCL:Clean">
+        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_View_VCL:Make">
+        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CSV_View_FMX">
+        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Clean">
+        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Make">
+        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="App_CSV_VCL">
+        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj"/>
+    </Target>
+    <Target Name="App_CSV_VCL:Clean">
+        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="App_CSV_VCL:Make">
+        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="App_CSV_FMX">
+        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj"/>
+    </Target>
+    <Target Name="App_CSV_FMX:Clean">
+        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="App_CSV_FMX:Make">
+        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="MVVM_Core;CSV_Core;CSV_View_VCL;CSV_View_FMX;App_CSV_VCL;App_CSV_FMX"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="MVVM_Core:Clean;CSV_Core:Clean;CSV_View_VCL:Clean;CSV_View_FMX:Clean;App_CSV_VCL:Clean;App_CSV_FMX:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="MVVM_Core:Make;CSV_Core:Make;CSV_View_VCL:Make;CSV_View_FMX:Make;App_CSV_VCL:Make;App_CSV_FMX:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
