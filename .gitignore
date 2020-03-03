@@ -56,3 +56,12 @@
 /Source/MVVM.VCL/MVVM.Platform.VCL.dproj.local
 /Source/MVVM.VCL/MVVM.Platform.VCL.identcache
 /Source/MVVM.VCL/MVVM.Platform.VCL.res
+/Source/CSV.Core.DUnitX/__history
+/Source/CSV.Core.DUnitX/Src/__history
+/Source/CSV.Core.DUnitX/Obj/Win32/Debug
+/Source/CSV.Core.DUnitX/Win32/Debug/*.exe
+/Source/CSV.Core.DUnitX/*.identcache
+/Source/CSV.Core.DUnitX/*.local
+/Source/CSV.Core.DUnitX/*.res
+/ThirdParty/DunitX/Tests/*.res
+/Source/CSV.Core.DUnitX/Win32/Debug
