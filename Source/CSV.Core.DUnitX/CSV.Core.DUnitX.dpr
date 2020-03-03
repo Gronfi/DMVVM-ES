@@ -9,16 +9,16 @@ program CSV.Core.DUnitX;
 {$STRONGLINKTYPES ON}
 uses
   System.SysUtils,
-
-{$IFDEF MODO_CONSOLA}
+  {$IFDEF MODO_CONSOLA}
   DUnitX.Loggers.Console,
-{$ELSE}
+  {$ELSE}
   VCL.Forms,
   DUnitX.Loggers.GUI.VCL,
-{$ENDIF}
+  {$ENDIF }
   DUnitX.Loggers.Xml.NUnit,
   DUnitX.TestFramework,
-  CSV.Core.Model.DUnitX in 'Src\CSV.Core.Model.DUnitX.pas';
+  CSV.Core.Model.DUnitX in 'Src\CSV.Core.Model.DUnitX.pas',
+  CSV.Core.ViewModel.DUnitX in 'Src\CSV.Core.ViewModel.DUnitX.pas';
 
 var
   runner : ITestRunner;

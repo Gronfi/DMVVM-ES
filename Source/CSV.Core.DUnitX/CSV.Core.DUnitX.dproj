@@ -58,7 +58,7 @@
         <DCC_UnitSearchPath>..\$(Platform)\$(Config)\DCP;..\..\ThirdParty\DunitX;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <SanitizedProjectName>CSV_Core_DUnitX</SanitizedProjectName>
         <UsePackages>true</UsePackages>
-        <DCC_UsePackage>CSV.Core;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>CSV.Core;MVVM.Platform.VCL;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DcpOutput>..\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
@@ -98,6 +98,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="Src\CSV.Core.Model.DUnitX.pas"/>
+        <DCCReference Include="Src\CSV.Core.ViewModel.DUnitX.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -126,14 +127,14 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\CSV.Core.DUnitX.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>CSV_Core_DUnitX.exe</RemoteName>
+                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
+                    <Platform Name="OSX32">
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
+                <DeployFile LocalName="..\Win32\Debug\CSV.Core.DUnitX.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>CSV_Core_DUnitX.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

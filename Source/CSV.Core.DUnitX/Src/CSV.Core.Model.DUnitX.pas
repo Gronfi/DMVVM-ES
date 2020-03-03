@@ -12,7 +12,6 @@ type
   TCSVModelTests = class(TObject)
   private
     FModelo: ICSVFile_Model;
-    procedure Test2(const AValue1, AValue2: Integer);
   public
     [Setup]
     procedure Setup;
@@ -28,6 +27,10 @@ type
     [TestCase('Procesa-OK','..\..\Data.Examples\TestOK.csv,True')]
     [TestCase('Procesa-NoOK','..\..\Data.Examples\TestFalla.csv,False')]
     procedure Procesamiento(const AFile: String; const AResultado: Boolean);
+    [Test]
+    [TestCase('Procesa-P-OK','..\..\Data.Examples\TestOK.csv,True')]
+    [TestCase('Procesa-P-NoOK','..\..\Data.Examples\TestFalla.csv,False')]
+    procedure ProcesamientoParalelo(const AFile: String; const AResultado: Boolean);
   end;
 
 implementation
@@ -36,7 +39,7 @@ uses
   System.SysUtils,
   System.IOUtils,
 
-  CSV.Model, CSV.ViewModel;
+  CSV.Model;
 
 procedure TCSVModelTests.Setup;
 begin
@@ -77,16 +80,23 @@ begin
   Assert.AreEqual(AResultado, LRes);
 end;
 
+procedure TCSVModelTests.ProcesamientoParalelo(const AFile: String; const AResultado: Boolean);
+var
+  LRes: Boolean;
+begin
+  TDUnitX.CurrentRunner.Log(TLogLevel.Information, 'Fichero a chequear: ' + AFile);
+  FModelo.FileName := AFile;
+  LRes := FModelo.ProcesarFicheroCSV_Parallel;
+  TDUnitX.CurrentRunner.Status('Resultado del chequeo: ' + LRes.ToString);
+  Assert.AreEqual(AResultado, LRes);
+end;
+
 procedure TCSVModelTests.SetFileName;
 const
   CName = 'c:\temp\Test.csv';
 begin
   FModelo.FileName := CName;
   Assert.AreEqual(FModelo.FileName, CName);
-end;
-
-procedure TCSVModelTests.Test2(const AValue1 : Integer;const AValue2 : Integer);
-begin
 end;
 
 initialization

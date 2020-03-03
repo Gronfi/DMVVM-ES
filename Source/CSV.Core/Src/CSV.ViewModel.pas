@@ -123,6 +123,7 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
+  Result := False;
   if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
@@ -140,6 +141,7 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
+  Result := False;
   if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
