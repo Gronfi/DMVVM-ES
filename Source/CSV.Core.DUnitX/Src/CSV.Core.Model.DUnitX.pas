@@ -21,8 +21,6 @@ type
     [Test]
     procedure SetFileName;
     [Test]
-    //[TestCase('Test-Existe','.\test.csv', 'True')]
-    //[TestCase('Test-NoExiste','3,4')]
     procedure ExistsFile;
     [Test]
     procedure NotExistsFile;
@@ -35,6 +33,7 @@ type
 implementation
 
 uses
+  System.SysUtils,
   System.IOUtils,
 
   CSV.Model, CSV.ViewModel;
@@ -74,6 +73,7 @@ begin
   TDUnitX.CurrentRunner.Log(TLogLevel.Information, 'Fichero a chequear: ' + AFile);
   FModelo.FileName := AFile;
   LRes := FModelo.ProcesarFicheroCSV;
+  TDUnitX.CurrentRunner.Status('Resultado del chequeo: ' + LRes.ToString);
   Assert.AreEqual(AResultado, LRes);
 end;
 

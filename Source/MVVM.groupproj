@@ -15,6 +15,9 @@
         <Projects Include="CSV.Core\CSV.Core.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="CSV.View.VCL\CSV.View.VCL.dproj">
             <Dependencies/>
         </Projects>
@@ -71,6 +74,15 @@
     <Target Name="CSV_Core:Make">
         <MSBuild Projects="CSV.Core\CSV.Core.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CSV_Core_DUnitX">
+        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj"/>
+    </Target>
+    <Target Name="CSV_Core_DUnitX:Clean">
+        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_Core_DUnitX:Make">
+        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Make"/>
+    </Target>
     <Target Name="CSV_View_VCL">
         <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj"/>
     </Target>
@@ -108,13 +120,13 @@
         <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="MVVM_Core;MVVM_Platform_VCL;MVVM_Platform_FMX;CSV_Core;CSV_View_VCL;CSV_View_FMX;App_CSV_VCL;App_CSV_FMX"/>
+        <CallTarget Targets="MVVM_Core;MVVM_Platform_VCL;MVVM_Platform_FMX;CSV_Core;CSV_Core_DUnitX;CSV_View_VCL;CSV_View_FMX;App_CSV_VCL;App_CSV_FMX"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="MVVM_Core:Clean;MVVM_Platform_VCL:Clean;MVVM_Platform_FMX:Clean;CSV_Core:Clean;CSV_View_VCL:Clean;CSV_View_FMX:Clean;App_CSV_VCL:Clean;App_CSV_FMX:Clean"/>
+        <CallTarget Targets="MVVM_Core:Clean;MVVM_Platform_VCL:Clean;MVVM_Platform_FMX:Clean;CSV_Core:Clean;CSV_Core_DUnitX:Clean;CSV_View_VCL:Clean;CSV_View_FMX:Clean;App_CSV_VCL:Clean;App_CSV_FMX:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="MVVM_Core:Make;MVVM_Platform_VCL:Make;MVVM_Platform_FMX:Make;CSV_Core:Make;CSV_View_VCL:Make;CSV_View_FMX:Make;App_CSV_VCL:Make;App_CSV_FMX:Make"/>
+        <CallTarget Targets="MVVM_Core:Make;MVVM_Platform_VCL:Make;MVVM_Platform_FMX:Make;CSV_Core:Make;CSV_Core_DUnitX:Make;CSV_View_VCL:Make;CSV_View_FMX:Make;App_CSV_VCL:Make;App_CSV_FMX:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

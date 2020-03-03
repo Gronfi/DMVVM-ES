@@ -88,11 +88,11 @@ begin
   FTest1:= TCollections.CreateList<String>;
   FTest2:= TCollections.CreateList<String>;
   FTest3:= TCollections.CreateList<String>;
-  for I := 1 to 30000 do
+  for I := 5 to 30000 do
     FTest1.Add(I.ToString);
-  for I := 1 to 50000 do
+  for I := 6 to 50000 do
     FTest2.Add(I.ToString);
-  for I := 1 to 80000 do
+  for I := 7 to 80000 do
     FTest3.Add(I.ToString);
 end;
 
@@ -134,6 +134,7 @@ var
   I        : Integer;
   LFromFile: TStrings;
 begin
+  Result    := True;
   LFromFile := LoadFile;
   try
     //Procesamiento de Rows
@@ -205,7 +206,7 @@ function TCSVFile_Model.ValidarDato(const ARowNo, AColumn: Integer;
   const AData: String): Boolean;
 begin
   //algo aleatorio simplemente de prueba
-  Result := not((ARowNo in [3, 59, 100]) and (AColumn in [1, 25, 50]));
+  Result := not((ARowNo in [3, 59, 100]) and (AColumn in [6..10]));
   if not Result then Exit;
   //calculos tontos varios
   if FTest1.Contains(AData) then
