@@ -87,6 +87,7 @@
         <DCCReference Include="Src\MVVM.Bindings.pas"/>
         <DCCReference Include="Src\MVVM.Classes.pas"/>
         <DCCReference Include="Src\MVVM.Interfaces.pas"/>
+        <DCCReference Include="Src\MVVM.Core.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

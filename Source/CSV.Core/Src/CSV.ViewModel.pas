@@ -53,7 +53,9 @@ implementation
 uses
   System.SysUtils,
   System.Threading,
-  System.Diagnostics;
+  System.Diagnostics,
+
+  MVVM.Core;
 
 { TCSVFile_ViewModel }
 
@@ -121,10 +123,13 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  LTiming := TStopwatch.Create;
-  LTiming.Start;
-  Result := FModelo.ProcesarFicheroCSV;
-  FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (normal) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
+  if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
+  begin
+    LTiming := TStopwatch.Create;
+    LTiming.Start;
+    Result := FModelo.ProcesarFicheroCSV;
+    FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (normal) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
+  end;
 end;
 
 function TCSVFile_ViewModel.ProcesarFicheroCSV_Parallel: Boolean;
@@ -135,10 +140,13 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  LTiming := TStopwatch.Create;
-  LTiming.Start;
-  Result := FModelo.ProcesarFicheroCSV_Parallel;
-  FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (Paralelo) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
+  if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
+  begin
+    LTiming := TStopwatch.Create;
+    LTiming.Start;
+    Result := FModelo.ProcesarFicheroCSV_Parallel;
+    FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (Paralelo) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
+  end;
 end;
 
 procedure TCSVFile_ViewModel.SetFileName(const AFileName: String);

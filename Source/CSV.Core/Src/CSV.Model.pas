@@ -79,9 +79,21 @@ begin
 end;
 
 constructor TCSVFile_Model.Create;
+var
+  I: Integer;
 begin
   inherited;
   FBinder := TBindingHelper.Create(Self);
+
+  FTest1:= TCollections.CreateList<String>;
+  FTest2:= TCollections.CreateList<String>;
+  FTest3:= TCollections.CreateList<String>;
+  for I := 1 to 30000 do
+    FTest1.Add(I.ToString);
+  for I := 1 to 50000 do
+    FTest2.Add(I.ToString);
+  for I := 1 to 80000 do
+    FTest3.Add(I.ToString);
 end;
 
 destructor TCSVFile_Model.Destroy;

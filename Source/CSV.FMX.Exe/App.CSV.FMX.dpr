@@ -5,7 +5,6 @@ uses
   FMX.Forms,
   MVVM.Bindings in 'Source\MVVM.Bindings.pas',
   MVVM.Interfaces in 'Source\MVVM.Interfaces.pas',
-  MVVM.Classes in 'Source\MVVM.Classes.pas',
   CSV.Interfaces in 'CSV.Interfaces.pas',
   CSV.Model in 'CSV.Model.pas',
   CSV.ViewModel in 'CSV.ViewModel.pas',

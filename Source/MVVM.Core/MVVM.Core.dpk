@@ -34,6 +34,7 @@ requires
 contains
   MVVM.Bindings in 'Src\MVVM.Bindings.pas',
   MVVM.Classes in 'Src\MVVM.Classes.pas',
-  MVVM.Interfaces in 'Src\MVVM.Interfaces.pas';
+  MVVM.Interfaces in 'Src\MVVM.Interfaces.pas',
+  MVVM.Core in 'Src\MVVM.Core.pas';
 
 end.
