@@ -3,6 +3,8 @@ program App.CSV.FMX;
 uses
   System.StartUpCopy,
   FMX.Forms,
+
+  MVVM.Servicios.Platform.FMX,
   MVVM.Bindings in 'Source\MVVM.Bindings.pas',
   MVVM.Interfaces in 'Source\MVVM.Interfaces.pas',
   CSV.Interfaces in 'CSV.Interfaces.pas',
@@ -15,6 +17,7 @@ uses
 
 begin
   Application.Initialize;
+  InitializePlatform;
 
   Modelo      := TCSVFile_Model.Create;
 

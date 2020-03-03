@@ -54,8 +54,6 @@ var
 implementation
 
 uses
-  MVVM.Servicios.Platform.FMX,
-
   Spring;
 
 {$R *.fmx}
@@ -161,8 +159,5 @@ procedure TfrmCSV.RemoveViewModel(AViewModel: IViewModel<ICSVFile_Model>);
 begin
   FViewModel := nil;
 end;
-
-initialization
-  TFMXServicioDialogo.QualifiedClassName;
 
 end.

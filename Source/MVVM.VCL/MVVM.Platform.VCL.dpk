@@ -1,4 +1,4 @@
-package CSV.View.FMX;
+package MVVM.Platform.VCL;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -28,10 +28,10 @@ package CSV.View.FMX;
 {$IMPLICITBUILD ON}
 
 requires
-  CSV.Core,
-  fmx;
+  MVVM.Core,
+  VCL;
 
 contains
-  CSV.View in 'Src\CSV.View.pas' {frmCSV};
+  MVVM.Servicios.Platform.VCL in 'Src\MVVM.Servicios.Platform.VCL.pas';
 
 end.

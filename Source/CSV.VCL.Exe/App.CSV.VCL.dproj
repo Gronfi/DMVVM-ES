@@ -59,7 +59,7 @@
         <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <SanitizedProjectName>App_CSV_VCL</SanitizedProjectName>
         <UsePackages>true</UsePackages>
-        <DCC_UsePackage>CSV.View.VCL;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>CSV.View.VCL;MVVM.Platform.VCL;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DcpOutput>..\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
@@ -117,7 +117,6 @@
         <DCCReference Include="..\CSV.Resources.Common\CSV.RecursosEjercicio.pas"/>
         <DCCReference Include="Src\Unit1.pas">
             <Form>Form1</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

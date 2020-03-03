@@ -2,6 +2,8 @@ program App.CSV.VCL;
 
 uses
   Vcl.Forms,
+
+  MVVM.Servicios.Platform.VCL,
   MVVM.Bindings in 'Source\MVVM.Bindings.pas',
   MVVM.Interfaces in 'Source\MVVM.Interfaces.pas',
   MVVM.Classes in 'Source\MVVM.Classes.pas',
@@ -16,6 +18,8 @@ uses
 
 begin
   Application.Initialize;
+  InitializePlatform;
+
   Application.MainFormOnTaskbar := True;
 
   Modelo      := TCSVFile_Model.Create;
@@ -27,9 +31,8 @@ begin
   Vista.AddViewModel(VistaModelo);
   TfrmCSV(Vista).Show;
 
-  // Truco para que quede elegante, crear form principal
+  // Truco para que quede elegante (de momento), crear form principal
   Application.CreateForm(TForm1, Form1);
-  //Application.ShowMainForm := False;
   // Fin de truco
 
   Application.Run;

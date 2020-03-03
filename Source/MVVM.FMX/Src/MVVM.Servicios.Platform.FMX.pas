@@ -11,6 +11,8 @@ type
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; override;
   end;
 
+  procedure InitializePlatform;
+
 implementation
 
 uses
@@ -22,6 +24,11 @@ uses
 function TFMXServicioDialogo.MessageDlg(const ATitulo, ATexto: String): Boolean;
 begin
   Result := FMX.Dialogs.MessageDlg(ATitulo, TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes
+end;
+
+procedure InitializePlatform;
+begin
+  ;
 end;
 
 initialization
