@@ -31,6 +31,10 @@ https://github.com/msnts/glue
 
 https://github.com/bogdanpolak/command-delphi
 
+## Ideas a tener en cuenta
+
+* Motor permite el registro de distintos tipos de estrategias/métodos de binding
+
 ***
 
 ### Prototipo 0 (finalizado)

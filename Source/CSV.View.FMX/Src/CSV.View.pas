@@ -9,7 +9,7 @@ uses
   FMX.Controls.Presentation,
 
   MVVM.Interfaces,
-  CSV.Interfaces, FMX.Effects, FMX.Layouts;
+  CSV.Interfaces, FMX.Effects, FMX.Layouts, FMX.Objects;
 
 type
   TfrmCSV = class(TForm, ICSVFile_View)
@@ -25,6 +25,10 @@ type
     DoCrearVista: TAction;
     DoSelectFile: TAction;
     ShadowEffect1: TShadowEffect;
+    rrProgreso: TRoundRect;
+    ShadowEffect2: TShadowEffect;
+    Label2: TLabel;
+    pgBarra: TProgressBar;
     procedure btPathClick(Sender: TObject);
     procedure btTNPClick(Sender: TObject);
     procedure btTPClick(Sender: TObject);
@@ -37,6 +41,7 @@ type
 
   protected
     procedure OnProcesoFinalizado(const ADato: String);
+    procedure OnProgresoProceso(const ADato: Integer);
 
     procedure DoSeleccionarFichero;
     procedure DoCrearNuevaVista;
@@ -76,6 +81,8 @@ begin
       FViewModel.Bind('IsValidFile', btTP, 'Enabled'); //boton habilitado o no
       //3) evento de fin de procesamiento
       FViewModel.OnProcesamientoFinalizado.Add(OnProcesoFinalizado);
+      //4) evento de progreso
+      FViewModel.OnProgresoProcesamiento.Add(OnProgresoProceso);
     end
     else raise Exception.Create('No casan las interfaces');
   end;
@@ -152,7 +159,16 @@ end;
 
 procedure TfrmCSV.OnProcesoFinalizado(const ADato: String);
 begin
-  mmInfo.Lines.Add('Evento fin procesamiento: ' + ADato)
+  mmInfo.Lines.Add('Evento fin procesamiento: ' + ADato);
+  rrProgreso.Visible := False;
+end;
+
+procedure TfrmCSV.OnProgresoProceso(const ADato: Integer);
+begin
+  if not rrProgreso.IsVisible then
+    rrProgreso.Visible := True;
+  pgBarra.Value        := ADato;
+  Application.ProcessMessages;
 end;
 
 procedure TfrmCSV.RemoveViewModel(AViewModel: IViewModel<ICSVFile_Model>);

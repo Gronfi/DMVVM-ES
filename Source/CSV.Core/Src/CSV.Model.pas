@@ -18,6 +18,7 @@ type
   private
     FBinder  : TBindingHelper;
     FFileName: String;
+    FProgreso: Integer;
 
     FTest1, FTest2, FTest3: IList<String>;
   protected
@@ -25,6 +26,7 @@ type
     procedure SetFileName(const AFileName: String);
 
     function GetIsPathOK: Boolean;
+    function GetProgresoProcesamiento: Integer;
 
     function ProcesarRow(const ARowNo: Integer; const AData: String): Boolean;
     function ValidarDato(const ARowNo, AColumn: Integer; const AData: String): Boolean;
@@ -46,6 +48,7 @@ type
 
     property IsPathOk: Boolean read GetIsPathOK;
     property FileName: String read GetFileName write SetFileName;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
   end;
 
 implementation
@@ -112,6 +115,11 @@ begin
   Result := TFile.Exists(FFileName);
 end;
 
+function TCSVFile_Model.GetProgresoProcesamiento: Integer;
+begin
+  Result := FProgreso;
+end;
+
 function TCSVFile_Model.LoadFile: TStrings;
 begin
   Result := TStringList.Create;
@@ -131,17 +139,25 @@ end;
 
 function TCSVFile_Model.ProcesarFicheroCSV: Boolean;
 var
-  I        : Integer;
-  LFromFile: TStrings;
+  I             : Integer;
+  LFromFile     : TStrings;
+  LPaso         : Integer;
 begin
   Result    := True;
   LFromFile := LoadFile;
   try
+    FProgreso := 0;
     //Procesamiento de Rows
     for I := 0 to LFromFile.Count - 1 do
     begin
       if not ProcesarRow(I, LFromFile[I]) then
         Exit(False);
+      LPaso := ((I + 1) * 100) DIV LFromFile.Count;
+      if (LPaso <> FProgreso) then
+      begin
+        FProgreso := LPaso;
+        Notify('ProgresoProcesamiento');
+      end;
     end;
   finally
     LFromFile.Free;
@@ -217,7 +233,7 @@ begin
     Exit(False);
   if AData = 'FallaSiempre' then
     Exit(False);
-
+  Sleep(10);
 end;
 
 end.

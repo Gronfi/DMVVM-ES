@@ -94,6 +94,52 @@ object frmCSV: TfrmCSV
       ShadowColor = claBlack
     end
   end
+  object FileOpenDialog1: TOpenDialog
+    DefaultExt = '*.csv'
+    InitialDir = 'C:\Temp'
+    Left = 440
+    Top = 64
+  end
+  object rrProgreso: TRoundRect
+    Position.X = 76.000000000000000000
+    Position.Y = 217.000000000000000000
+    Size.Width = 337.000000000000000000
+    Size.Height = 73.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    object ShadowEffect2: TShadowEffect
+      Distance = 3.000000000000000000
+      Direction = 45.000000000000000000
+      Softness = 0.300000011920929000
+      Opacity = 0.600000023841857900
+      ShadowColor = claBlack
+    end
+    object Label2: TLabel
+      Align = Top
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 5.000000000000000000
+      Size.Width = 297.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Procesamiento en curso'
+      TabOrder = 0
+    end
+    object pgBarra: TProgressBar
+      Align = VertCenter
+      Orientation = Horizontal
+      Margins.Left = 15.000000000000000000
+      Margins.Right = 15.000000000000000000
+      Position.X = 15.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 307.000000000000000000
+      Size.Height = 5.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
   object ActionList1: TActionList
     Left = 360
     Top = 64
@@ -105,11 +151,5 @@ object frmCSV: TfrmCSV
       Text = '...'
       OnExecute = DoSelectFileExecute
     end
-  end
-  object FileOpenDialog1: TOpenDialog
-    DefaultExt = '*.csv'
-    InitialDir = 'C:\Temp'
-    Left = 440
-    Top = 64
   end
 end

@@ -18,12 +18,16 @@ type
     FBinder                   : TBindingHelper;
     FModelo                   : ICSVFile_Model;
     FOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
-
+    FOnProgresoProcesamiento  : IEvent<TProgresoProcesamiento>;
   protected
     function GetFileName: String;
     procedure SetFileName(const AFileName: String);
 
+    function GetProgresoProcesamiento: Integer;
+    procedure SetProgresoProcesamiento(const AValue: Integer);
+
     function GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
+    function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
 
     function GetIsValidFile: Boolean;
     procedure SetIsValidFile(const AValue: Boolean);
@@ -45,7 +49,10 @@ type
 
     property FileName: String read GetFileName write SetFileName;
     property IsValidFile: Boolean read GetIsValidFile write SetIsValidFile;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento write SetProgresoProcesamiento;
+
     property OnDatosProcesamientoFinalizado: IEvent<TFinProcesamiento> read GetOnProcesamientoFinalizado;
+    property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
 implementation
@@ -87,10 +94,13 @@ begin
   FBinder := TBindingHelper.Create(Self);
 
   FOnProcesamientoFinalizado := TBindingHelper.CreateEvent<TFinProcesamiento>;
+  FOnProgresoProcesamiento   := TBindingHelper.CreateEvent<TProgresoProcesamiento>;
 end;
 
 destructor TCSVFile_ViewModel.Destroy;
 begin
+  FOnProcesamientoFinalizado := nil;
+  FOnProgresoProcesamiento   := nil;
   FBinder.Free;
   inherited;
 end;
@@ -110,6 +120,17 @@ end;
 function TCSVFile_ViewModel.GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
 begin
   Result := FOnProcesamientoFinalizado;
+end;
+
+function TCSVFile_ViewModel.GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
+begin
+  Result := FOnProgresoProcesamiento;
+end;
+
+function TCSVFile_ViewModel.GetProgresoProcesamiento: Integer;
+begin
+  Guard.CheckNotNull(FModelo, 'Modelo no asignado');
+  Result := FModelo.ProgresoProcesamiento;
 end;
 
 procedure TCSVFile_ViewModel.Notify(const APropertyName: string);
@@ -174,9 +195,15 @@ begin
     FModelo := AModel;
     //Bindings
     FModelo.Bind('IsPathOK', Self, 'IsValidFile');
+    FModelo.Bind('ProgresoProcesamiento', Self, 'ProgresoProcesamiento');
     //
     Notify;
   end;
+end;
+
+procedure TCSVFile_ViewModel.SetProgresoProcesamiento(const AValue: Integer);
+begin
+  FOnProgresoProcesamiento.Invoke(AValue);
 end;
 
 end.

@@ -17,6 +17,7 @@ type
     procedure SetFileName(const AFileName: String);
 
     function GetIsPathOK: Boolean;
+    function GetProgresoProcesamiento: Integer;
 
     function LoadFile: TStrings;
 
@@ -25,16 +26,22 @@ type
 
     property IsPathOk: Boolean read GetIsPathOK;
     property FileName: String read GetFileName write SetFileName;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
   end;
 
   TFinProcesamiento = procedure(const AData: String) of Object;
+  TProgresoProcesamiento = procedure(const AData: Integer) of Object;
 
   ICSVFile_ViewModel = Interface(IViewModel<ICSVFile_Model>)
   ['{A3EA9B78-2144-4AE3-98CE-6EF522DCDBF7}']
     function GetFileName: String;
     procedure SetFileName(const AFileName: String);
 
+    function GetProgresoProcesamiento: Integer;
+    procedure SetProgresoProcesamiento(const AValue: Integer);
+
     function GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
+    function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
 
     function GetIsValidFile: Boolean;
     procedure SetIsValidFile(const AValue: Boolean);
@@ -44,7 +51,10 @@ type
 
     property IsValidFile: Boolean read GetIsValidFile write SetIsValidFile;
     property FileName: String read GetFileName write SetFileName;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento write SetProgresoProcesamiento;
+
     property OnProcesamientoFinalizado: IEvent<TFinProcesamiento> read GetOnProcesamientoFinalizado;
+    property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
   ICSVFile_View = Interface(IView<ICSVFile_Model>)
