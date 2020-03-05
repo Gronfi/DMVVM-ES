@@ -1,9 +1,9 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{8F362601-DDEA-46EB-BE2B-0CA7C110E526}</ProjectGuid>
-        <MainSource>CSV.View.FMX.dpk</MainSource>
+        <ProjectGuid>{B9A98167-86F2-4977-B80E-167C590B06E7}</ProjectGuid>
+        <MainSource>CSV.Core.dpk</MainSource>
         <ProjectVersion>18.8</ProjectVersion>
-        <FrameworkType>FMX</FrameworkType>
+        <FrameworkType>None</FrameworkType>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -46,12 +46,12 @@
         <GenPackage>true</GenPackage>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <SanitizedProjectName>CSV_View_FMX</SanitizedProjectName>
-        <DCC_DcpOutput>..\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
-        <DCC_BplOutput>..\$(Platform)\$(Config)\</DCC_BplOutput>
-        <DCC_UnitSearchPath>..\$(Platform)\$(Config)\DCP;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <SanitizedProjectName>CSV_Core</SanitizedProjectName>
+        <DCC_DcpOutput>..\..\..\Bin\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_BplOutput>..\..\..\Bin\$(Platform)\$(Config)</DCC_BplOutput>
+        <DCC_UnitSearchPath>..\..\..\Bin\$(Platform)\$(Config)\DCP;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -83,12 +83,10 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="CSV.Core.dcp"/>
-        <DCCReference Include="fmx.dcp"/>
-        <DCCReference Include="Src\CSV.View.pas">
-            <Form>frmCSV</Form>
-            <FormType>fmx</FormType>
-        </DCCReference>
+        <DCCReference Include="MVVM.Core.dcp"/>
+        <DCCReference Include="Src\CSV.Interfaces.pas"/>
+        <DCCReference Include="Src\CSV.Model.pas"/>
+        <DCCReference Include="Src\CSV.ViewModel.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -107,7 +105,7 @@
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">CSV.View.FMX.dpk</Source>
+                    <Source Name="MainSource">CSV.Core.dpk</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -132,9 +130,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\Win32\Debug\CSV.View.FMX.bpl" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\CSV.Core.bpl" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteName>CSV_View_FMX.bpl</RemoteName>
+                        <RemoteName>CSV_Core.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -894,6 +892,7 @@
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

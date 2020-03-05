@@ -12,22 +12,31 @@
         <Projects Include="MVVM.FMX\MVVM.Platform.FMX.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.Core\CSV.Core.dproj">
+        <Projects Include="..\Demos\CSV\CSV.Core\CSV.Core.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj">
+        <Projects Include="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.View.VCL\CSV.View.VCL.dproj">
+        <Projects Include="..\Demos\CSV\CSV.View.VCL\CSV.View.VCL.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.View.FMX\CSV.View.FMX.dproj">
+        <Projects Include="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.VCL.Exe\App.CSV.VCL.dproj">
+        <Projects Include="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="CSV.FMX.Exe\App.CSV.FMX.dproj">
+        <Projects Include="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Demos\DataSet\DataSet.View.FMX\DataSet.View.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Demos\DataSet\DataSet.FMX.App\App.DataSet.FMX.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -66,67 +75,94 @@
         <MSBuild Projects="MVVM.FMX\MVVM.Platform.FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="CSV_Core">
-        <MSBuild Projects="CSV.Core\CSV.Core.dproj"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core\CSV.Core.dproj"/>
     </Target>
     <Target Name="CSV_Core:Clean">
-        <MSBuild Projects="CSV.Core\CSV.Core.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core\CSV.Core.dproj" Targets="Clean"/>
     </Target>
     <Target Name="CSV_Core:Make">
-        <MSBuild Projects="CSV.Core\CSV.Core.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core\CSV.Core.dproj" Targets="Make"/>
     </Target>
     <Target Name="CSV_Core_DUnitX">
-        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj"/>
     </Target>
     <Target Name="CSV_Core_DUnitX:Clean">
-        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Clean"/>
     </Target>
     <Target Name="CSV_Core_DUnitX:Make">
-        <MSBuild Projects="CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj" Targets="Make"/>
     </Target>
     <Target Name="CSV_View_VCL">
-        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.View.VCL\CSV.View.VCL.dproj"/>
     </Target>
     <Target Name="CSV_View_VCL:Clean">
-        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.View.VCL\CSV.View.VCL.dproj" Targets="Clean"/>
     </Target>
     <Target Name="CSV_View_VCL:Make">
-        <MSBuild Projects="CSV.View.VCL\CSV.View.VCL.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="CSV_View_FMX">
-        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj"/>
-    </Target>
-    <Target Name="CSV_View_FMX:Clean">
-        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="CSV_View_FMX:Make">
-        <MSBuild Projects="CSV.View.FMX\CSV.View.FMX.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.View.VCL\CSV.View.VCL.dproj" Targets="Make"/>
     </Target>
     <Target Name="App_CSV_VCL">
-        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj"/>
     </Target>
     <Target Name="App_CSV_VCL:Clean">
-        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Clean"/>
     </Target>
     <Target Name="App_CSV_VCL:Make">
-        <MSBuild Projects="CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CSV_View_FMX">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Clean">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Make">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="App_CSV_FMX">
-        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj"/>
     </Target>
     <Target Name="App_CSV_FMX:Clean">
-        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Clean"/>
     </Target>
     <Target Name="App_CSV_FMX:Make">
-        <MSBuild Projects="CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DataSet_Core">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj"/>
+    </Target>
+    <Target Name="DataSet_Core:Clean">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DataSet_Core:Make">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DataSet_View_FMX">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.View.FMX\DataSet.View.FMX.dproj"/>
+    </Target>
+    <Target Name="DataSet_View_FMX:Clean">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.View.FMX\DataSet.View.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DataSet_View_FMX:Make">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.View.FMX\DataSet.View.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="App_DataSet_FMX">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.FMX.App\App.DataSet.FMX.dproj"/>
+    </Target>
+    <Target Name="App_DataSet_FMX:Clean">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.FMX.App\App.DataSet.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="App_DataSet_FMX:Make">
+        <MSBuild Projects="..\Demos\DataSet\DataSet.FMX.App\App.DataSet.FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="MVVM_Core;MVVM_Platform_VCL;MVVM_Platform_FMX;CSV_Core;CSV_Core_DUnitX;CSV_View_VCL;CSV_View_FMX;App_CSV_VCL;App_CSV_FMX"/>
+        <CallTarget Targets="MVVM_Core;MVVM_Platform_VCL;MVVM_Platform_FMX;CSV_Core;CSV_Core_DUnitX;CSV_View_VCL;App_CSV_VCL;CSV_View_FMX;App_CSV_FMX;DataSet_Core;DataSet_View_FMX;App_DataSet_FMX"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="MVVM_Core:Clean;MVVM_Platform_VCL:Clean;MVVM_Platform_FMX:Clean;CSV_Core:Clean;CSV_Core_DUnitX:Clean;CSV_View_VCL:Clean;CSV_View_FMX:Clean;App_CSV_VCL:Clean;App_CSV_FMX:Clean"/>
+        <CallTarget Targets="MVVM_Core:Clean;MVVM_Platform_VCL:Clean;MVVM_Platform_FMX:Clean;CSV_Core:Clean;CSV_Core_DUnitX:Clean;CSV_View_VCL:Clean;App_CSV_VCL:Clean;CSV_View_FMX:Clean;App_CSV_FMX:Clean;DataSet_Core:Clean;DataSet_View_FMX:Clean;App_DataSet_FMX:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="MVVM_Core:Make;MVVM_Platform_VCL:Make;MVVM_Platform_FMX:Make;CSV_Core:Make;CSV_Core_DUnitX:Make;CSV_View_VCL:Make;CSV_View_FMX:Make;App_CSV_VCL:Make;App_CSV_FMX:Make"/>
+        <CallTarget Targets="MVVM_Core:Make;MVVM_Platform_VCL:Make;MVVM_Platform_FMX:Make;CSV_Core:Make;CSV_Core_DUnitX:Make;CSV_View_VCL:Make;App_CSV_VCL:Make;CSV_View_FMX:Make;App_CSV_FMX:Make;DataSet_Core:Make;DataSet_View_FMX:Make;App_DataSet_FMX:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -3,8 +3,11 @@ unit MVVM.Bindings;
 interface
 
 uses
-  Generics.Collections, System.Bindings.Expression, System.Bindings.Helper,
+  System.Classes,
+  Generics.Collections,
+  System.Bindings.Expression, System.Bindings.Helper,
   System.RTTI,
+
   Spring,
   Spring.Collections;
 
