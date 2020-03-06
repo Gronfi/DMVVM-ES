@@ -49,17 +49,21 @@ Objetivos:
 7. A un modelo puede estar linkado un viewmodel (o varios), y este viewmodel puede dar soporte a tantas vistas como se le enganchen
 8. La parte del view no está trabajada
 
-### Prototipo 1 (en curso)
+### Prototipo 1 (en curso, aún los fuentes visibles son del prototipo.0)
 
 Objetivos:
 1. Añadir Motor de Mensajes al sistema: analizar si es mejor que el patrón observer para el modelo
-2. Añadir bindings a listas de objetos
-3. Añadir bindings de datasets
-4. Análisis de bindings del motor de grijjy/dsharp/knockoff/Glue para ver qué ideas buenas pueden incorporarse
-5. Trabajar la parte del View
+2. Análisis de bindings del motor de grijjy/dsharp/knockoff/Glue para ver qué ideas buenas pueden incorporarse
+	a. knockoff: no hay clases especializadas ni interfaces a utilizar en cualquiera de las 3 capas, se utilizan atributos para el binding. Complejo de realizar
+	b. glue: parece incompleto, sin ejemplos completos
+	c. dsharp: aún no analizado
+	d. grijjy: parece el más completo y sencillo de entender para aplicarlo como referencia. Se echan en falta más ejemplos
+3. Integrar al core la posibilidad de distintas estrategias de binding, que se puedan registrar
+4. Integrar ideas del framework de grijjy (por suerte ellos en su blog dan permiso a utilizar su framework para elaborar otros)
 
 ### Prototipo 2
 
 Objetivos:
-1. Crear cliente REST y ver encaje al modelo, qué se puede automatizar, qué no, dificultades,...
+1. Crear cliente REST (por generalidad clientes externos a la app) y ver encaje al modelo, qué se puede automatizar, qué no, dificultades,...
+2. App tethering: encaja?
 
