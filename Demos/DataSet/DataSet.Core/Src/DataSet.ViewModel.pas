@@ -17,7 +17,7 @@ uses
 type
   TDataSet_ViewModel = class(TInterfacedObject, IDataSetFile_ViewModel)
   private
-    FBinder                   : TBindingHelper;
+    FBinder                   : TBindingHelper_V2;
     FModelo                   : IDataSetFile_Model;
   protected
     function GetFileName: String;
@@ -60,7 +60,7 @@ uses
 
 procedure TDataSet_ViewModel.Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string);
 begin
-  FBinder.Bind(AProperty, ABindToObject, ABindToProperty);
+  FBinder.Bind(Self, AProperty, ABindToObject, ABindToProperty);
 end;
 
 procedure TDataSet_ViewModel.AbrirDataSet;
@@ -72,17 +72,17 @@ end;
 
 procedure TDataSet_ViewModel.Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string);
 begin
-  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
+//  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
 end;
 
 procedure TDataSet_ViewModel.BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression: string);
 begin
-  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
+//  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
 end;
 
 procedure TDataSet_ViewModel.BindReverse(const ABindObject: TObject; const AProperty, ABindToProperty: string);
 begin
-  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
+//  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
 end;
 
 constructor TDataSet_ViewModel.Create;
@@ -90,7 +90,7 @@ var
   I: Integer;
 begin
   inherited;
-  FBinder := TBindingHelper.Create(Self);
+  FBinder := TBindingHelper_V2.Create(Self);
 end;
 
 destructor TDataSet_ViewModel.Destroy;

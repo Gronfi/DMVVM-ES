@@ -3,8 +3,13 @@ unit MVVM.Interfaces;
 interface
 
 uses
+  System.RTTI,
+  System.Bindings.Expression, System.Bindings.Helper,
+  System.Generics.Collections,
+
   Spring,
-  System.Bindings.Expression, System.Bindings.Helper;
+
+  MVVM.Types;
 
 type
   INotificationChanged = interface
@@ -21,6 +26,47 @@ type
   end;
 
   TOpcionesBinding = TBindings.TCreateOptions;
+
+  IEstrategiaBinding = interface
+    ['{84676E39-0351-4F3E-AB66-814E022014BD}']
+    function GetObjeto: TObject;
+    procedure SetObjeto(AObjeto: TObject);
+
+    procedure Start;
+
+    procedure Notify(const APropertyName: String = '');
+
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
+      const ATarget: TObject; const ATargetPropertyPath: String;
+      const ADirection: EBindDirection = EBindDirection.OneWay;
+      const AFlags: EBindFlags = [];
+      const AValueConverterClass: TBindingValueConverterClass = nil;
+      const AExtraParams: TBindExtraParams = []);
+
+    procedure ClearBindings;
+
+    property Objeto: TObject read GetObjeto write SetObjeto;
+  end;
+
+  IDataBinder = interface
+    ['{E880F234-ED85-4594-9DA5-869100B95F8B}']
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
+                   const ATarget: TObject; const ATargetPropertyPath: String;
+                   const ADirection: EBindDirection = EBindDirection.OneWay;
+                   const AFlags: EBindFlags = [];
+                   const AValueConverterClass: TBindingValueConverterClass = nil;
+                   const AEstrategiaBinding: String = '';
+                   const AExtraParams: TBindExtraParams = []);
+
+    procedure Notify(const APropertyName: String);
+  end;
+
+  IBinder = interface
+    ['{AA80417A-B7B8-4867-A310-89BDAB7FEEDD}']
+    function GetDataBinder: IDataBinder;
+
+    property DataBinder: IDataBinder read GetDataBinder;
+  end;
 
   IModel = interface
     ['{28C9B05B-A5F5-49E1-913E-2AB10F9FB8F3}']

@@ -7,6 +7,7 @@ object frmDataSetDesktop: TfrmDataSetDesktop
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
   DesignerMasterStyle = 0
   object Grid1: TGrid
     Align = Client
@@ -30,6 +31,16 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     TabOrder = 4
     Text = 'Button1'
     OnClick = Button1Click
+  end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 8
+    Position.X = 760.000000000000000000
+    Position.Y = 88.000000000000000000
+    Size.Width = 172.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    OnChange = Edit1Change
   end
   object BindingsList1: TBindingsList
     Methods = <>

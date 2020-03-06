@@ -19,7 +19,7 @@ type
   private
     { Private declarations }
     FFileName: String;
-    FBinder  : TBindingHelper;
+    FBinder  : TBindingHelper_V2;
   protected
     function GetFileName: String;
     procedure SetFileName(const AFileName: String);
@@ -64,22 +64,22 @@ end;
 
 procedure TDataSet_Model.Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string);
 begin
-    FBinder.Bind(AProperty, ABindToObject, ABindToProperty);
+    FBinder.Bind(Self, AProperty, ABindToObject, ABindToProperty);
 end;
 
 procedure TDataSet_Model.Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string);
 begin
-  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
+//  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
 end;
 
 procedure TDataSet_Model.BindReverse(const ABindObject: TObject; const AProperty, ABindToProperty: string);
 begin
-  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
+//  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
 end;
 
 procedure TDataSet_Model.BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression: string);
 begin
-  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
+//  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
 end;
 
 constructor TDataSet_Model.Create;
@@ -90,7 +90,7 @@ end;
 procedure TDataSet_Model.DataModuleCreate(Sender: TObject);
 begin
   inherited;
-  FBinder := TBindingHelper.Create(Self);
+  FBinder := TBindingHelper_V2.Create(Self);
 end;
 
 { TdmDataSet }
