@@ -1,0 +1,155 @@
+object frmCSV: TfrmCSV
+  Left = 0
+  Top = 0
+  Caption = 'FMX'
+  ClientHeight = 506
+  ClientWidth = 489
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object btNuevaVista: TButton
+    Action = DoCrearVista
+    Anchors = [akLeft, akRight, akBottom]
+    Enabled = True
+    ImageIndex = -1
+    Position.X = 8.000000000000000000
+    Position.Y = 467.000000000000000000
+    Size.Width = 473.000000000000000000
+    Size.Height = 25.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+  end
+  object btPath: TButton
+    Action = DoSelectFile
+    Anchors = [akTop, akRight]
+    Enabled = True
+    ImageIndex = -1
+    Position.X = 424.000000000000000000
+    Position.Y = 24.000000000000000000
+    Size.Width = 57.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    StyleLookup = 'searchtoolbutton'
+    TabOrder = 4
+    OnClick = btPathClick
+  end
+  object btTNP: TButton
+    Anchors = [akLeft, akRight, akBottom]
+    Position.X = 8.000000000000000000
+    Position.Y = 347.000000000000000000
+    Size.Width = 473.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = 'btTNP'
+    OnClick = btTNPClick
+  end
+  object btTP: TButton
+    Anchors = [akLeft, akRight, akBottom]
+    Position.X = 8.000000000000000000
+    Position.Y = 403.000000000000000000
+    Size.Width = 473.000000000000000000
+    Size.Height = 41.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    Text = 'btTP'
+    OnClick = btTPClick
+  end
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Text = 'Path'
+    TabOrder = 7
+    object lePath: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Anchors = [akLeft, akTop, akRight]
+      TabOrder = 0
+      Position.X = -4.000000000000000000
+      Position.Y = 16.000000000000000000
+      Size.Width = 405.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TextPrompt = 'Introduce el path'
+      OnChangeTracking = lePathChangeTracking
+    end
+  end
+  object mmInfo: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    Position.X = 8.000000000000000000
+    Position.Y = 56.000000000000000000
+    Size.Width = 473.000000000000000000
+    Size.Height = 276.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 8
+    Viewport.Width = 469.000000000000000000
+    Viewport.Height = 272.000000000000000000
+    object ShadowEffect1: TShadowEffect
+      Distance = 3.000000000000000000
+      Direction = 45.000000000000000000
+      Softness = 0.300000011920929000
+      Opacity = 0.600000023841857900
+      ShadowColor = claBlack
+    end
+  end
+  object FileOpenDialog1: TOpenDialog
+    DefaultExt = '*.csv'
+    InitialDir = 'C:\Temp'
+    Left = 440
+    Top = 64
+  end
+  object rrProgreso: TRoundRect
+    Position.X = 76.000000000000000000
+    Position.Y = 217.000000000000000000
+    Size.Width = 337.000000000000000000
+    Size.Height = 73.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    object ShadowEffect2: TShadowEffect
+      Distance = 3.000000000000000000
+      Direction = 45.000000000000000000
+      Softness = 0.300000011920929000
+      Opacity = 0.600000023841857900
+      ShadowColor = claBlack
+    end
+    object Label2: TLabel
+      Align = Top
+      Margins.Left = 20.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Right = 20.000000000000000000
+      Position.X = 20.000000000000000000
+      Position.Y = 5.000000000000000000
+      Size.Width = 297.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      Text = 'Procesamiento en curso'
+      TabOrder = 0
+    end
+    object pgBarra: TProgressBar
+      Align = VertCenter
+      Orientation = Horizontal
+      Margins.Left = 15.000000000000000000
+      Margins.Right = 15.000000000000000000
+      Position.X = 15.000000000000000000
+      Position.Y = 45.000000000000000000
+      Size.Width = 307.000000000000000000
+      Size.Height = 5.000000000000000000
+      Size.PlatformDefault = False
+    end
+  end
+  object ActionList1: TActionList
+    Left = 360
+    Top = 64
+    object DoCrearVista: TAction
+      Text = 'Crear nueva Vista'
+      OnExecute = DoCrearVistaExecute
+    end
+    object DoSelectFile: TAction
+      Text = '...'
+      OnExecute = DoSelectFileExecute
+    end
+  end
+end
