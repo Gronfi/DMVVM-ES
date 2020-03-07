@@ -25,27 +25,35 @@ type
     ['{9201E57B-98C2-4724-9D03-84E7BF15CDAE}']
   end;
 
+  IBindableAction = interface
+  ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
+    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil); overload;
+    //procedure Bind(const AExecute: TExecuteMethod<Integer>; const ACanExecute: TCanExecuteMethod = nil); overload;   //DAVID: ???
+  end;
+
   TOpcionesBinding = TBindings.TCreateOptions;
 
   IEstrategiaBinding = interface
     ['{84676E39-0351-4F3E-AB66-814E022014BD}']
-    function GetObjeto: TObject;
-    procedure SetObjeto(AObjeto: TObject);
-
     procedure Start;
 
-    procedure Notify(const APropertyName: String = '');
+    procedure Notify(const ASource: TObject; const APropertyName: String = '');
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
       const ATarget: TObject; const ATargetPropertyPath: String;
       const ADirection: EBindDirection = EBindDirection.OneWay;
       const AFlags: EBindFlags = [];
       const AValueConverterClass: TBindingValueConverterClass = nil;
-      const AExtraParams: TBindExtraParams = []);
+      const AExtraParams: TBindExtraParams = []); overload;
+    procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String;
+                   const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
+                   const AFlags: EBindFlags = [];
+                   const AExtraParams: TBindExtraParams = []); overload;
+    procedure BindAction(const AAction: IBindableAction;
+                     const AExecute: TExecuteMethod;
+                     const ACanExecute: TCanExecuteMethod = nil); overload;
 
     procedure ClearBindings;
-
-    property Objeto: TObject read GetObjeto write SetObjeto;
   end;
 
   IDataBinder = interface
@@ -56,9 +64,22 @@ type
                    const AFlags: EBindFlags = [];
                    const AValueConverterClass: TBindingValueConverterClass = nil;
                    const AEstrategiaBinding: String = '';
-                   const AExtraParams: TBindExtraParams = []);
+                   const AExtraParams: TBindExtraParams = []); overload;
+    procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String;
+                   const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
+                   const AFlags: EBindFlags = [];
+                   const AEstrategiaBinding: String = '';
+                   const AExtraParams: TBindExtraParams = []); overload;
 
-    procedure Notify(const APropertyName: String);
+    procedure BindAction(const AAction: IBindableAction;
+                         const AExecute: TExecuteMethod;
+                         const ACanExecute: TCanExecuteMethod = nil;
+                         const AEstrategiaBinding: String = ''); overload;
+//    procedure BindAction(const AAction: IBindableAction;                                     //DAVID: ???
+//                         const AExecute: TExecuteMethod<Integer>;
+//                         const ACanExecute: TCanExecuteMethod = nil); overload; inline;
+
+    procedure Notify(const AObject: TObject; const APropertyName: String);
   end;
 
   IBinder = interface

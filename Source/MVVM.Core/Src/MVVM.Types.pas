@@ -23,6 +23,9 @@ type
     TwoWay);
 
   EBindFlag = (
+    { If the text used for properties is an expression to evaluate, and not directly an expression}
+    UsesExpressions,
+
     { If you want to get notified while a property of the source object
       is changing (for example, for each character added to a TEdit).
       The source object must implement the IgoNotifyPropertyChangeTracking
@@ -76,9 +79,27 @@ type
     class function ConvertTargetToSource(const ATarget: TValue): TValue; virtual;
   end;
 
+  RSourcePair = record
+    public
+      Source: TObject;
+      Alias : String;
+  end;
+
+  TSourcePairArray = TArray<RSourcePair>;
+
   TBindingValueConverterClass = class of TBindingValueConverter;
 
   TBindExtraParams = TArray<TPair<String, String>>;
+
+  { Acciones Bindables }
+  { The type of method to invoke when an IBindableAction is executed. }
+  TExecuteMethod = procedure of Object;
+  TExecuteMethod<T> = procedure(const AArg: T) of Object;
+
+  { The type of method to invoke to check whether an IBindableAction can be
+    executed. The Enabled property of the action will be set to the result of
+    this function. }
+  TCanExecuteMethod = function: Boolean of object;
 
 implementation
 

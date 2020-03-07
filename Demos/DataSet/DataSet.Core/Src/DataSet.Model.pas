@@ -112,7 +112,7 @@ end;
 
 procedure TDataSet_Model.Notify(const APropertyName: string);
 begin
-  FBinder.Notify(APropertyName);
+  FBinder.Notify(Self, APropertyName);
 end;
 
 procedure TDataSet_Model.Open;

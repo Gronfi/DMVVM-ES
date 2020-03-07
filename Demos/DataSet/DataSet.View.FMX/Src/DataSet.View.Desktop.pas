@@ -74,7 +74,7 @@ end;
 
 procedure TfrmDataSetDesktop.Edit1Change(Sender: TObject);
 begin
-  FBinder.Notify('Text');
+  FBinder.Notify(Edit1, 'Text');
 end;
 
 procedure TfrmDataSetDesktop.RefreshData;

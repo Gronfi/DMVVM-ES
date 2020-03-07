@@ -118,7 +118,7 @@ end;
 
 procedure TDataSet_ViewModel.Notify(const APropertyName: string);
 begin
-  FBinder.Notify(APropertyName);
+  FBinder.Notify(Self, APropertyName);
 end;
 
 procedure TDataSet_ViewModel.SetFileName(const AFileName: String);
