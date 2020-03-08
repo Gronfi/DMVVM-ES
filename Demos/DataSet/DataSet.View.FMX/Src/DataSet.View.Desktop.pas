@@ -12,7 +12,11 @@ uses
 
   MVVM.Interfaces, MVVM.Bindings,
   DataSet.Interfaces, Data.Bind.DBScope, Data.DB, Datasnap.DBClient,
-  FMX.StdCtrls, FMX.Objects, FMX.Edit;
+  FMX.StdCtrls, FMX.Objects, FMX.Edit,
+
+  System.Actions, FMX.ActnList,
+
+  MVVM.Controls.Platform.FMX;
 
 type
   TfrmDataSetDesktop = class(TForm, IDataSetFile_View)
@@ -22,6 +26,9 @@ type
     LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
     Button1: TButton;
     Edit1: TEdit;
+    ActionList1: TActionList;
+    actRefresco: TAction;
+    procedure actRefrescoExecute(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Edit1Change(Sender: TObject);
@@ -47,12 +54,20 @@ uses
 
 {$R *.fmx}
 
+procedure TfrmDataSetDesktop.actRefrescoExecute(Sender: TObject);
+begin
+  RefreshData;
+end;
+
 procedure TfrmDataSetDesktop.FormCreate(Sender: TObject);
 begin
   FBinder := TBindingHelper_V2.Create(Self);
 end;
 
 procedure TfrmDataSetDesktop.AddViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
+var
+  LProc: TProc;
+  LFunc: TFunc<Boolean>;
 begin
   if FViewModel <> AViewModel then
   begin
@@ -60,6 +75,15 @@ begin
     begin
       FViewModel := AViewModel as IDataSetFile_ViewModel;
       //Bindings a capela
+      LProc := procedure
+               begin
+                 FViewModel.AbrirDataSet;
+               end;
+      LFunc := function: Boolean
+               begin
+                 Result := FViewModel.IsValidFile;
+               end;
+      actRefresco.Bind(LProc, LFunc);
       FBinder.Bind(Edit1, 'Text', TObject(FViewModel), 'FileName', EBindDirection.TwoWay, [EBindFlag.DontApply]);
       RefreshData;
     end
@@ -74,7 +98,7 @@ end;
 
 procedure TfrmDataSetDesktop.Edit1Change(Sender: TObject);
 begin
-  FBinder.Notify(Edit1, 'Text');
+  //FBinder.Notify(Edit1, 'Text');
 end;
 
 procedure TfrmDataSetDesktop.RefreshData;

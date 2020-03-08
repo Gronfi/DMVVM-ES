@@ -83,6 +83,7 @@ type
     var
       FObject                            : TObject;
       FDiccionarioEstrategias            : IDictionary<String, IEstrategiaBinding>;
+      FEstrategiaPorDefecto              : String;
       //FDiccionarioNotificacionEstrategias: IDictionary<String, IList<String>>;
   protected
     class constructor CreateC;
@@ -90,6 +91,7 @@ type
 
     function ChequeoIntegridadSeleccionBinding(const AEstrategiaBinding: String): IEstrategiaBinding;
     function GetEstrategiaPorDefecto: String; virtual;
+    procedure SetEstrategiaPorDefecto(const AValue: String); virtual;
   public
     constructor Create(AObject: TObject); virtual;
     destructor Destroy; override;
@@ -129,6 +131,7 @@ type
       const ACanExecute: TgoCanExecuteMethod = nil;
       const AEstrategiaBinding: String = ''); overload; inline;
     *)
+    property EstrategiaPorDefecto: String read GetEstrategiaPorDefecto write SetEstrategiaPorDefecto;
     class procedure RegistrarEstrategiaBinding(const AEstrategia: String; AEstrategiaBindingClass: TClass_EstrategiaBindingBase);
   end;
 
@@ -317,6 +320,7 @@ begin
   FObject                            := AObject;
   //FDiccionarioNotificacionEstrategias:= TCollections.CreateDictionary<String, IList<String>>;
   FDiccionarioEstrategias            := TCollections.CreateDictionary<String, IEstrategiaBinding>;
+  FEstrategiaPorDefecto              := '';
 end;
 
 class constructor TBindingHelper_V2.CreateC;
@@ -337,6 +341,8 @@ end;
 
 function TBindingHelper_V2.GetEstrategiaPorDefecto: String;
 begin
+  if not FEstrategiaPorDefecto.IsEmpty then
+    Exit(FEstrategiaPorDefecto);
   {$IFDEF MSWINDOWS}
     Result := CEstrategiasBasicas[EEstrategiasBasicas._LIVEBINDINGS];
   {$ENDIF}
@@ -371,6 +377,14 @@ begin
   FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia, AEstrategiaBindingClass);
 end;
 
+procedure TBindingHelper_V2.SetEstrategiaPorDefecto(const AValue: String);
+begin
+  if FEstrategiaPorDefecto <> AValue then
+  begin
+    FEstrategiaPorDefecto := AValue;
+  end;
+end;
+
 { TEstrategia_LiveBindings }
 
 procedure TEstrategia_LiveBindings.Bind(const ASource: TObject; const ASourcePropertyPath: String;
@@ -384,6 +398,8 @@ var
   lAssocInput, lAssocOutput : IScope;
   lManaged                  : TBindingExpression;
   LOptions                  : TBindings.TCreateOptions;
+  LNotifyPropertyChanged       : INotifyPropertyChanged;
+  LNotifyPropertyChangeTracking: INotifyPropertyChangeTracking;
 begin
   LOptions := [coNotifyOutput];
   if not(EBindFlag.DontApply in AFlags) then
@@ -408,6 +424,16 @@ begin
                                                 LOptions);
   FBindings.Add(LManaged);
 
+  // Settings especiales segun interfaces
+  if Supports(ASource, INotifyPropertyChanged, LNotifyPropertyChanged) then
+  begin
+    LNotifyPropertyChanged.EstrategiaBinding := Self;
+  end;
+  if Supports(ASource, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
+  begin
+    LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+  end;
+
   if ADirection = EBindDirection.TwoWay then
   begin
     LAssocInput := TBindings.CreateAssociationScope([Associate(ATarget,'Src')]);
@@ -428,6 +454,16 @@ begin
                                                   nil,
                                                   LOptions);
     FBindings.Add(LManaged);
+
+    // Settings especiales segun interfaces
+    if Supports(ATarget, INotifyPropertyChanged, LNotifyPropertyChanged) then
+    begin
+      LNotifyPropertyChanged.EstrategiaBinding := Self;
+    end;
+    if Supports(ATarget, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
+    begin
+      LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+    end;
   end;
 end;
 
@@ -442,6 +478,8 @@ var
   LOptions                  : TBindings.TCreateOptions;
   LArrayAsociacion          : array of TBindingAssociation;
   I, LCnt                   : Integer;
+  LNotifyPropertyChanged       : INotifyPropertyChanged;
+  LNotifyPropertyChangeTracking: INotifyPropertyChangeTracking;
 begin
   LOptions := [coNotifyOutput];
   if not(DontApply in AFlags) then
@@ -451,6 +489,15 @@ begin
   for I := 0 to LCnt - 1 do
   begin
     LArrayAsociacion[I] := Associate(ASources[I].Source,ASources[I].Alias);
+    // Settings especiales segun interfaces
+    if Supports(ASources[I].Source, INotifyPropertyChanged, LNotifyPropertyChanged) then
+    begin
+      LNotifyPropertyChanged.EstrategiaBinding := Self;
+    end;
+    if Supports(ASources[I].Source, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
+    begin
+      LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+    end;
   end;
 
   LAssocInput := TBindings.CreateAssociationScope(LArrayAsociacion);

@@ -22,6 +22,9 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     Viewport.Height = 404.000000000000000000
   end
   object Button1: TButton
+    Action = actRefresco
+    Enabled = True
+    ImageIndex = -1
     Position.X = 848.000000000000000000
     Position.Y = 32.000000000000000000
     Size.Width = 80.000000000000000000
@@ -29,8 +32,6 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     Size.PlatformDefault = False
     StyleLookup = 'refreshtoolbutton'
     TabOrder = 4
-    Text = 'Button1'
-    OnClick = Button1Click
   end
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -58,5 +59,13 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     ScopeMappings = <>
     Left = 40
     Top = 104
+  end
+  object ActionList1: TActionList
+    Left = 616
+    Top = 40
+    object actRefresco: TAction
+      Text = 'Refresco'
+      OnExecute = actRefrescoExecute
+    end
   end
 end

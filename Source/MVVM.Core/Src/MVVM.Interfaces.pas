@@ -21,14 +21,27 @@ type
 
   IEventNotificationChanged = IEventoNotificationChanged<INotificationChanged>;
 
-  INotificationPropertyChanged = interface(INotificationChanged)
+  IEstrategiaBinding = interface;
+
+  INotifyPropertyChanged = interface
     ['{9201E57B-98C2-4724-9D03-84E7BF15CDAE}']
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+  INotifyPropertyChangeTracking = interface
+    ['{70345AF0-199C-4E75-A7BE-5C4929E82620}']
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
   end;
 
   IBindableAction = interface
   ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
-    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil); overload;
-    //procedure Bind(const AExecute: TExecuteMethod<Integer>; const ACanExecute: TCanExecuteMethod = nil); overload;   //DAVID: ???
+    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const AEstrategiaBinding: String = ''); overload;
   end;
 
   TOpcionesBinding = TBindings.TCreateOptions;

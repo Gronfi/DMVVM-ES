@@ -3,6 +3,7 @@ unit MVVM.Types;
 interface
 
 uses
+  System.SysUtils,
   System.RTTI,
   System.Generics.Collections;
 
@@ -91,15 +92,17 @@ type
 
   TBindExtraParams = TArray<TPair<String, String>>;
 
-  { Acciones Bindables }
+  { Acciones Bindables } //DAVID: no me gusta como queda por las interfaces
+
   { The type of method to invoke when an IBindableAction is executed. }
-  TExecuteMethod = procedure of Object;
-  TExecuteMethod<T> = procedure(const AArg: T) of Object;
+  TExecuteMethod = TProc;
+  //TExecuteMethod = procedure of Object;
 
   { The type of method to invoke to check whether an IBindableAction can be
     executed. The Enabled property of the action will be set to the result of
     this function. }
-  TCanExecuteMethod = function: Boolean of object;
+  TCanExecuteMethod = TFunc<Boolean>;
+  //TCanExecuteMethod = function:Boolean of object;
 
 implementation
 

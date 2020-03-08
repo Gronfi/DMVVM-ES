@@ -85,7 +85,6 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="bindengine.dcp"/>
         <DCCReference Include="Src\MVVM.Bindings.pas"/>
-        <DCCReference Include="Src\MVVM.Classes.pas"/>
         <DCCReference Include="Src\MVVM.Interfaces.pas"/>
         <DCCReference Include="Src\MVVM.Core.pas"/>
         <DCCReference Include="Src\MVVM.Types.pas"/>
