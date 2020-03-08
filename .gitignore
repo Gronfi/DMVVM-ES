@@ -264,3 +264,10 @@
 /Demos/DataSet/DataSet.FMX.App/*.res
 /Demos/DataSet/DataSet.View.FMX/*.res
 /Demos/DataSet/DataSet.View.FMX/Src/*.vlb
+/Demos/CSV/CSV.VCL.Exe/__history
+/Demos/DataSet/DataSet.Core/Src/__history
+/Demos/DataSet/DataSet.FMX.App/__history
+/Demos/DataSet/DataSet.View.FMX/Src/__history
+/Source/MVVM.FMX/Obj/Win32/Debug/*.dcu
+/Demos/DataSet/DataSet.View.FMX/__history
+/Source/MVVM.FMX/__history
