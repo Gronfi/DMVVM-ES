@@ -8,10 +8,10 @@ uses
   System.Generics.Collections;
 
 type
-  EEstrategiasBasicas = (_RTTI,_LIVEBINDINGS);
+  EBasicStrategies = (_RTTI,_LIVEBINDINGS);
 
 const
-  CEstrategiasBasicas : array[EEstrategiasBasicas] of String = ('RTTI', 'LIVEBINDINGS');
+  CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
 
 type
   EBindDirection = (
@@ -104,6 +104,66 @@ type
   TCanExecuteMethod = TFunc<Boolean>;
   //TCanExecuteMethod = function:Boolean of object;
 
+  TCollectionChangedAction = (
+    { An item was added or inserted into the collection.
+      The following properties of the associated TgoCollectionChangedEventArgs
+      are valid: Item, ItemIndex. }
+    Add,
+
+    { An item was removed from the collection.
+      The following properties of the associated TgoCollectionChangedEventArgs
+      are valid: ItemIndex. }
+    Delete,
+
+    { The property of an item in the collection was modified.
+      This action is only fired if the items in the collection implement the
+      IgoPropertyChangedEvent interface.
+      The following properties of the associated TgoCollectionChangedEventArgs
+      are valid: Item, PropertyName. }
+    ItemChange,
+
+    { The collection was cleared.
+      None of the properties of the associated TgoCollectionChangedEventArgs
+      are valid. }
+    Clear,
+
+    { The items in the collection were rearranged (for example, sorted).
+      None of the properties of the associated TgoCollectionChangedEventArgs
+      are valid. }
+    Rearrange);
+
+  { The arguments passed to an ICollectionChangedEvent. }
+  TCollectionChangedEventArgs = record
+  {$REGION 'Internal Declarations'}
+  private
+    FAction: TCollectionChangedAction;
+    FItem: TObject;
+    FItemIndex: Integer;
+    FPropertyName: String;
+  {$ENDREGION 'Internal Declarations'}
+  public
+    constructor Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
+
+    { The action that caused the event. The availability of the other properties
+      depends on this action. }
+    property Action: TCollectionChangedAction read FAction;
+
+    { The item in the collection to which the action applies.
+      Is only valid for the Add and ItemChange actions.
+      Will be nil for all other actions. }
+    property Item: TObject read FItem;
+
+    { The index of the item in the collection to which the action applies.
+      Is only valid for the Add and Delete actions.
+      Will be -1 for all other actions. }
+    property ItemIndex: Integer read FItemIndex;
+
+    { The name of the property of Item whose value has changed.
+      Is only valid for the ItemChange action.
+      Will be an empty string for all other actions. }
+    property PropertyName: String read FPropertyName;
+  end;
+
 implementation
 
 { TBindingValueConverter }
@@ -111,6 +171,16 @@ implementation
 class function TBindingValueConverter.ConvertTargetToSource(const ATarget: TValue): TValue;
 begin
   Result := ATarget;
+end;
+
+{ TCollectionChangedEventArgs }
+
+constructor TCollectionChangedEventArgs.Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
+begin
+  FAction := AAction;
+  FItem := AItem;
+  FItemIndex := AItemIndex;
+  FPropertyName := APropertyName;
 end;
 
 end.

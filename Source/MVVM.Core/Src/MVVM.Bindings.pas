@@ -15,14 +15,15 @@ uses
   MVVM.Types;
 
 type
-  TEstrategiaBindingBase = class abstract(TInterfacedObject, IEstrategiaBinding)
+  TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   public
     constructor Create; virtual;
     destructor Destroy; override;
 
     procedure Start; virtual;
 
-    procedure Notify(const AObject: TObject; const APropertyName: String = ''); virtual; abstract;
+    procedure Notify(const AObject: TObject; const APropertyName: String = ''); overload; virtual; abstract;
+    procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
       const ATarget: TObject; const ATargetPropertyPath: String;
@@ -41,9 +42,9 @@ type
     procedure ClearBindings; virtual; abstract;
   end;
 
-  TClass_EstrategiaBindingBase = class of TEstrategiaBindingBase;
+  TClass_BindingStrategyBase = class of TBindingStrategyBase;
 
-  TEstrategia_LiveBindings = class(TEstrategiaBindingBase)
+  TEstrategia_LiveBindings = class(TBindingStrategyBase)
   protected
     type
       TExpressionList = TObjectList<TBindingExpression>;
@@ -55,7 +56,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
 
-    procedure Notify(const AObject: TObject; const APropertyName: string = ''); override;
+    procedure Notify(const AObject: TObject; const APropertyName: string = ''); overload; override;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
       const ATarget: TObject; const ATargetPropertyPath: String;
@@ -78,18 +79,18 @@ type
   TBindingHelper_V2 = class(TInterfacedObject, IDataBinder)
   private
     class var
-      FDiccionarioEstrategiasBinding: IDictionary<String, TClass_EstrategiaBindingBase>;
+      FDiccionarioEstrategiasBinding: IDictionary<String, TClass_BindingStrategyBase>;
   private
     var
       FObject                            : TObject;
-      FDiccionarioEstrategias            : IDictionary<String, IEstrategiaBinding>;
+      FDiccionarioEstrategias            : IDictionary<String, IBindingStrategy>;
       FEstrategiaPorDefecto              : String;
       //FDiccionarioNotificacionEstrategias: IDictionary<String, IList<String>>;
   protected
     class constructor CreateC;
     class destructor DestroyC;
 
-    function ChequeoIntegridadSeleccionBinding(const AEstrategiaBinding: String): IEstrategiaBinding;
+    function ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
     function GetEstrategiaPorDefecto: String; virtual;
     procedure SetEstrategiaPorDefecto(const AValue: String); virtual;
   public
@@ -101,38 +102,39 @@ type
                    const ADirection: EBindDirection = EBindDirection.OneWay;
                    const AFlags: EBindFlags = [];
                    const AValueConverterClass: TBindingValueConverterClass = nil;
-                   const AEstrategiaBinding: String = '';
+                   const ABindingStrategy: String = '';
                    const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String;
                const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                const AFlags: EBindFlags = [];
-               const AEstrategiaBinding: String = '';
+               const ABindingStrategy: String = '';
                const AExtraParams: TBindExtraParams = []); overload;
 
     procedure BindAction(const AAction: IBindableAction;
                          const AExecute: TExecuteMethod;
                          const ACanExecute: TCanExecuteMethod = nil;
-                         const AEstrategiaBinding: String = ''); overload; inline;
+                         const ABindingStrategy: String = ''); overload; inline;
 
-    procedure Notify(const AObject: TObject; const APropertyName: String);
+    procedure Notify(const AObject: TObject; const APropertyName: String); overload; virtual;
+    procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
     (*
     procedure BindCollection<T: class>(const ACollection: IEnumerable<T>;
       const ATarget: IgoCollectionViewProvider;
       const ATemplate: TgoDataTemplateClass;
-      const AEstrategiaBinding: String = '');
+      const ABindingStrategy: String = '');
 
     procedure BindAction(const AAction: IgoBindableAction;
       const AExecute: TgoExecuteMethod;
       const ACanExecute: TgoCanExecuteMethod = nil;
-      const AEstrategiaBinding: String = ''); overload; inline;
+      const ABindingStrategy: String = ''); overload; inline;
     procedure BindAction(const AAction: IgoBindableAction;
       const AExecute: TgoExecuteMethod<Integer>;
       const ACanExecute: TgoCanExecuteMethod = nil;
-      const AEstrategiaBinding: String = ''); overload; inline;
+      const ABindingStrategy: String = ''); overload; inline;
     *)
     property EstrategiaPorDefecto: String read GetEstrategiaPorDefecto write SetEstrategiaPorDefecto;
-    class procedure RegistrarEstrategiaBinding(const AEstrategia: String; AEstrategiaBindingClass: TClass_EstrategiaBindingBase);
+    class procedure RegistrarBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
   end;
 
   (*
@@ -261,12 +263,12 @@ procedure TBindingHelper_V2.Bind(const ASource: TObject; const ASourcePropertyPa
                                  const ADirection: EBindDirection;
                                  const AFlags: EBindFlags;
                                  const AValueConverterClass: TBindingValueConverterClass;
-                                 const AEstrategiaBinding: String;
+                                 const ABindingStrategy: String;
                                  const AExtraParams: TBindExtraParams);
 var
-  LEstrategia: IEstrategiaBinding;
+  LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(AEstrategiaBinding);
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.Bind(ASource,
                    ASourcePropertyPath, ATarget,
                    ATargetPropertyPath, ADirection,
@@ -278,33 +280,33 @@ end;
 procedure TBindingHelper_V2.Bind(const ASources: TSourcePairArray; const ASourceExpresion: String;
                                  const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                                  const AFlags: EBindFlags;
-                                 const AEstrategiaBinding: String;
+                                 const ABindingStrategy: String;
                                  const AExtraParams: TBindExtraParams);
 var
-  LEstrategia: IEstrategiaBinding;
+  LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(AEstrategiaBinding);
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.Bind(ASources, ASourceExpresion,
                    ATarget, ATargetAlias, ATargetPropertyPath,
                    AFlags,
                    AExtraParams);
 end;
 
-procedure TBindingHelper_V2.BindAction(const AAction: IBindableAction; const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod; const AEstrategiaBinding: String);
+procedure TBindingHelper_V2.BindAction(const AAction: IBindableAction; const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
 var
-  LEstrategia: IEstrategiaBinding;
+  LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(AEstrategiaBinding);
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.BindAction(AAction, AExecute, ACanExecute);
 end;
 
-function TBindingHelper_V2.ChequeoIntegridadSeleccionBinding(const AEstrategiaBinding: String): IEstrategiaBinding;
+function TBindingHelper_V2.ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
 var
   LMetodo    : String;
 begin
-  if AEstrategiaBinding.IsEmpty then
+  if ABindingStrategy.IsEmpty then
     LMetodo := GetEstrategiaPorDefecto
-  else LMetodo := AEstrategiaBinding;
+  else LMetodo := ABindingStrategy;
   // Integridad
   Guard.CheckTrue(FDiccionarioEstrategiasBinding.ContainsKey(LMetodo), 'Estrategia de binding no registrada: ' + LMetodo);
   if not FDiccionarioEstrategias.TryGetValue(LMetodo, Result) then
@@ -319,13 +321,13 @@ begin
   inherited Create;
   FObject                            := AObject;
   //FDiccionarioNotificacionEstrategias:= TCollections.CreateDictionary<String, IList<String>>;
-  FDiccionarioEstrategias            := TCollections.CreateDictionary<String, IEstrategiaBinding>;
+  FDiccionarioEstrategias            := TCollections.CreateDictionary<String, IBindingStrategy>;
   FEstrategiaPorDefecto              := '';
 end;
 
 class constructor TBindingHelper_V2.CreateC;
 begin
-  FDiccionarioEstrategiasBinding := TCollections.CreateDictionary<String, TClass_EstrategiaBindingBase>;
+  FDiccionarioEstrategiasBinding := TCollections.CreateDictionary<String, TClass_BindingStrategyBase>;
 end;
 
 destructor TBindingHelper_V2.Destroy;
@@ -344,7 +346,7 @@ begin
   if not FEstrategiaPorDefecto.IsEmpty then
     Exit(FEstrategiaPorDefecto);
   {$IFDEF MSWINDOWS}
-    Result := CEstrategiasBasicas[EEstrategiasBasicas._LIVEBINDINGS];
+    Result := CBasicStrategies[EBasicStrategies._LIVEBINDINGS];
   {$ENDIF}
   {$IFDEF LINUX}
     Result := CEstrategiasBasicas[EEstrategiasBasicas._RTTI];
@@ -360,21 +362,25 @@ begin
   {$ENDIF}
 end;
 
-procedure TBindingHelper_V2.Notify(const AObject: TObject; const APropertyName: String);
+procedure TBindingHelper_V2.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
 var
-  //LLista     : IList<String>;
   LEstrategia: String;
 begin
-  //if FDiccionarioNotificacionEstrategias.TryGetValue(APropertyName, LLista) then
-  //begin
-    for LEstrategia in FDiccionarioEstrategias.Keys do
-      FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertyName);
-  //end;
+  for LEstrategia in FDiccionarioEstrategias.Keys do
+    FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertiesNames);
 end;
 
-class procedure TBindingHelper_V2.RegistrarEstrategiaBinding(const AEstrategia: String; AEstrategiaBindingClass: TClass_EstrategiaBindingBase);
+procedure TBindingHelper_V2.Notify(const AObject: TObject; const APropertyName: String);
+var
+  LEstrategia: String;
 begin
-  FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia, AEstrategiaBindingClass);
+  for LEstrategia in FDiccionarioEstrategias.Keys do
+    FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertyName);
+end;
+
+class procedure TBindingHelper_V2.RegistrarBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
+begin
+  FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia, ABindingStrategyClass);
 end;
 
 procedure TBindingHelper_V2.SetEstrategiaPorDefecto(const AValue: String);
@@ -427,11 +433,11 @@ begin
   // Settings especiales segun interfaces
   if Supports(ASource, INotifyPropertyChanged, LNotifyPropertyChanged) then
   begin
-    LNotifyPropertyChanged.EstrategiaBinding := Self;
+    LNotifyPropertyChanged.BindingStrategy := Self;
   end;
   if Supports(ASource, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
   begin
-    LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+    LNotifyPropertyChangeTracking.BindingStrategy := Self;
   end;
 
   if ADirection = EBindDirection.TwoWay then
@@ -458,11 +464,11 @@ begin
     // Settings especiales segun interfaces
     if Supports(ATarget, INotifyPropertyChanged, LNotifyPropertyChanged) then
     begin
-      LNotifyPropertyChanged.EstrategiaBinding := Self;
+      LNotifyPropertyChanged.BindingStrategy := Self;
     end;
     if Supports(ATarget, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
     begin
-      LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+      LNotifyPropertyChangeTracking.BindingStrategy := Self;
     end;
   end;
 end;
@@ -492,11 +498,11 @@ begin
     // Settings especiales segun interfaces
     if Supports(ASources[I].Source, INotifyPropertyChanged, LNotifyPropertyChanged) then
     begin
-      LNotifyPropertyChanged.EstrategiaBinding := Self;
+      LNotifyPropertyChanged.BindingStrategy := Self;
     end;
     if Supports(ASources[I].Source, INotifyPropertyChangeTracking, LNotifyPropertyChangeTracking) then
     begin
-      LNotifyPropertyChangeTracking.EstrategiaBinding := Self;
+      LNotifyPropertyChangeTracking.BindingStrategy := Self;
     end;
   end;
 
@@ -546,25 +552,33 @@ begin
   TBindings.Notify(AObject, APropertyName);
 end;
 
-{ TEstrategiaBindingBase }
+{ TBindingStrategyBase }
 
-constructor TEstrategiaBindingBase.Create;
+constructor TBindingStrategyBase.Create;
 begin
   inherited;
 end;
 
-destructor TEstrategiaBindingBase.Destroy;
+destructor TBindingStrategyBase.Destroy;
 begin
   inherited;
 end;
 
-procedure TEstrategiaBindingBase.Start;
+procedure TBindingStrategyBase.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
+var
+  LValue: String;
+begin
+  for LValue in APropertiesNames do
+    Notify(AObject, LValue);
+end;
+
+procedure TBindingStrategyBase.Start;
 begin
   ;
 end;
 
 initialization
 
-TBindingHelper_V2.RegistrarEstrategiaBinding(CEstrategiasBasicas[EEstrategiasBasicas._LIVEBINDINGS], TEstrategia_LiveBindings);
+TBindingHelper_V2.RegistrarBindingStrategy(CBasicStrategies[EBasicStrategies._LIVEBINDINGS], TEstrategia_LiveBindings);
 
 end.

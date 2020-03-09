@@ -67,7 +67,8 @@ procedure TDataSet_ViewModel.AbrirDataSet;
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   if not FModelo.DataSet.Active then
-    FModelo.Open;
+    if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
+      FModelo.Open;
 end;
 
 procedure TDataSet_ViewModel.Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string);

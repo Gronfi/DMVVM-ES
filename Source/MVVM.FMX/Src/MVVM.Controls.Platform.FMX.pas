@@ -5,6 +5,8 @@ interface
 uses
   System.Rtti,
   System.Classes,
+
+  FMX.Forms,
   FMX.Controls.Model,
   FMX.StdCtrls,
   FMX.Edit,
@@ -169,6 +171,247 @@ type
   end;
 {$ENDREGION 'FMX.ComboEdit'}
 
+{$REGION 'FMX.Colors'}
+type
+  { TColorPanel with support for light-weight two-way data binding.
+    Supports property changed notifications for: Color }
+  TColorPanel = class(FMX.Colors.TColorPanel, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FOrigOnChange: TNotifyEvent;
+    FEstrategiaBinding: IEstrategiaBinding;
+  private
+    procedure HandleOnChange(Sender: TObject);
+  protected
+    procedure Loaded; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TComboColorBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Color }
+  TComboColorBox = class(FMX.Colors.TComboColorBox, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoColorChange(Sender: TObject); override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TColorListBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Color }
+  TColorListBox = class(FMX.Colors.TColorListBox, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoChange; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TColorComboBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Color }
+  TColorComboBox = class(FMX.Colors.TColorComboBox, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoChange; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { THueTrackBar with support for light-weight two-way data binding.
+    Supports property changed notifications for: Value }
+  THueTrackBar = class(FMX.Colors.THueTrackBar, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoChanged; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TAlphaTrackBar with support for light-weight two-way data binding.
+    Supports property changed notifications for: Value }
+  TAlphaTrackBar = class(FMX.Colors.TAlphaTrackBar, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoChanged; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TBWTrackBar with support for light-weight two-way data binding.
+    Supports property changed notifications for: Value }
+  TBWTrackBar = class(FMX.Colors.TBWTrackBar, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoChanged; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+{$ENDREGION 'FMX.Colors'}
+
+{$REGION 'FMX.DateTimeCtrls'}
+type
+  { TTimeEdit with support for light-weight two-way data binding.
+    Supports property changed notifications for: Time }
+  TTimeEdit = class(FMX.DateTimeCtrls.TTimeEdit, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoDateTimeChanged; override;
+    procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+
+type
+  { TDateEdit with support for light-weight two-way data binding.
+    Supports property changed notifications for: Date }
+  TDateEdit = class(FMX.DateTimeCtrls.TDateEdit, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    procedure DoDateTimeChanged; override;
+    procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+{$ENDREGION 'FMX.DateTimeCtrls'}
+
+{$REGION 'FMX.SpinBox'}
+type
+  { TSpinBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Value }
+  TSpinBox = class(FMX.SpinBox.TSpinBox, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    function DefineModelClass: TDataModelClass; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+{$ENDREGION 'FMX.SpinBox'}
+
+{$REGION 'FMX.NumberBox'}
+type
+  { TNumberBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Value }
+  TNumberBox = class(FMX.NumberBox.TNumberBox, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+  protected
+    function DefineModelClass: TDataModelClass; override;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+{$ENDREGION 'FMX.NumberBox'}
+
+{$REGION 'FMX.ListBox'}
+type
+  { TListBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: ItemIndex, Selected, SelectedItem.
+    NOTE: When used with data binding, the TListBoxItem.Data property is used
+          to store the associated object. }
+  TListBox = class(FMX.ListBox.TListBox, ICollectionViewProvider, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IEstrategiaBinding;
+    FView: ICollectionView;
+
+    function GetSelectedItem: TObject; inline;
+    procedure SetSelectedItem(const Value: TObject);
+  private
+    procedure DoSelectionChanged;
+    function FindListBoxItem(const AItem: TObject): Integer;
+  protected
+    procedure DoChange; override;
+  protected
+    { IgoCollectionViewProvider }
+    function GetCollectionView: ICollectionView;
+  protected
+    function GetEstrategiaBinding: IEstrategiaBinding;
+    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    { Destructor }
+    destructor Destroy; override;
+
+    procedure Clear; override;
+
+    { The object that is associated with the selected item, or nil if there is
+      no item selected or there is no object associated with the selected item.
+      The associated object is the object in the TListBoxItem.Data property. }
+    property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
+    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+  end;
+{$ENDREGION 'FMX.ListBox'}
+
+
 implementation
 
 type
@@ -190,6 +433,15 @@ type
     procedure DoChangeTracking; override;
   end;
 
+  TBindableSpinBoxModel = class(TSpinBoxModel)
+  protected
+    procedure DoChange; override;
+  end;
+
+  TBindableNumberBoxModel = class(TNumberBoxModel)
+  protected
+    procedure DoChange; override;
+  end;
 
 { TAction }
 
@@ -460,6 +712,369 @@ begin
     if Assigned(LComboEdit.FEstrategiaBinding) then
       LComboEdit.FEstrategiaBinding.Notify(LComboEdit, 'Text');
   end;
+end;
+
+{ TColorPanel }
+
+function TColorPanel.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TColorPanel.HandleOnChange(Sender: TObject);
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Color');
+
+  if Assigned(FOrigOnChange) then
+    FOrigOnChange(Sender);
+end;
+
+procedure TColorPanel.Loaded;
+begin
+  inherited;
+  FOrigOnChange := OnChange;
+  OnChange      := HandleOnChange;
+end;
+
+procedure TColorPanel.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TComboColorBox }
+
+procedure TComboColorBox.DoColorChange(Sender: TObject);
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Color');
+  inherited;
+end;
+
+function TComboColorBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TComboColorBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TColorListBox }
+
+procedure TColorListBox.DoChange;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Color');
+  inherited;
+end;
+
+function TColorListBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TColorListBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TColorComboBox }
+
+procedure TColorComboBox.DoChange;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Color');
+  inherited;
+end;
+
+function TColorComboBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TColorComboBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ THueTrackBar }
+
+procedure THueTrackBar.DoChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Value');
+  inherited;
+end;
+
+function THueTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure THueTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TAlphaTrackBar }
+
+procedure TAlphaTrackBar.DoChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Value');
+  inherited;
+end;
+
+function TAlphaTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TAlphaTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TBWTrackBar }
+
+procedure TBWTrackBar.DoChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Value');
+  inherited;
+end;
+
+function TBWTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TBWTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TTimeEdit }
+
+procedure TTimeEdit.DoDateTimeChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Time');
+  inherited;
+end;
+
+function TTimeEdit.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TTimeEdit.HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime);
+begin
+  { This method can be called from an OS specific picker (on iOS and Android).
+    FMX does not protect those with the usual try..except block.
+    So we do that here to make sure the application doesn't crash when an
+    exception occurs in this method. }
+  try
+    inherited;
+  except
+    Application.HandleException(Self);
+  end;
+end;
+
+procedure TTimeEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TDateEdit }
+
+procedure TDateEdit.DoDateTimeChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Date');
+  inherited;
+end;
+
+function TDateEdit.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TDateEdit.HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime);
+begin
+  { This method can be called from an OS specific picker (on iOS and Android).
+    FMX does not protect those with the usual try..except block.
+    So we do that here to make sure the application doesn't crash when an
+    exception occurs in this method. }
+  try
+    inherited;
+  except
+    Application.HandleException(Self);
+  end;
+end;
+
+procedure TDateEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TSpinBox }
+
+function TSpinBox.DefineModelClass: TDataModelClass;
+begin
+  Result := TBindableSpinBoxModel;
+end;
+
+function TSpinBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TSpinBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TBindableSpinBoxModel }
+
+procedure TBindableSpinBoxModel.DoChange;
+var
+  Owner   : TComponent;
+  LSpinBox: TSpinBox absolute Owner;
+begin
+  Owner := Self.Owner; // Strong reference
+  if (Owner <> nil) then
+  begin
+    Assert(Owner is TSpinBox);
+    if Assigned(LSpinBox.FEstrategiaBinding) then
+      LSpinBox.FEstrategiaBinding.Notify(LSpinBox, 'Value');
+  end;
+  inherited;
+end;
+
+{ TNumberBox }
+
+function TNumberBox.DefineModelClass: TDataModelClass;
+begin
+  Result := TBindableNumberBoxModel;
+end;
+
+function TNumberBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TNumberBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TBindableNumberBoxModel }
+
+procedure TBindableNumberBoxModel.DoChange;
+var
+  Owner: TComponent;
+  LNumberBox: TNumberBox absolute Owner;
+begin
+  Owner := Self.Owner; // Strong reference
+  if (Owner <> nil) then
+  begin
+    Assert(Owner is TNumberBox);
+    if Assigned(LNumberBox.FEstrategiaBinding) then
+      LNumberBox.FEstrategiaBinding.Notify(LNumberBox, 'Value');
+  end;
+  inherited;
+end;
+
+{ TListBox }
+
+procedure TListBox.Clear;
+begin
+  if (Count > 0) then
+  begin
+    inherited;
+    DoSelectionChanged;
+  end;
+end;
+
+destructor TListBox.Destroy;
+begin
+  FView := nil;
+  inherited;
+end;
+
+procedure TListBox.DoChange;
+begin
+  DoSelectionChanged;
+  inherited;
+end;
+
+procedure TListBox.DoSelectionChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, ['ItemIndex', 'Selected', 'SelectedItem']);
+end;
+
+function TListBox.FindListBoxItem(const AItem: TObject): Integer;
+var
+  Item: TListBoxItem;
+  I: Integer;
+begin
+  for I := 0 to Count - 1 do
+  begin
+    Item := ItemByIndex(I);
+    if (Item.Data = AItem) then
+      Exit(I);
+  end;
+
+  Result := -1;
+end;
+
+function TListBox.GetCollectionView: ICollectionView;
+begin
+  if (FView = nil) then
+    FView := TListBoxCollectionView.Create(Self);
+  Result := FView;
+end;
+
+function TListBox.GetEstrategiaBinding: IEstrategiaBinding;
+begin
+  Result := FEstrategiaBinding
+end;
+
+function TListBox.GetSelectedItem: TObject;
+var
+  Sel: TListBoxItem;
+begin
+  Sel := Selected;
+  if Assigned(Sel) then
+    Result := Sel.Data
+  else
+    Result := nil;
+end;
+
+procedure TListBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+procedure TListBox.SetSelectedItem(const Value: TObject);
+begin
+  ItemIndex := FindListBoxItem(Value);
 end;
 
 end.
