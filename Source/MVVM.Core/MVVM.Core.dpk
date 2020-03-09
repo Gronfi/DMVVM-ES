@@ -33,8 +33,11 @@ requires
 
 contains
   MVVM.Bindings in 'Src\MVVM.Bindings.pas',
-  MVVM.Classes in 'Src\MVVM.Classes.pas',
   MVVM.Interfaces in 'Src\MVVM.Interfaces.pas',
-  MVVM.Core in 'Src\MVVM.Core.pas';
+  MVVM.Core in 'Src\MVVM.Core.pas',
+  MVVM.Types in 'Src\MVVM.Types.pas',
+  MVVM.Bindings.Collections in 'Src\MVVM.Bindings.Collections.pas',
+  MVVM.Classes in 'Src\MVVM.Classes.pas',
+  MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas';
 
 end.

@@ -10,9 +10,13 @@ uses
   Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
   FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid,
 
-  MVVM.Interfaces,
+  MVVM.Interfaces, MVVM.Bindings,
   DataSet.Interfaces, Data.Bind.DBScope, Data.DB, Datasnap.DBClient,
-  FMX.StdCtrls;
+  FMX.StdCtrls, FMX.Objects, FMX.Edit,
+
+  System.Actions, FMX.ActnList,
+
+  MVVM.Controls.Platform.FMX;
 
 type
   TfrmDataSetDesktop = class(TForm, IDataSetFile_View)
@@ -21,10 +25,17 @@ type
     BindSourceDB1: TBindSourceDB;
     LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
     Button1: TButton;
+    Edit1: TEdit;
+    ActionList1: TActionList;
+    actRefresco: TAction;
+    procedure actRefrescoExecute(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Edit1Change(Sender: TObject);
   private
     { Private declarations }
     FViewModel: IDataSetFile_ViewModel;
+    FBinder   : TBindingHelper_V2;
   public
     { Public declarations }
     procedure RefreshData;
@@ -38,11 +49,25 @@ var
 implementation
 
 uses
+  MVVM.Types,
   Data.Bind.DBLinks;
 
 {$R *.fmx}
 
+procedure TfrmDataSetDesktop.actRefrescoExecute(Sender: TObject);
+begin
+  RefreshData;
+end;
+
+procedure TfrmDataSetDesktop.FormCreate(Sender: TObject);
+begin
+  FBinder := TBindingHelper_V2.Create(Self);
+end;
+
 procedure TfrmDataSetDesktop.AddViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
+var
+  LProc: TProc;
+  LFunc: TFunc<Boolean>;
 begin
   if FViewModel <> AViewModel then
   begin
@@ -50,6 +75,16 @@ begin
     begin
       FViewModel := AViewModel as IDataSetFile_ViewModel;
       //Bindings a capela
+      LProc := procedure
+               begin
+                 FViewModel.AbrirDataSet;
+               end;
+      LFunc := function: Boolean
+               begin
+                 Result := FViewModel.IsValidFile;
+               end;
+      actRefresco.Bind(LProc, LFunc);
+      FBinder.Bind(Edit1, 'Text', TObject(FViewModel), 'FileName', EBindDirection.TwoWay, [EBindFlag.DontApply]);
       RefreshData;
     end
     else raise Exception.Create('No casan las interfaces');
@@ -59,6 +94,11 @@ end;
 procedure TfrmDataSetDesktop.Button1Click(Sender: TObject);
 begin
   RefreshData;
+end;
+
+procedure TfrmDataSetDesktop.Edit1Change(Sender: TObject);
+begin
+  //FBinder.Notify(Edit1, 'Text');
 end;
 
 procedure TfrmDataSetDesktop.RefreshData;

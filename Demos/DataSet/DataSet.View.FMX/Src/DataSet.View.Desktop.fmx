@@ -7,6 +7,7 @@ object frmDataSetDesktop: TfrmDataSetDesktop
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
   DesignerMasterStyle = 0
   object Grid1: TGrid
     Align = Client
@@ -21,6 +22,9 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     Viewport.Height = 404.000000000000000000
   end
   object Button1: TButton
+    Action = actRefresco
+    Enabled = True
+    ImageIndex = -1
     Position.X = 848.000000000000000000
     Position.Y = 32.000000000000000000
     Size.Width = 80.000000000000000000
@@ -28,8 +32,16 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     Size.PlatformDefault = False
     StyleLookup = 'refreshtoolbutton'
     TabOrder = 4
-    Text = 'Button1'
-    OnClick = Button1Click
+  end
+  object Edit1: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 8
+    Position.X = 760.000000000000000000
+    Position.Y = 88.000000000000000000
+    Size.Width = 172.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    OnChange = Edit1Change
   end
   object BindingsList1: TBindingsList
     Methods = <>
@@ -47,5 +59,13 @@ object frmDataSetDesktop: TfrmDataSetDesktop
     ScopeMappings = <>
     Left = 40
     Top = 104
+  end
+  object ActionList1: TActionList
+    Left = 616
+    Top = 40
+    object actRefresco: TAction
+      Text = 'Refresco'
+      OnExecute = actRefrescoExecute
+    end
   end
 end
