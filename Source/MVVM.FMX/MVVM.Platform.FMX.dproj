@@ -85,7 +85,7 @@
         </DelphiCompile>
         <DCCReference Include="MVVM.Core.dcp"/>
         <DCCReference Include="FMX.dcp"/>
-        <DCCReference Include="Src\MVVM.Servicios.Platform.FMX.pas"/>
+        <DCCReference Include="Src\MVVM.Services.Platform.FMX.pas"/>
         <DCCReference Include="Src\MVVM.Controls.Platform.FMX.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

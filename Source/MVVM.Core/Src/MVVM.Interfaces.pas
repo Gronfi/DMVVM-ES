@@ -14,12 +14,18 @@ uses
   MVVM.Types;
 
 type
+  IPlatformServices = interface
+    ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
+    function MessageDlg(const ATitle: string; const AText: String): Boolean;
+    function IsMainThreadUI: Boolean;
+  end;
+
   IObject = interface
     ['{61A3454D-3B58-4CDE-83AE-4C3E73732977}']
     function GetAsObject: TObject;
   end;
 
-  IMessage = interface
+  IMessage = interface(IObject)
     ['{8C6AE8E2-B18D-41B4-AAED-88CF3B110F1D}']
     function GetCreationDateTime: TDateTime;
     procedure Queue;
@@ -27,20 +33,20 @@ type
     property CreationDateTime: TDateTime read GetCreationDateTime;
   end;
 
+  TNotifyMessage = procedure (AMessage: IMessage) of Object;
+
   TListenerFilter = reference to function (AMessage: IMessage): Boolean;
 
-  IMessageListener = interface
+  IMessageListener = interface(IObject)
     ['{ABC992B0-4CB4-470A-BDCE-EBE6651C84DD}']
-    function GetIsMainThreadListener: boolean;
-    //function GetTypeRestriction: TMensajeTypeRestriction;
+    function GetIsCodeToExecuteInUIMainThread: boolean;
+    procedure SetIsCodeToExecuteInUIMainThread(const AValue: boolean);
+
+    function GetTypeRestriction: EMessageTypeRestriction;
+    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
+
     function GetListenerFilter: TListenerFilter;
-
-    procedure SetIsMainThreadListener(const AValue: boolean);
-    //procedure SetTypeRestriction(const ATypeRestriction: TMensajeTypeRestriction);
     procedure SetListenerFilter(const AFilter: TListenerFilter);
-
-    //function GetDefaultCallUIThread: boolean;
-    //function GetDefaultTypeRestriction: TMensajeTypeRestriction;
 
     function GetMensajeClass: TClass;
 
@@ -49,10 +55,11 @@ type
     procedure Register;
     procedure UnRegister;
 
-    procedure OnNewMessage(AMessage: IMessage);
+    procedure NewMessage(AMessage: IMessage);
 
     property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
-    property IsMainThreadListener: boolean read GetIsMainThreadListener write SetIsMainThreadListener;
+    property IsCodeToExecuteInUIMainThread: boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
+    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
   end;
 
   INotificationChanged = interface
@@ -84,7 +91,7 @@ type
 
   ICollectionSource = IEnumerable<TObject>;
 
-  ICollectionChangedEvent = IgoMultiCastEvent<TgoCollectionChangedEventArgs>;
+  //ICollectionChangedEvent = IgoMultiCastEvent<TgoCollectionChangedEventArgs>;
 
   INotifyCollectionChanged = interface
   ['{1E5FE0CA-B5B2-4F07-B881-FC99971716C6}']
@@ -99,7 +106,7 @@ type
 
       The implementor must invoke this event when the collection or an item
       in the collection has changed. }
-    function GetCollectionChangedEvent: ICollectionChangedEvent;
+    //function GetCollectionChangedEvent: ICollectionChangedEvent; DAVID
   end;
 
   { Abstract base template class that defines the mapping between properties of
@@ -156,6 +163,8 @@ type
 
       Returns -1 by default. }
     class function GetImageIndex(const AItem: TObject): Integer; virtual;
+
+    class function GetStyle(const AItem: TObject): string; virtual;
   end;
 
   TDataTemplateClass = class of TDataTemplate;
@@ -224,6 +233,9 @@ type
                    const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                    const AFlags: EBindFlags = [];
                    const AExtraParams: TBindExtraParams = []); overload;
+    procedure BindCollection<T: class>(const ACollection: TEnumerable<T>;
+                                       const ATarget: ICollectionViewProvider;
+                                       const ATemplate: TDataTemplateClass);
     procedure BindAction(const AAction: IBindableAction;
                      const AExecute: TExecuteMethod;
                      const ACanExecute: TCanExecuteMethod = nil); overload;
@@ -245,6 +257,10 @@ type
                    const AFlags: EBindFlags = [];
                    const ABindingStrategy: String = '';
                    const AExtraParams: TBindExtraParams = []); overload;
+    procedure BindCollection<T: class>(const ACollection: TEnumerable<T>;
+                                       const ATarget: ICollectionViewProvider;
+                                       const ATemplate: TDataTemplateClass;
+                                       const ABindingStrategy: String = '');
 
     procedure BindAction(const AAction: IBindableAction;
                          const AExecute: TExecuteMethod;
@@ -318,6 +334,11 @@ end;
 class function TDataTemplate.GetImageIndex(const AItem: TObject): Integer;
 begin
   Result := -1;
+end;
+
+class function TDataTemplate.GetStyle(const AItem: TObject): string;
+begin
+  Result := '';
 end;
 
 end.

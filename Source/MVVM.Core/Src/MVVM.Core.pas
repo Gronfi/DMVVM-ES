@@ -3,42 +3,108 @@ unit MVVM.Core;
 interface
 
 uses
-  Spring;
+  System.SysUtils,
+
+  Spring,
+  Spring.Container,
+
+  MVVM.Interfaces,
+  MVVM.Types;
 
 type
-  IServicioDialogo = interface
-    ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
-    function MessageDlg(const ATitulo: string; const ATexto: String): Boolean;
-  end;
-
-  TServicioDialogoBase = class abstract(TInterfacedObject, IServicioDialogo)
+  TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
+    function IsMainThreadUI: Boolean; virtual; abstract;
   end;
 
-  TServicioDialogoClass = class of TServicioDialogoBase;
+  TPlatformServicesClass = class of TPlatformServicesBase;
 
   MVVMCore = record
   private
-    class var FServicioDialogoClass: TServicioDialogoClass;
+    class var FPlatformServicesClass: TPlatformServicesClass;
+    class var FContainer: TContainer;
+    var
+      FEstrategia
+
+    class constructor CreateC;
+    class destructor DestroyC;
   public
-    class procedure RegistrarServicioDialogo(AServicioClass: TServicioDialogoClass); static;
-    class function ServicioDialogo: IServicioDialogo; static;
+    class procedure RegisterPlatformServices(AServicioClass: TPlatformServicesClass); static;
+    class function PlatformServices: IPlatformServices; static;
+    class function Container: TContainer; static;
+    class procedure InitializationDone; static;
+    class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode); overload; static;
   end;
 
 implementation
 
+uses
+  System.Classes,
+  System.Threading;
+
 { MVVM }
 
-class procedure MVVMCore.RegistrarServicioDialogo(AServicioClass: TServicioDialogoClass);
+class function MVVMCore.Container: TContainer;
 begin
-  FServicioDialogoClass := AServicioClass;
+  Result := FContainer;
 end;
 
-class function MVVMCore.ServicioDialogo: IServicioDialogo;
+class constructor MVVMCore.CreateC;
 begin
-  Spring.Guard.CheckNotNull(FServicioDialogoClass, 'No hay registrado ningun servicio para el dialogo');
-  Result := FServicioDialogoClass.Create;
+  FContainer := TContainer.Create;
+end;
+
+class procedure MVVMCore.DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode);
+begin
+  case AExecutionMode of
+    medQueue:
+      begin
+        TThread.Queue(TThread.CurrentThread, procedure
+                                             begin
+                                               AProc(AData);
+                                             end);
+      end;
+    medSynchronize:
+      begin
+        TThread.Synchronize(TThread.CurrentThread, procedure
+                                                   begin
+                                                     AProc(AData)
+                                                   end);
+      end;
+    medNewTask:
+      begin
+        TTask.Create(procedure
+                     begin
+                       AProc(AData)
+                     end).Start;
+      end;
+    medNormal:
+      begin
+        AProc(AData);
+      end;
+  end;
+end;
+
+class destructor MVVMCore.DestroyC;
+begin
+  FContainer.Free;
+end;
+
+class procedure MVVMCore.InitializationDone;
+begin
+  FContainer.Build;
+end;
+
+class procedure MVVMCore.RegisterPlatformServices(AServicioClass: TPlatformServicesClass);
+begin
+  FPlatformServicesClass := AServicioClass;
+end;
+
+class function MVVMCore.PlatformServices: IPlatformServices;
+begin
+  Spring.Guard.CheckNotNull(FPlatformServicesClass, 'No hay registrado ningun servicio para la plataforma');
+  Result := FPlatformServicesClass.Create;
 end;
 
 end.

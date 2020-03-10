@@ -1,4 +1,4 @@
-unit MVVM.Servicios.Platform.FMX;
+unit MVVM.Services.Platform.FMX;
 
 interface
 
@@ -6,9 +6,10 @@ uses
   MVVM.Core;
 
 type
-  TFMXServicioDialogo = class(TServicioDialogoBase)
+  TFMXPlatformServices = class(TPlatformServicesBase)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; override;
+    function IsMainThreadUI: Boolean; override;
   end;
 
   procedure InitializePlatform;
@@ -16,12 +17,19 @@ type
 implementation
 
 uses
+  FMX.Forms,
   FMX.Dialogs,
+  System.Classes,
   System.UITypes;
 
 { TFMXServicioDialogo }
 
-function TFMXServicioDialogo.MessageDlg(const ATitulo, ATexto: String): Boolean;
+function TFMXPlatformServices.IsMainThreadUI: Boolean;
+begin
+  Result :=  TThread.Current.ThreadID = MainThreadID;
+end;
+
+function TFMXPlatformServices.MessageDlg(const ATitulo, ATexto: String): Boolean;
 begin
   Result := FMX.Dialogs.MessageDlg(ATitulo, TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes
 end;
@@ -32,6 +40,6 @@ begin
 end;
 
 initialization
-  MVVMCore.RegistrarServicioDialogo(TFMXServicioDialogo);
+  MVVMCore.RegisterPlatformServices(TFMXPlatformServices);
 
 end.

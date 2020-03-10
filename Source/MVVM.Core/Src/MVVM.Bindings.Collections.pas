@@ -103,6 +103,9 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 { TCollectionView }
 
 procedure TCollectionView.AddItemsToView;
@@ -162,14 +165,14 @@ begin
 end;
 
 procedure TCollectionView.SetSource(AValue: ICollectionSource);
-var
-  NCC: INotifyCollectionChanged;
+//var
+//  NCC: INotifyCollectionChanged;
 begin
   if (AValue <> FSource) then
   begin
     { Unsubscribe from collection changed event of old source. }
-    if Assigned(FSource) and (Supports(FSource, INotifyCollectionChanged, NCC)) then
-      NCC.GetCollectionChangedEvent.Remove(CollectionChanged);
+//    if Assigned(FSource) and (Supports(FSource, INotifyCollectionChanged, NCC)) then
+//      NCC.GetCollectionChangedEvent.Remove(CollectionChanged);
 
     FSource := AValue;
     if Assigned(FTemplate) then
@@ -179,19 +182,35 @@ begin
     end;
 
     { Subscribe to collection changed event of new source. }
-    if Assigned(FSource) and (Supports(FSource, IgoNotifyCollectionChanged, NCC)) then
-      NCC.GetCollectionChangedEvent.Add(CollectionChanged);
+//    if Assigned(FSource) and (Supports(FSource, IgoNotifyCollectionChanged, NCC)) then
+//      NCC.GetCollectionChangedEvent.Add(CollectionChanged);
   end;
 end;
 
 procedure TCollectionView.SetTemplate(const AValue: TDataTemplateClass);
+var
+  PrevTemplate: TDataTemplateClass;
 begin
-
+  if (AValue <> FTemplate) then
+  begin
+    PrevTemplate := FTemplate;
+    FTemplate := AValue;
+    if Assigned(FTemplate) and Assigned(FSource) then
+    begin
+      if Assigned(PrevTemplate) then
+        UpdateItemsInView
+      else
+      begin
+        ClearItemsInView;
+        AddItemsToView;
+      end;
+    end;
+  end;
 end;
 
 procedure TCollectionView.UpdateItemsInView;
 begin
-
+  Assert(False);
 end;
 
 end.

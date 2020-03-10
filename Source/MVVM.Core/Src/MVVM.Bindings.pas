@@ -35,6 +35,9 @@ type
                    const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                    const AFlags: EBindFlags = [];
                    const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
+    procedure BindCollection<T: class>(const ACollection: TEnumerable<T>;
+                                       const ATarget: ICollectionViewProvider;
+                                       const ATemplate: TDataTemplateClass); virtual; abstract;
     procedure BindAction(const AAction: IBindableAction;
                      const AExecute: TExecuteMethod;
                      const ACanExecute: TCanExecuteMethod = nil); overload; virtual; abstract;
@@ -68,6 +71,9 @@ type
                    const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                    const AFlags: EBindFlags = [];
                    const AExtraParams: TBindExtraParams = []); overload; override;
+    procedure BindCollection<T: class>(const ACollection: TEnumerable<T>;
+                                       const ATarget: ICollectionViewProvider;
+                                       const ATemplate: TDataTemplateClass); override;
     procedure BindAction(const AAction: IBindableAction;
                      const AExecute: TExecuteMethod;
                      const ACanExecute: TCanExecuteMethod = nil); overload; override;
@@ -85,7 +91,6 @@ type
       FObject                            : TObject;
       FDiccionarioEstrategias            : IDictionary<String, IBindingStrategy>;
       FEstrategiaPorDefecto              : String;
-      //FDiccionarioNotificacionEstrategias: IDictionary<String, IList<String>>;
   protected
     class constructor CreateC;
     class destructor DestroyC;
@@ -109,7 +114,10 @@ type
                const AFlags: EBindFlags = [];
                const ABindingStrategy: String = '';
                const AExtraParams: TBindExtraParams = []); overload;
-
+    procedure BindCollection<T: class>(const ACollection: TEnumerable<T>;
+                                       const ATarget: ICollectionViewProvider;
+                                       const ATemplate: TDataTemplateClass;
+                                       const ABindingStrategy: String = '');
     procedure BindAction(const AAction: IBindableAction;
                          const AExecute: TExecuteMethod;
                          const ACanExecute: TCanExecuteMethod = nil;
@@ -298,6 +306,14 @@ var
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.BindAction(AAction, AExecute, ACanExecute);
+end;
+
+procedure TBindingHelper_V2.BindCollection<T>(const ACollection: TEnumerable<T>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia.BindCollection<T>(ACollection, ATarget, ATemplate);
 end;
 
 function TBindingHelper_V2.ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
@@ -523,6 +539,11 @@ procedure TEstrategia_LiveBindings.BindAction(const AAction: IBindableAction; co
 begin
   Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) no puede ser null');
   AAction.Bind(AExecute, ACanExecute);
+end;
+
+procedure TEstrategia_LiveBindings.BindCollection<T>(const ACollection: TEnumerable<T>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+begin
+  // DAVID
 end;
 
 procedure TEstrategia_LiveBindings.ClearBindings;

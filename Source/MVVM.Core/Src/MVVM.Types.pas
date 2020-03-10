@@ -164,6 +164,10 @@ type
     property PropertyName: String read FPropertyName;
   end;
 
+  EMessageTypeRestriction = (mtrAllowDescendants, mtrDefinedTypeOnly);
+
+  EDelegatedExecutionMode = (medQueue, medSynchronize, medNewTask, medNormal);
+
 implementation
 
 { TBindingValueConverter }

@@ -6,7 +6,6 @@ uses
   System.Rtti,
   System.Classes,
 
-  FMX.Forms,
   FMX.Controls.Model,
   FMX.StdCtrls,
   FMX.Edit,
@@ -20,6 +19,7 @@ uses
   FMX.ListView,
   FMX.Objects,
   FMX.ActnList,
+  FMX.TreeView,
 
   MVVM.Interfaces,
   MVVM.Types;
@@ -32,17 +32,17 @@ type
   {$REGION 'Internal Declarations'}
   private
     FOrigOnChange     : TNotifyEvent;
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   private
     procedure HandleOnChange(Sender: TObject);
   protected
     procedure Loaded; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
   { TTrackBar with support for light-weight two-way data binding.
@@ -50,15 +50,15 @@ type
   TTrackBar = class(FMX.StdCtrls.TTrackBar, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChanged; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
   { TSwitch with support for light-weight two-way data binding.
@@ -66,15 +66,15 @@ type
   TSwitch = class(FMX.StdCtrls.TSwitch, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoSwitch; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
   { TArcDial with support for light-weight two-way data binding.
@@ -82,15 +82,15 @@ type
   TArcDial = class(FMX.StdCtrls.TArcDial, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure AfterChangedProc(Sender: TObject); override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.StdCtrls'}
 
@@ -119,15 +119,15 @@ type
   TEdit = class(FMX.Edit.TEdit, INotifyPropertyChanged, INotifyPropertyChangeTracking)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.Edit'}
 
@@ -139,15 +139,15 @@ type
   TMemo = class(FMX.Memo.TMemo, INotifyPropertyChanged, INotifyPropertyChangeTracking)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.Memo'}
 
@@ -159,15 +159,15 @@ type
   TComboEdit = class(FMX.ComboEdit.TComboEdit, INotifyPropertyChanged, INotifyPropertyChangeTracking)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.ComboEdit'}
 
@@ -179,17 +179,17 @@ type
   {$REGION 'Internal Declarations'}
   private
     FOrigOnChange: TNotifyEvent;
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   private
     procedure HandleOnChange(Sender: TObject);
   protected
     procedure Loaded; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -198,15 +198,15 @@ type
   TComboColorBox = class(FMX.Colors.TComboColorBox, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoColorChange(Sender: TObject); override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -215,15 +215,15 @@ type
   TColorListBox = class(FMX.Colors.TColorListBox, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChange; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -232,15 +232,15 @@ type
   TColorComboBox = class(FMX.Colors.TColorComboBox, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChange; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -249,15 +249,15 @@ type
   THueTrackBar = class(FMX.Colors.THueTrackBar, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChanged; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -266,15 +266,15 @@ type
   TAlphaTrackBar = class(FMX.Colors.TAlphaTrackBar, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChanged; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -283,15 +283,15 @@ type
   TBWTrackBar = class(FMX.Colors.TBWTrackBar, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoChanged; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.Colors'}
 
@@ -302,16 +302,16 @@ type
   TTimeEdit = class(FMX.DateTimeCtrls.TTimeEdit, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoDateTimeChanged; override;
     procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
 type
@@ -320,16 +320,16 @@ type
   TDateEdit = class(FMX.DateTimeCtrls.TDateEdit, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     procedure DoDateTimeChanged; override;
     procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.DateTimeCtrls'}
 
@@ -340,15 +340,15 @@ type
   TSpinBox = class(FMX.SpinBox.TSpinBox, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.SpinBox'}
 
@@ -359,15 +359,15 @@ type
   TNumberBox = class(FMX.NumberBox.TNumberBox, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.NumberBox'}
 
@@ -380,7 +380,7 @@ type
   TListBox = class(FMX.ListBox.TListBox, ICollectionViewProvider, INotifyPropertyChanged)
   {$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IEstrategiaBinding;
+    FEstrategiaBinding: IBindingStrategy;
     FView: ICollectionView;
 
     function GetSelectedItem: TObject; inline;
@@ -394,8 +394,8 @@ type
     { IgoCollectionViewProvider }
     function GetCollectionView: ICollectionView;
   protected
-    function GetEstrategiaBinding: IEstrategiaBinding;
-    procedure SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
   {$ENDREGION 'Internal Declarations'}
   public
     { Destructor }
@@ -407,12 +407,147 @@ type
       no item selected or there is no object associated with the selected item.
       The associated object is the object in the TListBoxItem.Data property. }
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property EstrategiaBinding: IEstrategiaBinding read GetEstrategiaBinding write SetEstrategiaBinding;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION 'FMX.ListBox'}
 
+{$REGION 'FMX.ListView'}
+  { TListView with support for light-weight two-way data binding.
+    Supports property changed notifications for: ItemIndex, Selected, SelectedItem
+    NOTE: When used with data binding, the TListViewItem.Tag property is used
+          to store the associated object. This is an unsafe reference, so you
+          must make sure that the associated objects are available for the
+          lifetime of the list view. }
+  TListView = class(FMX.ListView.TListView, ICollectionViewProvider, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IBindingStrategy;
+    FView: ICollectionView;
+    function GetSelectedItem: TObject; inline;
+    procedure SetSelectedItem(const Value: TObject);
+  private
+    function FindListViewItem(const AItem: TObject): Integer;
+  protected
+    procedure DoChange; override;
+  protected
+    { IgoCollectionViewProvider }
+    function GetCollectionView: ICollectionView;
+  protected
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    { Destructor }
+    destructor Destroy; override;
+
+    { The object that is associated with the selected item, or nil if there is
+      no item selected or there is no object associated with the selected item.
+      The associated object is the object in the TListViewItem.Tag property.
+      This is an unsafe reference, so you must make sure that the associated
+      objects are available for the lifetime of the list view. }
+    property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+  end;
+{$ENDREGION 'FMX.ListView'}
+
+{$REGION 'FMX.Objects'}
+type
+  { TImage with support for light-weight two-way data binding.
+    Supports property changed notifications for: Bitmap }
+  TImage = class(FMX.Objects.TImage, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IBindingStrategy;
+  protected
+    procedure DoChanged; override;
+  protected
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+  {$ENDREGION 'Internal Declarations'}
+  public
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+  end;
+{$ENDREGION 'FMX.Objects'}
+
+{$REGION 'FMX.TreeView'}
+type
+  TTreeView = class(Fmx.TreeView.TTreeView, ICollectionViewProvider, INotifyPropertyChanged)
+  {$REGION 'Internal Declarations'}
+  private
+    FEstrategiaBinding: IBindingStrategy;
+    FView: ICollectionView;
+    FOnChanged_ : TNotifyEvent;
+    function GetSelectedNode: TObject; inline;
+    procedure SetSelectedNode(const Value: TObject);
+  private
+    function FindTreeNode(const AItem: TObject): TTreeViewItem;
+  protected
+    procedure Loaded; override;
+    procedure Change( Sender: TObject);
+    procedure DoSelectNode(Node: TTreeViewItem; Selected: Boolean);
+  protected
+    { IgoCollectionViewProvider }
+    function GetCollectionView: ICollectionView;
+  protected
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+  protected
+  {$ENDREGION 'Internal Declarations'}
+  public
+    { Destructor }
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+
+    { The object that is associated with the selected item, or nil if there is
+      no item selected or there is no object associated with the selected item.
+      The associated object is the object in the TListItem.Data property. }
+    property SelectedNode: TObject read GetSelectedNode write SetSelectedNode;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+  end;
+{$ENDREGION 'FMX.TreeView'}
+
+{$REGION 'FMX.ComboBox'}
+
+  { TComboBox with support for light-weight two-way data binding.
+    Supports property changed notifications for: Text
+    Supports property changing notifications for: Text
+    NOTE: Both PropertyChanged and PropertyChangeTracking notifications are
+    fired for each individual keypress. }
+  TComboBox = class(Fmx.ListBox.TComboBox, INotifyPropertyChanged,  ICollectionViewProvider, INotifyPropertyChangeTracking)
+  {$REGION 'Internal Declarations'}
+  private
+    FView             : ICollectionView;
+    FEstrategiaBinding: IBindingStrategy;
+
+    FSelectedItem: TObject;
+    function GetSelectedItem: TObject; inline;
+    procedure SetSelectedItem(const Value: TObject);
+  protected
+    FChanged_: TNotifyEvent;
+    procedure Loaded; override;
+    procedure Change (Sender: TObject);
+  protected
+    function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+
+    function GetCollectionView: ICollectionView;
+  {$ENDREGION 'Internal Declarations'}
+  public
+    { Destructor }
+    destructor Destroy; override;
+    property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
+    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+  end;
+{$ENDREGION 'FMX.ComboBox'}
 
 implementation
+
+uses
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.ListView.Appearances,
+
+  MVVM.Bindings.Collections;
 
 type
   TBindableEditModel = class(TCustomEditModel)
@@ -441,6 +576,76 @@ type
   TBindableNumberBoxModel = class(TNumberBoxModel)
   protected
     procedure DoChange; override;
+  end;
+
+  TListBoxCollectionView = class(TCollectionView)
+  private
+    [weak] FListBox: TListBox;
+  private
+    procedure UpdateListBoxItem(const AListBoxItem: TListBoxItem;
+      const AItem: TObject);
+  protected
+    procedure ClearItemsInView; override;
+    procedure BeginUpdateView; override;
+    procedure EndUpdateView; override;
+    procedure AddItemToView(const AItem: TObject); override;
+    procedure DeleteItemFromView(const AItemIndex: Integer); override;
+    procedure UpdateItemInView(const AItem: TObject;
+      const APropertyName: String); override;
+    procedure UpdateAllItemsInView; override;
+  public
+    constructor Create(const AListBox: TListBox);
+  end;
+
+  TListViewCollectionView = class(TCollectionView)
+  private
+    [weak] FListView: TListView;
+  private
+    procedure UpdateListViewItem(const AListViewItem: TListViewItem; const AItem: TObject);
+  protected
+    procedure ClearItemsInView; override;
+    procedure BeginUpdateView; override;
+    procedure EndUpdateView; override;
+    procedure AddItemToView(const AItem: TObject); override;
+    procedure DeleteItemFromView(const AItemIndex: Integer); override;
+    procedure UpdateItemInView(const AItem: TObject; const APropertyName: String); override;
+    procedure UpdateAllItemsInView; override;
+  public
+    constructor Create(const AListView: TListView);
+  end;
+
+  TTreeViewCollectionView = class(TCollectionView)
+  private
+    FTreeView: TTreeView;
+  private
+    procedure UpdateTreeNode(const ATreeViewItem: TTreeViewItem; const AItem: TObject);
+  protected
+    procedure ClearItemsInView; override;
+    procedure BeginUpdateView; override;
+    procedure EndUpdateView; override;
+    procedure AddItemToView(const AItem: TObject); override;
+    procedure DeleteItemFromView(const AItemIndex: Integer); override;
+    procedure UpdateItemInView(const AItem: TObject;
+      const APropertyName: String); override;
+    procedure UpdateAllItemsInView; override;
+  public
+    constructor Create(const ATreeView: TTreeView);
+  end;
+
+  TComboBoxCollectionView = class(TCollectionView)
+  private
+    FComboBox: TComboBox;
+  protected
+    procedure ClearItemsInView; override;
+    procedure BeginUpdateView; override;
+    procedure EndUpdateView; override;
+    procedure AddItemToView(const AItem: TObject); override;
+    procedure DeleteItemFromView(const AItemIndex: Integer); override;
+    procedure UpdateItemInView(const AItem: TObject;
+      const APropertyName: String); override;
+    procedure UpdateAllItemsInView; override;
+  public
+    constructor Create(const AComboBox: TComboBox);
   end;
 
 { TAction }
@@ -477,7 +682,7 @@ end;
 
 { TCheckBox }
 
-function TCheckBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TCheckBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
@@ -498,7 +703,7 @@ begin
   OnChange      := HandleOnChange;
 end;
 
-procedure TCheckBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TCheckBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -513,12 +718,12 @@ begin
   inherited;
 end;
 
-function TTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+function TTrackBar.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -533,12 +738,12 @@ begin
   inherited;
 end;
 
-function TSwitch.GetEstrategiaBinding: IEstrategiaBinding;
+function TSwitch.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TSwitch.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TSwitch.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -553,12 +758,12 @@ begin
   inherited;
 end;
 
-function TArcDial.GetEstrategiaBinding: IEstrategiaBinding;
+function TArcDial.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TArcDial.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TArcDial.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -571,12 +776,12 @@ begin
   Result := TBindableEditModel;
 end;
 
-function TEdit.GetEstrategiaBinding: IEstrategiaBinding;
+function TEdit.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -621,12 +826,12 @@ begin
   Result := TBindableMemoModel;
 end;
 
-function TMemo.GetEstrategiaBinding: IEstrategiaBinding;
+function TMemo.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TMemo.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TMemo.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -671,12 +876,12 @@ begin
   Result := TBindableComboEditModel;
 end;
 
-function TComboEdit.GetEstrategiaBinding: IEstrategiaBinding;
+function TComboEdit.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TComboEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TComboEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -716,7 +921,7 @@ end;
 
 { TColorPanel }
 
-function TColorPanel.GetEstrategiaBinding: IEstrategiaBinding;
+function TColorPanel.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
@@ -737,7 +942,7 @@ begin
   OnChange      := HandleOnChange;
 end;
 
-procedure TColorPanel.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TColorPanel.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -752,12 +957,12 @@ begin
   inherited;
 end;
 
-function TComboColorBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TComboColorBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TComboColorBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TComboColorBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -772,12 +977,12 @@ begin
   inherited;
 end;
 
-function TColorListBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TColorListBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TColorListBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TColorListBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -792,12 +997,12 @@ begin
   inherited;
 end;
 
-function TColorComboBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TColorComboBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TColorComboBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TColorComboBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -812,12 +1017,12 @@ begin
   inherited;
 end;
 
-function THueTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+function THueTrackBar.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure THueTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure THueTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -832,12 +1037,12 @@ begin
   inherited;
 end;
 
-function TAlphaTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+function TAlphaTrackBar.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TAlphaTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TAlphaTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -852,12 +1057,12 @@ begin
   inherited;
 end;
 
-function TBWTrackBar.GetEstrategiaBinding: IEstrategiaBinding;
+function TBWTrackBar.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TBWTrackBar.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TBWTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -872,7 +1077,7 @@ begin
   inherited;
 end;
 
-function TTimeEdit.GetEstrategiaBinding: IEstrategiaBinding;
+function TTimeEdit.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
@@ -890,7 +1095,7 @@ begin
   end;
 end;
 
-procedure TTimeEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TTimeEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -905,7 +1110,7 @@ begin
   inherited;
 end;
 
-function TDateEdit.GetEstrategiaBinding: IEstrategiaBinding;
+function TDateEdit.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
@@ -923,7 +1128,7 @@ begin
   end;
 end;
 
-procedure TDateEdit.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TDateEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -936,12 +1141,12 @@ begin
   Result := TBindableSpinBoxModel;
 end;
 
-function TSpinBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TSpinBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TSpinBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TSpinBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -971,12 +1176,12 @@ begin
   Result := TBindableNumberBoxModel;
 end;
 
-function TNumberBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TNumberBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
 
-procedure TNumberBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TNumberBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -1050,7 +1255,7 @@ begin
   Result := FView;
 end;
 
-function TListBox.GetEstrategiaBinding: IEstrategiaBinding;
+function TListBox.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FEstrategiaBinding
 end;
@@ -1066,7 +1271,7 @@ begin
     Result := nil;
 end;
 
-procedure TListBox.SetEstrategiaBinding(AEstrategiaBinding: IEstrategiaBinding);
+procedure TListBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
   if FEstrategiaBinding <> AEstrategiaBinding then
     FEstrategiaBinding := AEstrategiaBinding;
@@ -1075,6 +1280,350 @@ end;
 procedure TListBox.SetSelectedItem(const Value: TObject);
 begin
   ItemIndex := FindListBoxItem(Value);
+end;
+
+{ TListBoxCollectionView }
+
+procedure TListBoxCollectionView.AddItemToView(const AItem: TObject);
+var
+  ListBox: TListBox;
+  ListBoxItem: TListBoxItem;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+  begin
+    ListBoxItem := TListBoxItem.Create(ListBox);
+    UpdateListBoxItem(ListBoxItem, AItem);
+    ListBox.AddObject(ListBoxItem);
+  end;
+end;
+
+procedure TListBoxCollectionView.BeginUpdateView;
+var
+  ListBox: TListBox;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+    ListBox.BeginUpdate;
+end;
+
+procedure TListBoxCollectionView.ClearItemsInView;
+var
+  ListBox: TListBox;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+    ListBox.Clear;
+end;
+
+constructor TListBoxCollectionView.Create(const AListBox: TListBox);
+begin
+  Assert(Assigned(AListBox));
+  inherited Create;
+  FListBox := AListBox;
+end;
+
+procedure TListBoxCollectionView.DeleteItemFromView(const AItemIndex: Integer);
+var
+  ListBox: TListBox;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+    ListBox.Items.Delete(AItemIndex);
+end;
+
+procedure TListBoxCollectionView.EndUpdateView;
+var
+  ListBox: TListBox;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+    ListBox.EndUpdate;
+end;
+
+procedure TListBoxCollectionView.UpdateAllItemsInView;
+var
+  ListBox: TListBox;
+  Item: TObject;
+  ListBoxItem: TListBoxItem;
+  Index: Integer;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+  begin
+    Index := 0;
+    for Item in Source do
+    begin
+      ListBoxItem := ListBox.ItemByIndex(Index);
+      UpdateListBoxItem(ListBoxItem, Item);
+      Inc(Index);
+    end;
+  end;
+end;
+
+procedure TListBoxCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+var
+  ListBox: TListBox;
+  Index: Integer;
+begin
+  ListBox := FListBox; // Strong reference
+  if Assigned(ListBox) then
+  begin
+    Index := ListBox.FindListBoxItem(AItem);
+    if (Index >= 0) then
+      UpdateListBoxItem(ListBox.ItemByIndex(Index), AItem);
+  end;
+end;
+
+procedure TListBoxCollectionView.UpdateListBoxItem(const AListBoxItem: TListBoxItem; const AItem: TObject);
+begin
+  AListBoxItem.ItemData.Text   := Template.GetTitle(AItem);
+  AListBoxItem.ItemData.Detail := Template.GetDetail(AItem);
+  AListBoxItem.ImageIndex      := Template.GetImageIndex(AItem);
+  AListBoxItem.Data            := AItem;
+  AListBoxItem.StyleLookup     := Template.GetStyle(AItem);
+end;
+
+{ TListView }
+
+destructor TListView.Destroy;
+begin
+  FView := nil;
+  inherited;
+end;
+
+procedure TListView.DoChange;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, ['ItemIndex', 'Selected', 'SelectedItem']);
+end;
+
+function TListView.FindListViewItem(const AItem: TObject): Integer;
+var
+  I: Integer;
+  Item: TListViewItem;
+begin
+  for I := 0 to ItemCount - 1 do
+  begin
+    Item := Items[I];
+    if (Item.Tag = NativeInt(AItem)) then
+      Exit(I);
+  end;
+  Result := -1;
+end;
+
+function TListView.GetBindingStrategy: IBindingStrategy;
+begin
+  Result := FEstrategiaBinding
+end;
+
+function TListView.GetCollectionView: ICollectionView;
+begin
+  if (FView = nil) then
+    FView := TListViewCollectionView.Create(Self);
+  Result := FView;
+end;
+
+function TListView.GetSelectedItem: TObject;
+var
+  Sel: TListViewItem;
+begin
+  Sel := TListViewItem(Selected);
+  if Assigned(Sel) then
+    Result := TObject(Sel.Tag)
+  else
+    Result := nil;
+end;
+
+procedure TListView.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+procedure TListView.SetSelectedItem(const Value: TObject);
+begin
+  ItemIndex := FindListViewItem(Value);
+end;
+
+{ TListViewCollectionView }
+
+procedure TListViewCollectionView.AddItemToView(const AItem: TObject);
+var
+  ListView: TListView;
+  ListViewItem: TListViewItem;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+  begin
+    ListViewItem := ListView.Items.Add;
+    UpdateListViewItem(ListViewItem, AItem);
+  end;
+end;
+
+procedure TListViewCollectionView.BeginUpdateView;
+var
+  ListView: TListView;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+    ListView.BeginUpdate;
+end;
+
+procedure TListViewCollectionView.ClearItemsInView;
+var
+  ListView: TListView;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+    ListView.Items.Clear;
+end;
+
+constructor TListViewCollectionView.Create(const AListView: TListView);
+begin
+  Assert(Assigned(AListView));
+  inherited Create;
+  FListView := AListView;
+end;
+
+procedure TListViewCollectionView.DeleteItemFromView(const AItemIndex: Integer);
+var
+  ListView: TListView;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+    ListView.DeleteItem(AItemIndex);
+end;
+
+procedure TListViewCollectionView.EndUpdateView;
+var
+  ListView: TListView;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+    ListView.EndUpdate;
+end;
+
+procedure TListViewCollectionView.UpdateAllItemsInView;
+var
+  ListView: TListView;
+  Item: TObject;
+  ListViewItem: TListViewItem;
+  Index: Integer;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+  begin
+    Index := 0;
+    for Item in Source do
+    begin
+      ListViewItem := ListView.Items[Index];
+      UpdateListViewItem(ListViewItem, Item);
+      Inc(Index);
+    end;
+  end;
+end;
+
+procedure TListViewCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+var
+  ListView: TListView;
+  Index: Integer;
+begin
+  ListView := FListView; // Strong reference
+  if Assigned(ListView) then
+  begin
+    Index := ListView.FindListViewItem(AItem);
+    if (Index >= 0) then
+      UpdateListViewItem(ListView.Items[Index], AItem);
+  end;
+end;
+
+procedure TListViewCollectionView.UpdateListViewItem(const AListViewItem: TListViewItem; const AItem: TObject);
+begin
+  AListViewItem.Text := Template.GetTitle(AItem);
+  AListViewItem.Detail := Template.GetDetail(AItem);
+  AListViewItem.ImageIndex := Template.GetImageIndex(AItem);
+  AListViewItem.Tag := NativeInt(AItem);
+end;
+
+{ TImage }
+
+procedure TImage.DoChanged;
+begin
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Bitmap');
+  inherited;
+end;
+
+function TImage.GetBindingStrategy: IBindingStrategy;
+begin
+  Result := FEstrategiaBinding
+end;
+
+procedure TImage.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+begin
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
+end;
+
+{ TTreeView }
+
+procedure TTreeView.Change(Sender: TObject);
+begin
+
+end;
+
+constructor TTreeView.Create(AOwner: TComponent);
+begin
+  inherited;
+
+end;
+
+destructor TTreeView.Destroy;
+begin
+
+  inherited;
+end;
+
+procedure TTreeView.DoSelectNode(Node: TTreeViewItem; Selected: Boolean);
+begin
+
+end;
+
+function TTreeView.FindTreeNode(const AItem: TObject): TTreeViewItem;
+begin
+
+end;
+
+function TTreeView.GetBindingStrategy: IBindingStrategy;
+begin
+
+end;
+
+function TTreeView.GetCollectionView: ICollectionView;
+begin
+
+end;
+
+function TTreeView.GetSelectedNode: TObject;
+begin
+
+end;
+
+procedure TTreeView.Loaded;
+begin
+  inherited;
+
+end;
+
+procedure TTreeView.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+begin
+
+end;
+
+procedure TTreeView.SetSelectedNode(const Value: TObject);
+begin
+
 end;
 
 end.

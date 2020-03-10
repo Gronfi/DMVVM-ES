@@ -47,7 +47,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
         <SanitizedProjectName>MVVM_Core</SanitizedProjectName>
-        <DCC_UnitSearchPath>..\..\Bin\$(Platform)\$(Config)\DCP;..\..\ThirdParty\Spring4D\;..\..\ThirdParty\Spring4D\Base;..\..\ThirdParty\Spring4D\Base\Collections;..\..\ThirdParty\Spring4D\Core;..\..\ThirdParty\Spring4D\Core\Container;..\..\ThirdParty\Spring4D\Core\Services;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\Bin\$(Platform)\$(Config)\DCP;..\..\ThirdParty\Spring4D\;..\..\ThirdParty\Spring4D\Base;..\..\ThirdParty\Spring4D\Base\Collections;..\..\ThirdParty\Spring4D\Core;..\..\ThirdParty\Spring4D\Core\Container;..\..\ThirdParty\Spring4D\Core\Services;..\..\ThirdParty\Spring4D\Base\Logging;..\..\ThirdParty\Spring4D\Core\Logging;..\..\ThirdParty\Spring4D\Base\Patterns;..\..\ThirdParty\Spring4D\Core\Interception;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DcpOutput>..\..\Bin\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
@@ -91,6 +91,7 @@
         <DCCReference Include="Src\MVVM.Bindings.Collections.pas"/>
         <DCCReference Include="Src\MVVM.Classes.pas"/>
         <DCCReference Include="Src\MVVM.Messages.Engine.pas"/>
+        <DCCReference Include="Src\MVVM.Utils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
