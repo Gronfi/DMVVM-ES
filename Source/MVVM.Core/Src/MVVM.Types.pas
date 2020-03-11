@@ -7,11 +7,11 @@ uses
   System.RTTI,
   System.Generics.Collections;
 
-type
-  EBasicStrategies = (_RTTI,_LIVEBINDINGS);
-
-const
-  CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
+//type
+//  EBasicStrategies = (_RTTI,_LIVEBINDINGS);
+//
+//const
+//  CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
 
 type
   EBindDirection = (
@@ -167,6 +167,8 @@ type
   EMessageTypeRestriction = (mtrAllowDescendants, mtrDefinedTypeOnly);
 
   EDelegatedExecutionMode = (medQueue, medSynchronize, medNewTask, medNormal);
+
+  EBindError = class(Exception);
 
 implementation
 

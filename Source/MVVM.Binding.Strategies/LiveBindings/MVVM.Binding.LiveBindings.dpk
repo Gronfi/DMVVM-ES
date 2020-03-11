@@ -1,4 +1,4 @@
-package MVVM.Core;
+package MVVM.Binding.LiveBindings;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -28,16 +28,11 @@ package MVVM.Core;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  MVVM.Core,
+  bindengine,
+  bindcomp;
 
 contains
-  MVVM.Bindings in 'Src\MVVM.Bindings.pas',
-  MVVM.Interfaces in 'Src\MVVM.Interfaces.pas',
-  MVVM.Core in 'Src\MVVM.Core.pas',
-  MVVM.Types in 'Src\MVVM.Types.pas',
-  MVVM.Bindings.Collections in 'Src\MVVM.Bindings.Collections.pas',
-  MVVM.Classes in 'Src\MVVM.Classes.pas',
-  MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
-  MVVM.Utils in 'Src\MVVM.Utils.pas';
+  MVVM.Bindings.LiveBindings in 'Src\MVVM.Bindings.LiveBindings.pas';
 
 end.

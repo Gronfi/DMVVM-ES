@@ -3,7 +3,7 @@ unit MVVM.Services.Platform.FMX;
 interface
 
 uses
-  MVVM.Core;
+  MVVM.Interfaces;
 
 type
   TFMXPlatformServices = class(TPlatformServicesBase)
@@ -20,13 +20,15 @@ uses
   FMX.Forms,
   FMX.Dialogs,
   System.Classes,
-  System.UITypes;
+  System.UITypes,
+
+  MVVM.Core;
 
 { TFMXServicioDialogo }
 
 function TFMXPlatformServices.IsMainThreadUI: Boolean;
 begin
-  Result :=  TThread.Current.ThreadID = MainThreadID;
+  Result := TThread.Current.ThreadID = MainThreadID;
 end;
 
 function TFMXPlatformServices.MessageDlg(const ATitulo, ATexto: String): Boolean;

@@ -14,7 +14,7 @@ type
   TCollectionView = class abstract(TInterfacedObject, ICollectionView)
   {$REGION 'Internal Declarations'}
   private
-    FSource  : ICollectionSource; // Reference
+    FSource  : TCollectionSource; // Reference
     FTemplate: TDataTemplateClass;
   private
     procedure AddItemsToView;
@@ -23,8 +23,8 @@ type
     procedure CollectionChanged(const ASender: TObject; const AArg: TCollectionChangedEventArgs);
   protected
     { IgoCollectionView }
-    function GetSource: ICollectionSource;
-    procedure SetSource(AValue: ICollectionSource);
+    function GetSource: TCollectionSource;
+    procedure SetSource(AValue: TCollectionSource);
     function GetTemplate: TDataTemplateClass;
     procedure SetTemplate(const AValue: TDataTemplateClass);
   {$ENDREGION 'Internal Declarations'}
@@ -94,7 +94,7 @@ type
       convertible to TList<TObject> if TPerson is a class. However, Delphi
       does not support covariance (and contravariance) with generics, so you
       need to typecast to TgoCollectionSource yourself.) }
-    property Source: ICollectionSource read FSource write SetSource;
+    property Source: TCollectionSource read FSource write SetSource;
 
     { The class that is used as a template to map items in the collection to
       properties of items in the view. }
@@ -154,7 +154,7 @@ begin
   end;
 end;
 
-function TCollectionView.GetSource: ICollectionSource;
+function TCollectionView.GetSource: TCollectionSource;
 begin
   Result := FSource;
 end;
@@ -164,7 +164,7 @@ begin
   Result := FTemplate;
 end;
 
-procedure TCollectionView.SetSource(AValue: ICollectionSource);
+procedure TCollectionView.SetSource(AValue: TCollectionSource);
 //var
 //  NCC: INotifyCollectionChanged;
 begin

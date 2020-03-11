@@ -569,8 +569,8 @@ begin
   Guard.CheckNotNull(AThreadMensajes, 'The listener must have a Thread assigned');
   inherited Create;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
-  Self.FThreadMensajes           := AThreadMensajes;
-  Self.FPoolMensajes             := nil;
+  FThreadMensajes           := AThreadMensajes;
+  FPoolMensajes             := nil;
   FFilterCondition               := AFilterCondition;
 end;
 
@@ -709,23 +709,19 @@ end;
 
 procedure TThreadMessageHandlerBase.AdquireRead;
 begin
-  Self.FSynchronizer.BeginRead;
+  FSynchronizer.BeginRead;
 end;
 
 procedure TThreadMessageHandlerBase.AdquireWrite;
 begin
-  Self.FSynchronizer.BeginWrite;
+  FSynchronizer.BeginWrite;
 end;
 
 constructor TThreadMessageHandlerBase.Create;
 begin
   inherited Create(False);
-  //Self.FPerformance  := TPerformanceCounter.Create(GetDefaultEventRateAverageOver);
-  Self.FSynchronizer := TMREWSync.Create;
-
-  //Self.FMensajes := TThreadedQueue<IMensaje>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, FrMath.INFINITO);
-  Self.FMessages := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
-
+  FSynchronizer := TMREWSync.Create;
+  FMessages     := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
   FMessageCount := 0;
 end;
 
@@ -733,7 +729,7 @@ destructor TThreadMessageHandlerBase.Destroy;
 begin
   Terminate;
   WaitFor;
-  Self.FMessages.Free;
+  FMessages.Free;
   FSynchronizer := nil;
   inherited Destroy;
 end;

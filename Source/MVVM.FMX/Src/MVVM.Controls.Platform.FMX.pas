@@ -1626,4 +1626,151 @@ begin
 
 end;
 
+{ TComboBox }
+
+procedure TComboBox.Change(Sender: TObject);
+begin
+  if Assigned(FOnPropertyChanged) then
+    FOnPropertyChanged.Invoke(Self, 'Text');
+
+  if Assigned(FOnPropertyChangeTracking) then
+    FOnPropertyChangeTracking.Invoke(Self, 'Text');
+
+  SetSelectedItem( Items.Objects[ItemIndex]);
+  inherited;
+end;
+
+destructor TComboBox.Destroy;
+begin
+  FView.Free;
+  inherited;
+end;
+
+function TComboBox.GetBindingStrategy: IBindingStrategy;
+begin
+
+end;
+
+function TComboBox.GetCollectionView: ICollectionView;
+begin
+  if (FView = nil) then
+    FView := TComboBoxCollectionView.Create(Self);
+
+  Result := FView;
+end;
+
+function TComboBox.GetSelectedItem: TObject;
+begin
+  Result := Items.Objects[ItemIndex];
+end;
+
+procedure TComboBox.Loaded;
+begin
+  inherited;
+  FChanged_ := onChange;
+  onChange := Change;
+end;
+
+procedure TComboBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+begin
+
+end;
+
+procedure TComboBox.SetSelectedItem(const Value: TObject);
+begin
+  if FSelectedItem <> Value then
+  begin
+    FSelectedItem := Value;
+
+    if Assigned(FOnPropertyChanged) then
+      FOnPropertyChanged.Invoke(Self, 'SelectedItem');
+  end;
+end;
+
+{ TComboBoxCollectionView }
+
+procedure TComboBoxCollectionView.AddItemToView(const AItem: TObject);
+var
+  sItem: string;
+begin
+  if Assigned(FComboBox) then
+  begin
+    sItem := Template.GetTitle(AItem);
+    FComboBox.Items.AddObject( sItem, AItem);
+  end;
+end;
+
+procedure TComboBoxCollectionView.BeginUpdateView;
+begin
+  if Assigned(FComboBox) then
+  begin
+    FComboBox.Items.BeginUpdate;
+  end;
+end;
+
+procedure TComboBoxCollectionView.ClearItemsInView;
+begin
+  if Assigned(FComboBox) then
+  begin
+    FComboBox.Items.Clear;
+  end;
+end;
+
+constructor TComboBoxCollectionView.Create(const AComboBox: TComboBox);
+begin
+  Assert(Assigned(AComboBox));
+  inherited Create;
+  FComboBox := AComboBox;
+end;
+
+procedure TComboBoxCollectionView.DeleteItemFromView(const AItemIndex: Integer);
+begin
+  if Assigned(FComboBox) then
+  begin
+    FComboBox.Items.Delete( AItemIndex);
+  end;
+end;
+
+procedure TComboBoxCollectionView.EndUpdateView;
+begin
+  if Assigned(FComboBox) then
+  begin
+    FComboBox.Items.EndUpdate;
+  end;
+end;
+
+procedure TComboBoxCollectionView.UpdateAllItemsInView;
+var
+  Item: TObject;
+  sItem: string;
+  Index: Integer;
+begin
+  if Assigned(FComboBox) then
+  begin
+    Index := 0;
+    for Item in Source do
+    begin
+      sItem := FComboBox.Items.Strings[index];
+      FComboBox.Items.Strings[Index] := Template.GetTitle( Item);
+      FComboBox.Items.Objects[Index] := Item;
+      Inc(Index);
+    end;
+  end;
+end;
+
+procedure TComboBoxCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+var
+  Index: Integer;
+begin
+  if Assigned(FComboBox) then
+  begin
+    Index := FComboBox.Items.IndexOfObject( AItem);
+     if (Index >= 0) then
+     begin
+       FComboBox.Items.Strings[Index] := Template.GetTitle( AItem);
+       FComboBox.Items.Objects[Index] := AItem;
+     end;
+  end;
+end;
+
 end.
