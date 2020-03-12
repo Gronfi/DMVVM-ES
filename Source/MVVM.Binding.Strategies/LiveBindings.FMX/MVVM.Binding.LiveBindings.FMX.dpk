@@ -1,4 +1,4 @@
-package MVVM.Platform.FMX;
+package MVVM.Binding.LiveBindings.FMX;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -28,12 +28,10 @@ package MVVM.Platform.FMX;
 {$IMPLICITBUILD ON}
 
 requires
-  MVVM.Core,
-  FMX;
+  MVVM.Binding.LiveBindings,
+  MVVM.Platform.FMX;
 
 contains
-  MVVM.Services.Platform.FMX in 'Src\MVVM.Services.Platform.FMX.pas',
-  MVVM.Controls.Platform.FMX in 'Src\MVVM.Controls.Platform.FMX.pas',
-  MVVM.Views.Platform.FMX in 'Src\MVVM.Views.Platform.FMX.pas';
+  MVVM.Binding.LiveBindings.Controls.FMX in 'Src\MVVM.Binding.LiveBindings.Controls.FMX.pas';
 
 end.

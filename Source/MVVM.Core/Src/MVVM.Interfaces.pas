@@ -3,6 +3,7 @@ unit MVVM.Interfaces;
 interface
 
 uses
+  System.Classes,
   System.SysUtils,
   System.Generics.Collections,
   System.UITypes,
@@ -16,12 +17,20 @@ type
     ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
     function MessageDlg(const ATitle: string; const AText: String): Boolean;
     function IsMainThreadUI: Boolean;
+    function LoadBitmap(const AFileName: String): TObject; overload;
+    function LoadBitmap(const AStream: TStream): TObject; overload;
+    function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload;
+    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload;
   end;
 
   TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
     function IsMainThreadUI: Boolean; virtual; abstract;
+    function LoadBitmap(const AFileName: String): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AStream: TStream): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; virtual; abstract;
   end;
 
   TPlatformServicesClass = class of TPlatformServicesBase;
@@ -170,9 +179,11 @@ type
         with the object.
 
       Returns -1 by default. }
+    class function GetID(const AItem: TObject): Integer; virtual; abstract;
     class function GetImageIndex(const AItem: TObject): Integer; virtual;
-
     class function GetStyle(const AItem: TObject): string; virtual;
+    class function GetParent(const AItem: TObject): TObject; virtual; abstract;
+    class function GetChildren( const AItem: TObject): TList<TObject>; virtual; abstract;
   end;
 
   TDataTemplateClass = class of TDataTemplate;
@@ -191,6 +202,7 @@ type
     procedure SetSource(AValue: TCollectionSource);
     function GetTemplate: TDataTemplateClass;
     procedure SetTemplate(const AValue: TDataTemplateClass);
+    function GetComponent: TComponent;
     {$ENDREGION 'Internal Declarations'}
 
     { The collection to show in the view. This can be any class derived from
@@ -210,6 +222,7 @@ type
     { The class that is used as a template to map items in the collection to
       properties of items in the view. }
     property Template: TDataTemplateClass read GetTemplate write SetTemplate;
+    property Component: TComponent read GetComponent;
   end;
 
   ICollectionViewProvider = interface
@@ -240,7 +253,8 @@ type
                    const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                    const AFlags: EBindFlags = [];
                    const AExtraParams: TBindExtraParams = []); overload;
-    procedure BindCollection(const ACollection: TEnumerable<TObject>;
+    procedure BindCollection(AServiceType: PTypeInfo;
+                             const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass);
     procedure BindAction(const AAction: IBindableAction;
@@ -250,6 +264,7 @@ type
     procedure ClearBindings;
   end;
 
+  (*
   IDataBinder = interface
     ['{E880F234-ED85-4594-9DA5-869100B95F8B}']
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
@@ -277,6 +292,7 @@ type
     procedure Notify(const AObject: TObject; const APropertyName: String); overload;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload;
   end;
+  *)
 
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   public
@@ -298,7 +314,8 @@ type
                    const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
                    const AFlags: EBindFlags = [];
                    const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
-    procedure BindCollection(const ACollection: TEnumerable<TObject>;
+    procedure BindCollection(AServiceType: PTypeInfo;
+                             const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); virtual; abstract;
     procedure BindAction(const AAction: IBindableAction;
@@ -310,12 +327,12 @@ type
 
   TClass_BindingStrategyBase = class of TBindingStrategyBase;
 
-  IBinder = interface
-    ['{AA80417A-B7B8-4867-A310-89BDAB7FEEDD}']
-    function GetDataBinder: IDataBinder;
-
-    property DataBinder: IDataBinder read GetDataBinder;
-  end;
+//  IBinder = interface
+//    ['{AA80417A-B7B8-4867-A310-89BDAB7FEEDD}']
+//    //function GetDataBinder: IDataBinder;
+//
+//    //property DataBinder: IDataBinder read GetDataBinder;  DAVID
+//  end;
 
   IModel = interface
     ['{28C9B05B-A5F5-49E1-913E-2AB10F9FB8F3}']
@@ -344,7 +361,7 @@ type
     property Model: T read GetModel;
   end;
 
-  IView = interface(IBinder)
+  IView = interface
     ['{44055F6F-42A8-43DD-B393-1CC700B8C7F8}']
     procedure SetupView;
   end;
@@ -352,12 +369,13 @@ type
   IView<T:IViewModel> = interface
     ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
     function GetViewModel: T;
-    procedure AddViewModel(AViewModel: IViewModel);
+    procedure InitView(AViewModel: T);
 
     property ViewModel: T read GetViewModel;
   end;
 
   IViewForm<T:IViewModel> = interface(IView<T>)
+    procedure Execute;
     procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
   end;
 

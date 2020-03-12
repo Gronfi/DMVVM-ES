@@ -15,7 +15,7 @@ uses
   MVVM.Types;
 
 type
-  TBindingManager = class(TInterfacedObject, IDataBinder)
+  TBindingManager = class
   private
     class var
       FDiccionarioEstrategiasBinding: IDictionary<String, TClass_BindingStrategyBase>;
@@ -23,16 +23,14 @@ type
     var
       FObject                            : TObject;
       FDiccionarioEstrategias            : IDictionary<String, IBindingStrategy>;
-      //FEstrategiaPorDefecto              : String;
   protected
     class constructor CreateC;
     class destructor DestroyC;
 
     function ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
-//    function GetEstrategiaPorDefecto: String; virtual;
-//    procedure SetEstrategiaPorDefecto(const AValue: String); virtual;
   public
-    constructor Create(AObject: TObject); virtual;
+    constructor Create(AObject: TObject); overload; virtual;
+    constructor Create; overload; virtual;
     destructor Destroy; override;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
@@ -47,7 +45,7 @@ type
                const AFlags: EBindFlags = [];
                const ABindingStrategy: String = '';
                const AExtraParams: TBindExtraParams = []); overload;
-    procedure BindCollection(const ACollection: TEnumerable<TObject>;
+    procedure BindCollection<T: Class>(const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass;
                              const ABindingStrategy: String = '');
@@ -59,7 +57,6 @@ type
     procedure Notify(const AObject: TObject; const APropertyName: String); overload; virtual;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
-    //property EstrategiaPorDefecto: String read GetEstrategiaPorDefecto write SetEstrategiaPorDefecto;
     class procedure RegistrarBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
   end;
 
@@ -114,12 +111,12 @@ begin
   LEstrategia.BindAction(AAction, AExecute, ACanExecute);
 end;
 
-procedure TBindingManager.BindCollection(const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
+procedure TBindingManager.BindCollection<T>(const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindCollection(ACollection, ATarget, ATemplate);
+  LEstrategia.BindCollection(TypeInfo(T), ACollection, ATarget, ATemplate);
 end;
 
 function TBindingManager.ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
@@ -140,11 +137,14 @@ end;
 
 constructor TBindingManager.Create(AObject: TObject);
 begin
-  inherited Create;
+  Create;
   FObject                            := AObject;
-  //FDiccionarioNotificacionEstrategias:= TCollections.CreateDictionary<String, IList<String>>;
-  FDiccionarioEstrategias            := TCollections.CreateDictionary<String, IBindingStrategy>;
-  //FEstrategiaPorDefecto              := '';
+end;
+
+constructor TBindingManager.Create;
+begin
+  inherited Create;
+  FDiccionarioEstrategias := TCollections.CreateDictionary<String, IBindingStrategy>;
 end;
 
 class constructor TBindingManager.CreateC;

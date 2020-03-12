@@ -3,6 +3,8 @@ unit MVVM.Bindings.Collections;
 interface
 
 uses
+  System.Classes,
+
   MVVM.Interfaces,
   MVVM.Types;
 
@@ -27,6 +29,7 @@ type
     procedure SetSource(AValue: TCollectionSource);
     function GetTemplate: TDataTemplateClass;
     procedure SetTemplate(const AValue: TDataTemplateClass);
+    function GetComponent: TComponent; virtual; abstract;
   {$ENDREGION 'Internal Declarations'}
   protected
     { Must be overridden to clear all items in the view.
@@ -99,6 +102,8 @@ type
     { The class that is used as a template to map items in the collection to
       properties of items in the view. }
     property Template: TDataTemplateClass read FTemplate write FTemplate;
+
+    property Component: TComponent read GetComponent;
   end;
 
 implementation

@@ -593,6 +593,8 @@ type
     procedure UpdateItemInView(const AItem: TObject;
       const APropertyName: String); override;
     procedure UpdateAllItemsInView; override;
+
+    function GetComponent: TComponent; override;
   public
     constructor Create(const AListBox: TListBox);
   end;
@@ -610,6 +612,8 @@ type
     procedure DeleteItemFromView(const AItemIndex: Integer); override;
     procedure UpdateItemInView(const AItem: TObject; const APropertyName: String); override;
     procedure UpdateAllItemsInView; override;
+
+    function GetComponent: TComponent; override;
   public
     constructor Create(const AListView: TListView);
   end;
@@ -628,6 +632,8 @@ type
     procedure UpdateItemInView(const AItem: TObject;
       const APropertyName: String); override;
     procedure UpdateAllItemsInView; override;
+
+    function GetComponent: TComponent; override;
   public
     constructor Create(const ATreeView: TTreeView);
   end;
@@ -644,6 +650,8 @@ type
     procedure UpdateItemInView(const AItem: TObject;
       const APropertyName: String); override;
     procedure UpdateAllItemsInView; override;
+
+    function GetComponent: TComponent; override;
   public
     constructor Create(const AComboBox: TComboBox);
   end;
@@ -1341,6 +1349,11 @@ begin
     ListBox.EndUpdate;
 end;
 
+function TListBoxCollectionView.GetComponent: TComponent;
+begin
+  Result := FListBox;
+end;
+
 procedure TListBoxCollectionView.UpdateAllItemsInView;
 var
   ListBox: TListBox;
@@ -1504,6 +1517,11 @@ begin
     ListView.EndUpdate;
 end;
 
+function TListViewCollectionView.GetComponent: TComponent;
+begin
+  Result := FListView;
+end;
+
 procedure TListViewCollectionView.UpdateAllItemsInView;
 var
   ListView: TListView;
@@ -1569,86 +1587,116 @@ end;
 { TTreeView }
 
 procedure TTreeView.Change(Sender: TObject);
+var
+  Node: TTreeViewItem;
+  tV: TTreeView;
 begin
-
+  tv := (Sender as TTreeView);
+  if assigned( tv.selected) then
+  begin
+    Node := (Sender as TTreeView).selected;
+    if Assigned( FOnChanged_) then
+      FOnChanged_( node);
+    DoSelectNode( Node, True);
+  end;
 end;
 
 constructor TTreeView.Create(AOwner: TComponent);
 begin
   inherited;
-
 end;
 
 destructor TTreeView.Destroy;
 begin
-
+  FView := nil;
   inherited;
 end;
 
 procedure TTreeView.DoSelectNode(Node: TTreeViewItem; Selected: Boolean);
 begin
-
+  if Selected and Assigned(FEstrategiaBinding) then
+  begin
+    FEstrategiaBinding.Notify(Self, ['Selected', 'SelectedNode']);
+  end;
+  inherited;
 end;
 
 function TTreeView.FindTreeNode(const AItem: TObject): TTreeViewItem;
+var
+  node: TTreeViewItem;
+  i: Integer;
 begin
-
+  Result := nil;
+  for i := 0 to Count - 1 do
+  begin
+    node := Items[i];
+    if node.TagObject = AItem then
+      Result := node;
+  end;
 end;
 
 function TTreeView.GetBindingStrategy: IBindingStrategy;
 begin
-
+  Result := FEstrategiaBinding
 end;
 
 function TTreeView.GetCollectionView: ICollectionView;
 begin
+  if (FView = nil) then
+    FView := TTreeViewCollectionView.Create(Self);
 
+  Result := FView;
 end;
 
 function TTreeView.GetSelectedNode: TObject;
+var
+  Sel: TTreeViewItem;
 begin
-
+  Sel := Selected;
+  if (Sel = nil) then
+    Result := nil
+  else
+    Result := Sel.TagObject;
 end;
 
 procedure TTreeView.Loaded;
 begin
   inherited;
-
+  FOnChanged_ := OnChange;
+  OnChange := Change;
 end;
 
 procedure TTreeView.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
-
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 procedure TTreeView.SetSelectedNode(const Value: TObject);
 begin
-
+  Selected := FindTreeNode(Value);
 end;
 
 { TComboBox }
 
 procedure TComboBox.Change(Sender: TObject);
 begin
-  if Assigned(FOnPropertyChanged) then
-    FOnPropertyChanged.Invoke(Self, 'Text');
+  if Assigned(FEstrategiaBinding) then
+    FEstrategiaBinding.Notify(Self, 'Text');
 
-  if Assigned(FOnPropertyChangeTracking) then
-    FOnPropertyChangeTracking.Invoke(Self, 'Text');
-
-  SetSelectedItem( Items.Objects[ItemIndex]);
+  SetSelectedItem(Items.Objects[ItemIndex]);
   inherited;
 end;
 
 destructor TComboBox.Destroy;
 begin
-  FView.Free;
+  FView := nil;
   inherited;
 end;
 
 function TComboBox.GetBindingStrategy: IBindingStrategy;
 begin
-
+  Result := FEstrategiaBinding
 end;
 
 function TComboBox.GetCollectionView: ICollectionView;
@@ -1668,12 +1716,13 @@ procedure TComboBox.Loaded;
 begin
   inherited;
   FChanged_ := onChange;
-  onChange := Change;
+  onChange  := Change;
 end;
 
 procedure TComboBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
 begin
-
+  if FEstrategiaBinding <> AEstrategiaBinding then
+    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 procedure TComboBox.SetSelectedItem(const Value: TObject);
@@ -1682,8 +1731,8 @@ begin
   begin
     FSelectedItem := Value;
 
-    if Assigned(FOnPropertyChanged) then
-      FOnPropertyChanged.Invoke(Self, 'SelectedItem');
+    if Assigned(FEstrategiaBinding) then
+      FEstrategiaBinding.Notify(Self, 'SelectedItem');
   end;
 end;
 
@@ -1739,6 +1788,11 @@ begin
   end;
 end;
 
+function TComboBoxCollectionView.GetComponent: TComponent;
+begin
+  Result := FComboBox
+end;
+
 procedure TComboBoxCollectionView.UpdateAllItemsInView;
 var
   Item: TObject;
@@ -1771,6 +1825,104 @@ begin
        FComboBox.Items.Objects[Index] := AItem;
      end;
   end;
+end;
+
+{ TTreeViewCollectionView }
+
+procedure TTreeViewCollectionView.AddItemToView(const AItem: TObject);
+var
+  Item: TTreeViewItem;
+
+  procedure Branch( Parent: TTreeViewItem; AItem: TObject );
+  var
+    Item: TTreeViewItem;
+    obj: TObject;
+  begin
+    for obj in Template.GetChildren( AItem) do
+    begin
+      Item := TTreeViewItem.Create( FTreeView );
+      Item.Parent := Parent;
+      Item.Text := Template.GetTitle( obj);
+      UpdateTreeNode(Item, obj);
+      Branch( Item, obj);
+    end;
+  end;
+
+begin
+  Item := TTreeViewItem.Create( FTreeView );
+  Item.Parent := FTreeView;
+  Item.Text := Template.GetTitle( AItem);
+  UpdateTreeNode(Item, AItem);
+  Branch( Item, AItem);
+end;
+
+procedure TTreeViewCollectionView.BeginUpdateView;
+begin
+  FTreeView.BeginUpdate;
+end;
+
+procedure TTreeViewCollectionView.ClearItemsInView;
+var
+  //Item: TTreeViewItem;
+  i: Integer;
+begin
+  for i := 0 to FtreeView.Count -1 do
+  begin
+    FtreeView.Items[ i].Free;
+  end;
+end;
+
+constructor TTreeViewCollectionView.Create(const ATreeView: TTreeView);
+begin
+  Assert(Assigned(ATreeView));
+  inherited Create;
+  FTreeView := ATreeView;
+end;
+
+procedure TTreeViewCollectionView.DeleteItemFromView(const AItemIndex: Integer);
+begin
+  FTreeView.Items[ AItemIndex].Free;
+end;
+
+procedure TTreeViewCollectionView.EndUpdateView;
+begin
+  FTreeView.EndUpdate;
+end;
+
+function TTreeViewCollectionView.GetComponent: TComponent;
+begin
+  Result := FTreeView
+end;
+
+procedure TTreeViewCollectionView.UpdateAllItemsInView;
+var
+  Index: Integer;
+  Item: TObject;
+  Node: TTreeViewItem;
+begin
+  Index := 0;
+  for Item in Source do
+  begin
+    Node := FTreeView.Items[ Index];
+    UpdateTreeNode( Node, Item);
+    Inc(Index);
+  end;
+end;
+
+procedure TTreeViewCollectionView.UpdateItemInView(const AItem: TObject;
+  const APropertyName: String);
+var
+  Node: TTreeViewItem;
+begin
+  Node := FTreeView.FindTreeNode(AItem);
+  if (Node <> nil) then
+    UpdateTreeNode(Node, AItem);
+end;
+
+procedure TTreeViewCollectionView.UpdateTreeNode(
+  const ATreeViewItem: TTreeViewItem; const AItem: TObject);
+begin
+  ATreeViewItem.TagObject := TObject(AItem);
 end;
 
 end.
