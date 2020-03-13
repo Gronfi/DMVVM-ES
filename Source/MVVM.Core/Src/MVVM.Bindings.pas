@@ -52,7 +52,7 @@ type
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass;
                              const ABindingStrategy: String = '');
-    procedure BindDataSource(const ADataSource: TDataSource;
+    procedure BindDataSet(const ADataSet: TDataSet;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass;
                              const ABindingStrategy: String = '');
@@ -133,12 +133,12 @@ begin
   LEstrategia.BindCollection(TypeInfo(T), ACollection, ATarget, ATemplate);
 end;
 
-procedure TBindingManager.BindDataSource(const ADataSource: TDataSource; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
+procedure TBindingManager.BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindDataSource(ADataSource, ATarget, ATemplate);
+  LEstrategia.BindDataSet(ADataSet, ATarget, ATemplate);
 end;
 
 function TBindingManager.ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;

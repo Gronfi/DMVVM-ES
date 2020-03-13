@@ -25,7 +25,7 @@ type
   private
     class var
       FObjectListLinkers   : IDictionary<TClass, TProc<PTypeInfo, TComponent, TEnumerable<TObject>>>;
-      FObjectDataSetLinkers: IDictionary<TClass, TProc<TDataSource, TComponent>>;
+      FObjectDataSetLinkers: IDictionary<TClass, TProc<TDataSet, TComponent>>;
   protected
     type
       TExpressionList = TObjectList<TBindingExpression>;
@@ -37,7 +37,7 @@ type
     class destructor DestroyC;
   protected
     function InternalBindCollection(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
-    function InternalBindDataSource(ADataSource: TDataSource; AComponent: TComponent): Boolean;
+    function InternalBindDataSet(ADataSet: TDataSet; AComponent: TComponent): Boolean;
     property Bindings: TExpressionList read FBindings;
   public
     constructor Create; override;
@@ -61,7 +61,7 @@ type
                              const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); override;
-    procedure BindDataSource(const ADataSource: TDataSource;
+    procedure BindDataSet(const ADataSet: TDataSet;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); override;
     procedure BindAction(const AAction: IBindableAction;
@@ -70,7 +70,7 @@ type
     procedure ClearBindings; override;
 
     class procedure RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>); static;
-    class procedure RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSource, TComponent>); static;
+    class procedure RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSet, TComponent>); static;
   end;
 
 implementation
@@ -233,13 +233,13 @@ begin
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
 end;
 
-procedure TStrategy_LiveBindings.BindDataSource(const ADataSource: TDataSource; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+procedure TStrategy_LiveBindings.BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
 var
   LView: ICollectionView;
 begin
-  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ADataSource) no puede ser null');
-  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ATarget) no puede ser null');
-  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ATemplate) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ADataSet) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ATarget) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ATemplate) no puede ser null');
 
   LView := ATarget.GetCollectionView;
   if (LView = nil) then
@@ -247,7 +247,7 @@ begin
 
   LView.Template := ATemplate;
 
-  if InternalBindDataSource(ADataSource, LView.Component) then
+  if InternalBindDataSet(ADataSet, LView.Component) then
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
   //LAdapterBindSource := TAdapterBindSource.Create(nil); //DAVID
   //LAdapterBindSource.
@@ -271,7 +271,7 @@ end;
 class constructor TStrategy_LiveBindings.CreateC;
 begin
   FObjectListLinkers    := TCollections.CreateDictionary<TClass, TProc<PTypeInfo, TComponent, TEnumerable<TObject>>>;
-  FObjectDataSetLinkers := TCollections.CreateDictionary<TClass, TProc<TDataSource, TComponent>>;
+  FObjectDataSetLinkers := TCollections.CreateDictionary<TClass, TProc<TDataSet, TComponent>>;
 end;
 
 destructor TStrategy_LiveBindings.Destroy;
@@ -303,9 +303,9 @@ begin
   end;
 end;
 
-function TStrategy_LiveBindings.InternalBindDataSource(ADataSource: TDataSource; AComponent: TComponent): Boolean;
+function TStrategy_LiveBindings.InternalBindDataSet(ADataSet: TDataSet; AComponent: TComponent): Boolean;
 var
-  LProc : TProc<TDataSource, TComponent>;
+  LProc : TProc<TDataSet, TComponent>;
   LClass: TClass;
 begin
   Result := False;
@@ -313,7 +313,7 @@ begin
   begin
     if AComponent.ClassType.InheritsFrom(LClass) then
     begin
-      LProc(ADataSource, AComponent);
+      LProc(ADataSet, AComponent);
       Exit(True);
     end;
   end;
@@ -329,7 +329,7 @@ begin
   //
 end;
 
-class procedure TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSource, TComponent>);
+class procedure TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSet, TComponent>);
 begin
   FObjectDataSetLinkers.AddOrSetValue(AClass, AProcedure);
 end;

@@ -287,7 +287,7 @@ type
                              const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass);
-    procedure BindDataSource(const ADataSource: TDataSource;
+    procedure BindDataSet(const ADataSet: TDataSet;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass);
     procedure BindAction(const AAction: IBindableAction;
@@ -298,6 +298,8 @@ type
   end;
 
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
+  protected
+    F
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -323,7 +325,7 @@ type
                              const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); virtual; abstract;
-    procedure BindDataSource(const ADataSource: TDataSource;
+    procedure BindDataSet(const ADataSet: TDataSet;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); virtual; abstract;
     procedure BindAction(const AAction: IBindableAction;

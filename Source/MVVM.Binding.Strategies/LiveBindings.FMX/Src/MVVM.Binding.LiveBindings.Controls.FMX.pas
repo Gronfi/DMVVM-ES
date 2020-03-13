@@ -24,7 +24,7 @@ uses
 initialization
 
 {$REGION 'TListBox'}
-TEstrategia_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
+TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
   procedure (AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
   var
     LLink  : TBindListLink;
@@ -47,11 +47,12 @@ TEstrategia_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
     LLink.SourceComponent  := LSource;
   end);
 
-TEstrategia_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
-  procedure (ADataSource: TDataSource; AComponent: TComponent)
+TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
+  procedure (ADataSet: TDataSet; AComponent: TComponent)
   var
     LLink  : TBindListLink;
     LSource: TBindSourceDB;
+    LDS    : TDataSource;
     I      : Integer;
   begin
     //Remove possible previous link
@@ -65,10 +66,11 @@ TEstrategia_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
     end;
     LLink                  := TBindListLink.Create(AComponent);
     LLink.ControlComponent := AComponent;
+    LDS                    := TDataSource.Create(LLink);
+    LDS.DataSet            := ADataSet;
     LSource                := TBindSourceDB.Create(LLink);
-    LSource.DataSource     := ADataSource;
+    LSource.DataSource     := LDS;
     LLink.SourceComponent  := LSource;
   end);
 {$ENDREGION}
-
 end.

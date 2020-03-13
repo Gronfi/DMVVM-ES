@@ -2,6 +2,26 @@
 
 ![logo del grupo](logo-grupo.png)
 
+<br/>
+<div>
+  <!-- Stability -->
+  <a href="https://nodejs.org/api/documentation.html#documentation_stability_index">
+    <img src="https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square"
+      alt="API stability" />
+  </a>
+  <!-- Standard -->
+  <a href="https://img.shields.io/badge">
+    <img src="https://img.shields.io/badge/Language-Delphi-brightgreen.svg"
+      alt="Delphi" />
+  </a>
+  <!-- Standard -->
+  <a href="https://img.shields.io/badge">
+    <img src="https://img.shields.io/badge/Date-2020-red.svg"
+      alt="2005" />
+  </a>
+</div>
+<br/>
+
 Ejercicios de práctica para tratar de comprender el patrón **MVVM** y quizás terminar con el desarrollo de un pequeño y útil **Framework MVVM** para Delphi.
 
 ## Otros frameworks utilizados
@@ -30,6 +50,9 @@ https://delphisorcery.blogspot.com/2011/12/putting-pieces-together-dsharp.html
 https://github.com/msnts/glue
 
 https://github.com/bogdanpolak/command-delphi
+
+Modificado
+https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
 
 ## Ideas a tener en cuenta
 
