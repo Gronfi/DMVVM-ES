@@ -9,6 +9,7 @@ uses
   System.Generics.Collections,
   System.Bindings.Expression, System.Bindings.Helper,
   System.RTTI,
+  Data.DB,
 
   Spring.Collections,
 
@@ -17,14 +18,14 @@ uses
   MVVM.Bindings;
 
 const
-  ESTRATEGIA_NAME = 'LIVEBINDINGS';
+  STRATEGY_NAME = 'LIVEBINDINGS';
 
 type
-  TEstrategia_LiveBindings = class(TBindingStrategyBase)
+  TStrategy_LiveBindings = class(TBindingStrategyBase)
   private
     class var
       FObjectListLinkers   : IDictionary<TClass, TProc<PTypeInfo, TComponent, TEnumerable<TObject>>>;
-      FObjectDataSetLinkers: IDictionary<TClass, TProc<TComponent>>;
+      FObjectDataSetLinkers: IDictionary<TClass, TProc<TDataSource, TComponent>>;
   protected
     type
       TExpressionList = TObjectList<TBindingExpression>;
@@ -36,10 +37,13 @@ type
     class destructor DestroyC;
   protected
     function InternalBindCollection(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
+    function InternalBindDataSource(ADataSource: TDataSource; AComponent: TComponent): Boolean;
     property Bindings: TExpressionList read FBindings;
   public
     constructor Create; override;
     destructor Destroy; override;
+
+    procedure OnObjectDestroyed(AMessage: IMessage); override;
 
     procedure Notify(const AObject: TObject; const APropertyName: string = ''); overload; override;
 
@@ -57,13 +61,16 @@ type
                              const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); override;
+    procedure BindDataSource(const ADataSource: TDataSource;
+                             const ATarget: ICollectionViewProvider;
+                             const ATemplate: TDataTemplateClass); override;
     procedure BindAction(const AAction: IBindableAction;
                      const AExecute: TExecuteMethod;
                      const ACanExecute: TCanExecuteMethod = nil); overload; override;
     procedure ClearBindings; override;
 
     class procedure RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>); static;
-    class procedure RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TComponent>); static;
+    class procedure RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSource, TComponent>); static;
   end;
 
 implementation
@@ -76,7 +83,7 @@ uses
 
 { TEstrategia_LiveBindings }
 
-procedure TEstrategia_LiveBindings.Bind(const ASource: TObject; const ASourcePropertyPath: String;
+procedure TStrategy_LiveBindings.Bind(const ASource: TObject; const ASourcePropertyPath: String;
                                         const ATarget: TObject; const ATargetPropertyPath: String;
                                         const ADirection: EBindDirection;
                                         const AFlags: EBindFlags;
@@ -156,7 +163,7 @@ begin
   end;
 end;
 
-procedure TEstrategia_LiveBindings.Bind(const ASources: TSourcePairArray;
+procedure TStrategy_LiveBindings.Bind(const ASources: TSourcePairArray;
   const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String;
   const ATargetPropertyPath: String; const AFlags: EBindFlags;
   const AExtraParams: TBindExtraParams);
@@ -202,19 +209,18 @@ begin
   FBindings.Add(LManaged);
 end;
 
-procedure TEstrategia_LiveBindings.BindAction(const AAction: IBindableAction; const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod);
+procedure TStrategy_LiveBindings.BindAction(const AAction: IBindableAction; const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod);
 begin
   Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) no puede ser null');
   AAction.Bind(AExecute, ACanExecute);
 end;
 
-procedure TEstrategia_LiveBindings.BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+procedure TStrategy_LiveBindings.BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
 var
-  LView             : ICollectionView;
-  //LAdapterBindSource: TAdapterBindSource;
+  LView: ICollectionView;
 begin
-  Assert(Assigned(ATarget));
-  Assert(Assigned(ATemplate));
+  Guard.CheckNotNull(ATarget, '<BindCollection> (Param=ATarget) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindCollection> (Param=ATemplate) no puede ser null');
 
   LView := ATarget.GetCollectionView;
   if (LView = nil) then
@@ -225,11 +231,29 @@ begin
 
   if InternalBindCollection(AServiceType, LView.Component, ACollection) then
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
+end;
+
+procedure TStrategy_LiveBindings.BindDataSource(const ADataSource: TDataSource; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+var
+  LView: ICollectionView;
+begin
+  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ADataSource) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ATarget) no puede ser null');
+  Guard.CheckNotNull(ATarget, '<BindDataSource> (Param=ATemplate) no puede ser null');
+
+  LView := ATarget.GetCollectionView;
+  if (LView = nil) then
+    raise EBindError.CreateFmt('Function %s.GetCollectionView cannot return nil', [TObject(ATarget).QualifiedClassName]);
+
+  LView.Template := ATemplate;
+
+  if InternalBindDataSource(ADataSource, LView.Component) then
+    raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
   //LAdapterBindSource := TAdapterBindSource.Create(nil); //DAVID
   //LAdapterBindSource.
 end;
 
-procedure TEstrategia_LiveBindings.ClearBindings;
+procedure TStrategy_LiveBindings.ClearBindings;
 var
   i: TBindingExpression;
 begin
@@ -238,34 +262,34 @@ begin
   FBindings.Clear;
 end;
 
-constructor TEstrategia_LiveBindings.Create;
+constructor TStrategy_LiveBindings.Create;
 begin
   inherited;
   FBindings := TExpressionList.Create(false {AOwnsObjects});
 end;
 
-class constructor TEstrategia_LiveBindings.CreateC;
+class constructor TStrategy_LiveBindings.CreateC;
 begin
   FObjectListLinkers    := TCollections.CreateDictionary<TClass, TProc<PTypeInfo, TComponent, TEnumerable<TObject>>>;
-  FObjectDataSetLinkers := TCollections.CreateDictionary<TClass, TProc<TComponent>>;
+  FObjectDataSetLinkers := TCollections.CreateDictionary<TClass, TProc<TDataSource, TComponent>>;
 end;
 
-destructor TEstrategia_LiveBindings.Destroy;
+destructor TStrategy_LiveBindings.Destroy;
 begin
   ClearBindings;
   FBindings.Free;
   inherited;
 end;
 
-class destructor TEstrategia_LiveBindings.DestroyC;
+class destructor TStrategy_LiveBindings.DestroyC;
 begin
   FObjectListLinkers    := nil;
   FObjectDataSetLinkers := nil;
 end;
 
-function TEstrategia_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
+function TStrategy_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
 var
-  LProc: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>;
+  LProc : TProc<PTypeInfo, TComponent, TEnumerable<TObject>>;
   LClass: TClass;
 begin
   Result := False;
@@ -279,23 +303,44 @@ begin
   end;
 end;
 
-procedure TEstrategia_LiveBindings.Notify(const AObject: TObject; const APropertyName: string);
+function TStrategy_LiveBindings.InternalBindDataSource(ADataSource: TDataSource; AComponent: TComponent): Boolean;
+var
+  LProc : TProc<TDataSource, TComponent>;
+  LClass: TClass;
+begin
+  Result := False;
+  for LClass in FObjectDataSetLinkers.Keys do
+  begin
+    if AComponent.ClassType.InheritsFrom(LClass) then
+    begin
+      LProc(ADataSource, AComponent);
+      Exit(True);
+    end;
+  end;
+end;
+
+procedure TStrategy_LiveBindings.Notify(const AObject: TObject; const APropertyName: string);
 begin
   TBindings.Notify(AObject, APropertyName);
 end;
 
-class procedure TEstrategia_LiveBindings.RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TComponent>);
+procedure TStrategy_LiveBindings.OnObjectDestroyed(AMessage: IMessage);
+begin
+  //
+end;
+
+class procedure TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(const AClass: TClass; AProcedure: TProc<TDataSource, TComponent>);
 begin
   FObjectDataSetLinkers.AddOrSetValue(AClass, AProcedure);
 end;
 
-class procedure TEstrategia_LiveBindings.RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>);
+class procedure TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>);
 begin
   FObjectListLinkers.AddOrSetValue(AClass, AProcedure);
 end;
 
 initialization
 
-TBindingManager.RegistrarBindingStrategy(ESTRATEGIA_NAME, TEstrategia_LiveBindings);
+TBindingManager.RegisterBindingStrategy(STRATEGY_NAME, TStrategy_LiveBindings);
 
 end.

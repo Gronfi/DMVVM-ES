@@ -10,7 +10,7 @@ inherited ViewAlbums_NmXhdpiPh: TViewAlbums_NmXhdpiPh
       Size.Height = 48.000000000000000000
       inherited SpeedButtonMaster: TSpeedButton
         Size.Width = 48.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Height = 40.000000000000000000
         Visible = True
       end
       inherited LabelAlbumDetails: TLabel

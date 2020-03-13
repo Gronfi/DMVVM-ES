@@ -7,12 +7,14 @@ uses
   System.SysUtils,
   System.Generics.Collections,
   System.UITypes,
+  Data.DB,
 
   Spring,
 
   MVVM.Types;
 
 type
+{$REGION 'IPlatformServices'}
   IPlatformServices = interface
     ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
     function MessageDlg(const ATitle: string; const AText: String): Boolean;
@@ -22,7 +24,9 @@ type
     function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload;
     function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload;
   end;
+{$ENDREGION}
 
+{$REGION 'TPlatformServicesBase'}
   TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
@@ -32,14 +36,18 @@ type
     function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload; virtual; abstract;
     function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; virtual; abstract;
   end;
+{$ENDREGION}
 
   TPlatformServicesClass = class of TPlatformServicesBase;
 
+{$REGION 'IObject'}
   IObject = interface
     ['{61A3454D-3B58-4CDE-83AE-4C3E73732977}']
     function GetAsObject: TObject;
   end;
+{$ENDREGION}
 
+{$REGION 'IMessage'}
   IMessage = interface(IObject)
     ['{8C6AE8E2-B18D-41B4-AAED-88CF3B110F1D}']
     function GetCreationDateTime: TDateTime;
@@ -47,11 +55,13 @@ type
 
     property CreationDateTime: TDateTime read GetCreationDateTime;
   end;
+{$ENDREGION}
 
   TNotifyMessage = procedure (AMessage: IMessage) of Object;
 
   TListenerFilter = reference to function (AMessage: IMessage): Boolean;
 
+{$REGION 'IMessageListener'}
   IMessageListener = interface(IObject)
     ['{ABC992B0-4CB4-470A-BDCE-EBE6651C84DD}']
     function GetIsCodeToExecuteInUIMainThread: boolean;
@@ -76,20 +86,28 @@ type
     property IsCodeToExecuteInUIMainThread: boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
     property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
   end;
+{$ENDREGION}
 
+(*
+{$REGION 'INotificationChanged'}
   INotificationChanged = interface
     ['{DC4EF24C-660A-46EE-8404-4ECF67CF7287}']
   end;
+{$ENDREGION}
 
+{$REGION 'INotificationChanged<T:INotificationChanged>'}
   IEventNotificationChanged<T:INotificationChanged> = interface(IEvent<T>)
   end;
+{$ENDREGION}
 
   IEventNotificationChanged = IEventNotificationChanged<INotificationChanged>;
+*)
 
   IBindingStrategy        = Interface;
   ICollectionViewProvider = interface;
   IBindableAction         = interface;
 
+{$REGION 'INotifyPropertyChanged'}
   INotifyPropertyChanged = interface
     ['{9201E57B-98C2-4724-9D03-84E7BF15CDAE}']
     function GetBindingStrategy: IBindingStrategy;
@@ -97,7 +115,9 @@ type
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
+{$ENDREGION}
 
+{$REGION 'INotifyPropertyChangeTracking'}
   INotifyPropertyChangeTracking = interface
     ['{70345AF0-199C-4E75-A7BE-5C4929E82620}']
     function GetBindingStrategy: IBindingStrategy;
@@ -105,11 +125,13 @@ type
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
+{$ENDREGION}
 
   TCollectionSource = TEnumerable<TObject>;
 
   //ICollectionChangedEvent = IgoMultiCastEvent<TgoCollectionChangedEventArgs>;
 
+{$REGION 'INotifyCollectionChanged'}
   INotifyCollectionChanged = interface
   ['{1E5FE0CA-B5B2-4F07-B881-FC99971716C6}']
     { Gets the multi-cast event that must be fired when a collection or an
@@ -125,6 +147,7 @@ type
       in the collection has changed. }
     //function GetCollectionChangedEvent: ICollectionChangedEvent; DAVID
   end;
+{$ENDREGION}
 
   { Abstract base template class that defines the mapping between properties of
     each item in a collection and the corresponding item in the view.
@@ -135,6 +158,7 @@ type
     be assigned to the TListBoxItem.Text property.
 
     You can pass the template to the TgoDataBinder.BindCollection method. }
+{$REGION 'TDataTemplate'}
   TDataTemplate = class abstract
   public
     { Must be overridden to return the title of a given object.
@@ -185,6 +209,7 @@ type
     class function GetParent(const AItem: TObject): TObject; virtual; abstract;
     class function GetChildren( const AItem: TObject): TList<TObject>; virtual; abstract;
   end;
+{$ENDREGION}
 
   TDataTemplateClass = class of TDataTemplate;
 
@@ -195,6 +220,8 @@ type
 
     Implementors should use the abstract TgoCollectionView class in the
     Grijjy.Mvvm.DataBinding.Collections unit as a base for their views. }
+
+{$REGION 'ICollectionView'}
   ICollectionView = interface
   ['{FB28F410-1707-497B-BD1E-67C218E9EB42}']
     {$REGION 'Internal Declarations'}
@@ -224,6 +251,7 @@ type
     property Template: TDataTemplateClass read GetTemplate write SetTemplate;
     property Component: TComponent read GetComponent;
   end;
+{$ENDREGION}
 
   ICollectionViewProvider = interface
   ['{22F1E2A9-0078-4401-BA80-C8EFFEE091EA}']
@@ -239,6 +267,8 @@ type
   IBindingStrategy = interface
     ['{84676E39-0351-4F3E-AB66-814E022014BD}']
     procedure Start;
+
+    procedure OnObjectDestroyed(AMessage: IMessage);
 
     procedure Notify(const ASource: TObject; const APropertyName: String = ''); overload;
     procedure Notify(const ASource: TObject; const APropertiesNames: TArray<String>); overload;
@@ -257,6 +287,9 @@ type
                              const ACollection: TEnumerable<TObject>;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass);
+    procedure BindDataSource(const ADataSource: TDataSource;
+                             const ATarget: ICollectionViewProvider;
+                             const ATemplate: TDataTemplateClass);
     procedure BindAction(const AAction: IBindableAction;
                      const AExecute: TExecuteMethod;
                      const ACanExecute: TCanExecuteMethod = nil); overload;
@@ -264,42 +297,14 @@ type
     procedure ClearBindings;
   end;
 
-  (*
-  IDataBinder = interface
-    ['{E880F234-ED85-4594-9DA5-869100B95F8B}']
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
-                   const ATarget: TObject; const ATargetPropertyPath: String;
-                   const ADirection: EBindDirection = EBindDirection.OneWay;
-                   const AFlags: EBindFlags = [];
-                   const AValueConverterClass: TBindingValueConverterClass = nil;
-                   const ABindingStrategy: String = '';
-                   const AExtraParams: TBindExtraParams = []); overload;
-    procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String;
-                   const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String;
-                   const AFlags: EBindFlags = [];
-                   const ABindingStrategy: String = '';
-                   const AExtraParams: TBindExtraParams = []); overload;
-    procedure BindCollection(const ACollection: TEnumerable<TObject>;
-                             const ATarget: ICollectionViewProvider;
-                             const ATemplate: TDataTemplateClass;
-                             const ABindingStrategy: String = '');
-
-    procedure BindAction(const AAction: IBindableAction;
-                         const AExecute: TExecuteMethod;
-                         const ACanExecute: TCanExecuteMethod = nil;
-                         const ABindingStrategy: String = ''); overload;
-
-    procedure Notify(const AObject: TObject; const APropertyName: String); overload;
-    procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload;
-  end;
-  *)
-
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   public
     constructor Create; virtual;
     destructor Destroy; override;
 
     procedure Start; virtual;
+
+    procedure OnObjectDestroyed(AMessage: IMessage); virtual; abstract;
 
     procedure Notify(const AObject: TObject; const APropertyName: String = ''); overload; virtual; abstract;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
@@ -316,6 +321,9 @@ type
                    const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
     procedure BindCollection(AServiceType: PTypeInfo;
                              const ACollection: TEnumerable<TObject>;
+                             const ATarget: ICollectionViewProvider;
+                             const ATemplate: TDataTemplateClass); virtual; abstract;
+    procedure BindDataSource(const ADataSource: TDataSource;
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass); virtual; abstract;
     procedure BindAction(const AAction: IBindableAction;

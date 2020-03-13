@@ -83,6 +83,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
+        <DCCReference Include="dbrtl.dcp"/>
         <DCCReference Include="Src\MVVM.Bindings.pas"/>
         <DCCReference Include="Src\MVVM.Interfaces.pas"/>
         <DCCReference Include="Src\MVVM.Core.pas"/>

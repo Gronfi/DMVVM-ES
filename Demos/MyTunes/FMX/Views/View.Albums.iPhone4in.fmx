@@ -8,7 +8,6 @@ inherited ViewAlbums_iPhone4in: TViewAlbums_iPhone4in
     inherited ToolBar: TToolBar
       Size.Width = 320.000000000000000000
       inherited SpeedButtonMaster: TSpeedButton
-        Size.Height = 44.000000000000000000
         Visible = True
       end
       inherited LabelAlbumDetails: TLabel

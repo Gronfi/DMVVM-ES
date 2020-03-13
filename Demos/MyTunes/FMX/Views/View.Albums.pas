@@ -26,12 +26,19 @@ uses
   FMX.Layouts,
   FMX.ActnList,
   FMX.DialogService,
-  Grijjy.Mvvm.Controls.Fmx, // MUST be listed AFTER all other FMX.* units!
-  Grijjy.Mvvm.Views.Fmx,
+
+  MVVM.Core,
+  MVVM.Controls.Platform.FMX, // MUST be listed AFTER all other FMX.* units!
+  MVVM.Views.Platform.FMX,
+
+  //Grijjy.Mvvm.Controls.Fmx,
+  //Grijjy.Mvvm.Views.Fmx,
+
+  MyTunes.Interfaces,
   ViewModel.Albums;
 
 type
-  TViewAlbums = class(TgoFormView<TViewModelAlbums>)
+  TViewAlbums = class(TFormView<TViewModelAlbums>)
     ActionList: TActionList;
     ActionAddAlbum: TAction;
     ActionDeleteAlbum: TAction;

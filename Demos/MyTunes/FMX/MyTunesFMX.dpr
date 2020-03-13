@@ -15,7 +15,8 @@ uses
   ViewModel.Tracks in '..\Shared\ViewModels\ViewModel.Tracks.pas',
   View.Album in 'Views\View.Album.pas' {ViewAlbum},
   ViewModel.Album in '..\Shared\ViewModels\ViewModel.Album.pas',
-  Converter.TitleToCaption in '..\Shared\Converters\Converter.TitleToCaption.pas';
+  Converter.TitleToCaption in '..\Shared\Converters\Converter.TitleToCaption.pas',
+  MyTunes.Interfaces in '..\Shared\Interfaces\MyTunes.Interfaces.pas';
 
 {$R *.res}
 

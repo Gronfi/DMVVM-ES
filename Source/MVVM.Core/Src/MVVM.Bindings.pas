@@ -5,16 +5,19 @@ interface
 uses
   System.Classes,
   Generics.Collections,
-  //System.Bindings.Expression, System.Bindings.Helper,
   System.RTTI,
+  Data.DB,
 
   Spring,
   Spring.Collections,
 
   MVVM.Interfaces,
-  MVVM.Types;
+  MVVM.Types,
+
+  MVVM.Messages.Engine;
 
 type
+{$REGION 'TBindingManager'}
   TBindingManager = class
   private
     class var
@@ -49,6 +52,10 @@ type
                              const ATarget: ICollectionViewProvider;
                              const ATemplate: TDataTemplateClass;
                              const ABindingStrategy: String = '');
+    procedure BindDataSource(const ADataSource: TDataSource;
+                             const ATarget: ICollectionViewProvider;
+                             const ATemplate: TDataTemplateClass;
+                             const ABindingStrategy: String = '');
     procedure BindAction(const AAction: IBindableAction;
                          const AExecute: TExecuteMethod;
                          const ACanExecute: TCanExecuteMethod = nil;
@@ -57,8 +64,15 @@ type
     procedure Notify(const AObject: TObject; const APropertyName: String); overload; virtual;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
-    class procedure RegistrarBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
+    class procedure RegisterBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
   end;
+{$ENDREGION}
+
+  TMessage_Object_Destroyed = class(TMessage)
+
+  end;
+
+  TMessageChannel_OBJECT_DESTROYED = class(TMessageChannel<TThreadMessageHandler>);
 
 implementation
 
@@ -117,6 +131,14 @@ var
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.BindCollection(TypeInfo(T), ACollection, ATarget, ATemplate);
+end;
+
+procedure TBindingManager.BindDataSource(const ADataSource: TDataSource; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia.BindDataSource(ADataSource, ATarget, ATemplate);
 end;
 
 function TBindingManager.ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String): IBindingStrategy;
@@ -202,7 +224,7 @@ begin
     FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertyName);
 end;
 
-class procedure TBindingManager.RegistrarBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
+class procedure TBindingManager.RegisterBindingStrategy(const AEstrategia: String; ABindingStrategyClass: TClass_BindingStrategyBase);
 begin
   FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia, ABindingStrategyClass);
 end;

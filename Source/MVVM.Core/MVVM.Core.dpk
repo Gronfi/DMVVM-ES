@@ -28,7 +28,8 @@ package MVVM.Core;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl;
+  rtl,
+  dbrtl;
 
 contains
   MVVM.Bindings in 'Src\MVVM.Bindings.pas',
