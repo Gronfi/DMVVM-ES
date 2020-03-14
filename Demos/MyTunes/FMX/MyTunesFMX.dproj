@@ -90,7 +90,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>MyTunesFMX</SanitizedProjectName>
-        <DCC_UnitSearchPath>..\..\..\Bin\$(Platform)\$(Config)\DCP;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\Bin\$(Platform)\$(Config)\DCP;..\GrijjyFoundation;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DcpOutput>..\..\..\Bin\$(Platform)\$(Config)\DCP</DCC_DcpOutput>
         <DCC_BplOutput>..\..\..\Bin\$(Platform)\$(Config)\</DCC_BplOutput>
         <UsePackages>true</UsePackages>

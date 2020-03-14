@@ -5,11 +5,12 @@ interface
 uses
   System.TimeSpan,
   System.Generics.Collections,
-  Grijjy.Mvvm.Observable;
+  //Grijjy.Mvvm.Observable;
+  MVVM.Observable;
 
 type
   { A model that represents a musical track an on album }
-  TAlbumTrack = class(TgoObservable)
+  TAlbumTrack = class(TObservable)
   {$REGION 'Internal Declarations'}
   private
     FName: String;
@@ -32,7 +33,7 @@ type
   end;
 
 type
-  TAlbumTracks = class(TgoObservableCollection<TAlbumTrack>)
+  TAlbumTracks = class(TObservableCollection<TAlbumTrack>)
   public
     constructor Create;
     procedure Assign(const ASource: TEnumerable<TAlbumTrack>);

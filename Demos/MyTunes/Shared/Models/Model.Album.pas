@@ -6,12 +6,14 @@ uses
   System.SysUtils,
   System.UITypes,
   System.Generics.Collections,
-  Grijjy.Mvvm.Observable,
+
+  MVVM.Observable,
+  //Grijjy.Mvvm.Observable,
   Model.Track;
 
 type
   { A model that represents a musical album }
-  TAlbum = class(TgoObservable)
+  TAlbum = class(TObservable)
   {$REGION 'Internal Declarations'}
   private
     FTitle: String;

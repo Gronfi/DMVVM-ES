@@ -107,6 +107,13 @@ type
   ICollectionViewProvider = interface;
   IBindableAction         = interface;
 
+{$REGION 'INotifyFree'}
+  INotifyFree = interface
+  ['{1AC2CD8F-9023-470B-AB35-533B3CF45EB3}']
+    procedure NotifyFree;
+  end;
+{$ENDREGION}
+
 {$REGION 'INotifyPropertyChanged'}
   INotifyPropertyChanged = interface
     ['{9201E57B-98C2-4724-9D03-84E7BF15CDAE}']
@@ -268,8 +275,6 @@ type
     ['{84676E39-0351-4F3E-AB66-814E022014BD}']
     procedure Start;
 
-    procedure OnObjectDestroyed(AMessage: IMessage);
-
     procedure Notify(const ASource: TObject; const APropertyName: String = ''); overload;
     procedure Notify(const ASource: TObject; const APropertiesNames: TArray<String>); overload;
 
@@ -298,15 +303,11 @@ type
   end;
 
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
-  protected
-    F
   public
     constructor Create; virtual;
     destructor Destroy; override;
 
     procedure Start; virtual;
-
-    procedure OnObjectDestroyed(AMessage: IMessage); virtual; abstract;
 
     procedure Notify(const AObject: TObject; const APropertyName: String = ''); overload; virtual; abstract;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;

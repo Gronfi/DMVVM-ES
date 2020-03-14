@@ -39,6 +39,7 @@ contains
   MVVM.Bindings.Collections in 'Src\MVVM.Bindings.Collections.pas',
   MVVM.Classes in 'Src\MVVM.Classes.pas',
   MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
-  MVVM.Utils in 'Src\MVVM.Utils.pas';
+  MVVM.Utils in 'Src\MVVM.Utils.pas',
+  MVVM.Observable in 'Src\MVVM.Observable.pas';
 
 end.

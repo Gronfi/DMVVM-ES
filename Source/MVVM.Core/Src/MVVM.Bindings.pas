@@ -68,17 +68,27 @@ type
   end;
 {$ENDREGION}
 
+{$REGION 'TMessage_Object_Destroyed'}
   TMessage_Object_Destroyed = class(TMessage)
+  private
+    FObjectDestroyed: TObject;
+  public
+    constructor Create(AObjectDestroyed: TObject); overload;
 
+    property ObjectDestroyed: TObject read FObjectDestroyed write FObjectDestroyed;
   end;
 
+  TMessageListener_TMessage_Object_Destroyed = class(TMessageListener<TMessage_Object_Destroyed>);
+
   TMessageChannel_OBJECT_DESTROYED = class(TMessageChannel<TThreadMessageHandler>);
+{$ENDREGION}
 
 implementation
 
 uses
   System.SysUtils,
 
+  MVVM.Utils,
   MVVM.Core;
 
 { TBindingManager }
@@ -176,7 +186,7 @@ end;
 
 destructor TBindingManager.Destroy;
 begin
-  //FDiccionarioNotificacionEstrategias := nil;
+  FDiccionarioEstrategias := nil;
   inherited;
 end;
 
@@ -184,29 +194,6 @@ class destructor TBindingManager.DestroyC;
 begin
   FDiccionarioEstrategiasBinding := nil;
 end;
-
-(*
-function TBindingManager.GetEstrategiaPorDefecto: String;
-begin
-  if not FEstrategiaPorDefecto.IsEmpty then
-    Exit(FEstrategiaPorDefecto);
-  {$IFDEF MSWINDOWS}
-    Result := CBasicStrategies[EBasicStrategies._LIVEBINDINGS];
-  {$ENDIF}
-  {$IFDEF LINUX}
-    Result := CEstrategiasBasicas[EEstrategiasBasicas._RTTI];
-  {$ENDIF}
-  {$IFDEF ANDROID}
-    Result := CEstrategiasBasicas[EEstrategiasBasicas._RTTI];
-  {$ENDIF}
-  {$IFDEF POSIX}
-    Result := CEstrategiasBasicas[EEstrategiasBasicas._RTTI];
-  {$ENDIF}
-  {$IFDEF MACOS}
-    Result := CEstrategiasBasicas[EEstrategiasBasicas._RTTI];
-  {$ENDIF}
-end;
-*)
 
 procedure TBindingManager.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
 var
@@ -229,14 +216,20 @@ begin
   FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia, ABindingStrategyClass);
 end;
 
-(*
-procedure TBindingManager.SetEstrategiaPorDefecto(const AValue: String);
+{ TMessage_Object_Destroyed }
+
+constructor TMessage_Object_Destroyed.Create(AObjectDestroyed: TObject);
 begin
-  if FEstrategiaPorDefecto <> AValue then
-  begin
-    FEstrategiaPorDefecto := AValue;
-  end;
+  inherited Create;
+  FObjectDestroyed := AObjectDestroyed;
 end;
-*)
+
+initialization
+
+MVVMCore.Container.RegisterType<TMessageChannel_OBJECT_DESTROYED>(
+  function: TMessageChannel_OBJECT_DESTROYED
+  begin
+    Result := TMessageChannel_OBJECT_DESTROYED.Create(Utils.iif<Integer>((TThread.ProcessorCount > 2), 2, TThread.ProcessorCount));
+  end).AsSingleton;
 
 end.

@@ -7,7 +7,7 @@ uses
   System.TypInfo,
   System.SysUtils,
   System.Generics.Collections,
-  System.Bindings.Expression, System.Bindings.Helper,
+  System.Bindings.Expression, System.Bindings.Helper, System.Bindings.EvalProtocol, System.Bindings.Outputs,
   System.RTTI,
   Data.DB,
 
@@ -22,13 +22,39 @@ const
 
 type
   TStrategy_LiveBindings = class(TBindingStrategyBase)
+  private type
+    TInternalBindindExpression = class(TComponent)
+    private
+      FSynchronizer    : IReadWriteSync;
+      FExpression      : TBindingExpression;
+      FTrackedInstances: ISet<Pointer>;
+      FListener        : TMessageListener_TMessage_Object_Destroyed;
+
+      procedure SetFreeNotification(const AInstance: TObject);
+      procedure RemoveFreeNotification(const AInstance: TObject);
+      procedure HandleFreeEvent(const ASender, AInstance: TObject);
+    protected
+      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+      procedure OnObjectDestroyed(AMessage: IMessage);
+    public
+      constructor Create(const InputScopes: array of IScope;
+                         const BindExprStr: string;
+                         const OutputScopes: array of IScope;
+                         const OutputExpr: string;
+                         const OutputConverter: IValueRefConverter;
+                         Manager: TBindingManager = nil;
+                         Options: TBindings.TCreateOptions = [coNotifyOutput]); reintroduce;
+      destructor Destroy; override;
+
+      property Expression: TBindingExpression read FExpression;
+    end;
   private
     class var
       FObjectListLinkers   : IDictionary<TClass, TProc<PTypeInfo, TComponent, TEnumerable<TObject>>>;
       FObjectDataSetLinkers: IDictionary<TClass, TProc<TDataSet, TComponent>>;
   protected
     type
-      TExpressionList = TObjectList<TBindingExpression>;
+      TExpressionList = TObjectList<TInternalBindindExpression>;
   private
     var
       FBindings: TExpressionList;
@@ -43,7 +69,7 @@ type
     constructor Create; override;
     destructor Destroy; override;
 
-    procedure OnObjectDestroyed(AMessage: IMessage); override;
+    procedure OnObjectDestroyed(AMessage: IMessage);
 
     procedure Notify(const AObject: TObject; const APropertyName: string = ''); overload; override;
 
@@ -76,8 +102,7 @@ type
 implementation
 
 uses
-  System.Bindings.EvalProtocol,
-  //Data.Bind.ObjectScope,
+  MVVM.Core,
 
   Spring;
 
@@ -92,7 +117,7 @@ procedure TStrategy_LiveBindings.Bind(const ASource: TObject; const ASourcePrope
 var
   LSrcProperty, LDstProperty: String;
   lAssocInput, lAssocOutput : IScope;
-  lManaged                  : TBindingExpression;
+  lManaged                  : TInternalBindindExpression;
   LOptions                  : TBindings.TCreateOptions;
   LNotifyPropertyChanged       : MVVM.Interfaces.INotifyPropertyChanged;
   LNotifyPropertyChangeTracking: MVVM.Interfaces.INotifyPropertyChangeTracking;
@@ -112,12 +137,11 @@ begin
          LSrcProperty:= ASourcePropertyPath;
          LDstProperty:= ATargetPropertyPath;
        end;
-  LManaged    := TBindings.CreateManagedBinding(
-                                                [LAssocInput], LSrcProperty,
-                                                [LAssocOutput], LDstProperty,
-                                                nil,
-                                                nil,
-                                                LOptions);
+  LManaged:= TInternalBindindExpression.Create([LAssocInput], LSrcProperty,
+                                               [LAssocOutput], LDstProperty,
+                                               nil,
+                                               nil,
+                                               LOptions);
   FBindings.Add(LManaged);
 
   // Settings especiales segun interfaces
@@ -143,7 +167,7 @@ begin
            LSrcProperty:= ATargetPropertyPath;
            LDstProperty:= ASourcePropertyPath;
          end;
-    LManaged    := TBindings.CreateManagedBinding(
+    LManaged := TInternalBindindExpression.Create(
                                                   [LAssocInput], LSrcProperty,
                                                   [LAssocOutput], LDstProperty,
                                                   nil,
@@ -170,7 +194,7 @@ procedure TStrategy_LiveBindings.Bind(const ASources: TSourcePairArray;
 var
   LSrcProperty, LDstProperty: String;
   lAssocInput, lAssocOutput : IScope;
-  lManaged                  : TBindingExpression;
+  lManaged                  : TInternalBindindExpression;
   LOptions                  : TBindings.TCreateOptions;
   LArrayAsociacion          : array of TBindingAssociation;
   I, LCnt                   : Integer;
@@ -200,7 +224,7 @@ begin
   lAssocOutput:= TBindings.CreateAssociationScope([Associate(ATarget, ATargetAlias)]);
   LSrcProperty:= ASourceExpresion;
   LDstProperty:= ATargetPropertyPath;
-  LManaged    := TBindings.CreateManagedBinding(
+  LManaged    := TInternalBindindExpression.Create(
                                                 [LAssocInput], LSrcProperty,
                                                 [LAssocOutput], LDstProperty,
                                                 nil,
@@ -253,12 +277,15 @@ begin
   //LAdapterBindSource.
 end;
 
+// DAVID, liberacion
 procedure TStrategy_LiveBindings.ClearBindings;
 var
-  i: TBindingExpression;
+  i: TInternalBindindExpression;
 begin
   for i in FBindings do
-    TBindings.RemoveBinding(i);
+  begin
+    TBindings.RemoveBinding(i.Expression);
+  end;
   FBindings.Clear;
 end;
 
@@ -337,6 +364,117 @@ end;
 class procedure TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>);
 begin
   FObjectListLinkers.AddOrSetValue(AClass, AProcedure);
+end;
+
+{ TStrategy_LiveBindings.TInternalBindindExpression }
+
+constructor TStrategy_LiveBindings.TInternalBindindExpression.Create(
+                                                                    const InputScopes: array of IScope; const BindExprStr: string;
+                                                                    const OutputScopes: array of IScope; const OutputExpr: string;
+                                                                    const OutputConverter: IValueRefConverter;
+                                                                    Manager: TBindingManager;
+                                                                    Options: TBindings.TCreateOptions);
+var
+  FChannel: TMessageChannel_OBJECT_DESTROYED;
+begin
+  inherited Create(nil);
+  FSynchronizer     := TMREWSync.Create;
+  FTrackedInstances := TCollections.CreateSet<Pointer>;
+
+  FChannel          := MVVMCore.Container.Resolve<TMessageChannel_OBJECT_DESTROYED>;
+  FListener         := TMessageListener_TMessage_Object_Destroyed.Create(FChannel);
+  FListener.FilterCondition := function (AMessage: IMessage): Boolean
+                               begin
+                                 FSynchronizer.BeginRead;
+                                 try
+                                   Result := FTrackedInstances.Contains(TMessage_Object_Destroyed(AMessage).ObjectDestroyed)
+                                 finally
+                                   FSynchronizer.EndRead;
+                                 end;
+                               end;
+
+  FExpression       := TBindings.CreateManagedBinding(
+                                InputScopes, BindExprStr,
+                                OutputScopes, OutputExpr,
+                                nil,
+                                nil,
+                                Options);
+end;
+
+destructor TStrategy_LiveBindings.TInternalBindindExpression.Destroy;
+var
+  P       : Pointer;
+  Instance: TObject;
+begin
+  if (FTrackedInstances <> nil) then
+  begin
+    for P in FTrackedInstances do
+    begin
+      Instance := TObject(P);
+      RemoveFreeNotification(Instance);
+    end;
+    FTrackedInstances := nil;
+  end;
+  inherited;
+end;
+
+procedure TStrategy_LiveBindings.TInternalBindindExpression.HandleFreeEvent(const ASender, AInstance: TObject);
+begin
+  FSynchronizer.BeginWrite;
+  try
+    FTrackedInstances.Remove(AInstance);
+  finally
+    FSynchronizer.EndWrite;
+  end;
+end;
+
+procedure TStrategy_LiveBindings.TInternalBindindExpression.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (Operation = opRemove) then
+    HandleFreeEvent(AComponent, AComponent);
+end;
+
+procedure TStrategy_LiveBindings.TInternalBindindExpression.OnObjectDestroyed(AMessage: IMessage);
+begin
+  FSynchronizer.BeginWrite;
+  try
+    FTrackedInstances.Remove(TMessage_Object_Destroyed(AMessage).ObjectDestroyed);
+  finally
+    FSynchronizer.EndWrite;
+  end;
+
+end;
+
+procedure TStrategy_LiveBindings.TInternalBindindExpression.RemoveFreeNotification(const AInstance: TObject);
+begin
+  if (AInstance is TComponent) then
+    TComponent(AInstance).RemoveFreeNotification(Self);
+end;
+
+procedure TStrategy_LiveBindings.TInternalBindindExpression.SetFreeNotification(const AInstance: TObject);
+var
+  NotifyFree: INotifyFree;
+begin
+  if (AInstance is TComponent) then
+  begin
+    FSynchronizer.BeginWrite;
+    try
+      FTrackedInstances.Add(AInstance);
+    finally
+      FSynchronizer.EndWrite;
+    end;
+    TComponent(AInstance).FreeNotification(Self);
+  end
+  else if Supports(AInstance, INotifyFree, NotifyFree) then
+  begin
+    FSynchronizer.BeginWrite;
+    try
+      FTrackedInstances.Add(AInstance);
+    finally
+      FSynchronizer.EndWrite;
+    end;
+  end;
 end;
 
 initialization
