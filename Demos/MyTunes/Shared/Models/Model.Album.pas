@@ -7,6 +7,7 @@ uses
   System.UITypes,
   System.Generics.Collections,
 
+  MyTunes.Interfaces,
   MVVM.Observable,
   //Grijjy.Mvvm.Observable,
   Model.Track;
@@ -73,7 +74,7 @@ type
   end;
 
 type
-  TAlbums = TgoObservableCollection<TAlbum>;
+  TAlbums = TObservableCollection<IAlbum>;
 
 implementation
 

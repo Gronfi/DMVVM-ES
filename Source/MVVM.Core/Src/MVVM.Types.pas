@@ -7,11 +7,11 @@ uses
   System.RTTI,
   System.Generics.Collections;
 
-//type
-//  EBasicStrategies = (_RTTI,_LIVEBINDINGS);
+// type
+// EBasicStrategies = (_RTTI,_LIVEBINDINGS);
 //
-//const
-//  CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
+// const
+// CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
 
 type
   EBindDirection = (
@@ -24,7 +24,7 @@ type
     TwoWay);
 
   EBindFlag = (
-    { If the text used for properties is an expression to evaluate, and not directly an expression}
+    { If the text used for properties is an expression to evaluate, and not directly an expression }
     UsesExpressions,
 
     { If you want to get notified while a property of the source object
@@ -58,11 +58,12 @@ type
       target.
 
       Parameters:
-        ASource: the property value of the data binding source.
+      ASource: the property value of the data binding source.
 
       Returns:
-        ASource converted for the target binding. }
-    class function ConvertSourceToTarget(const ASource: TValue): TValue; virtual; abstract;
+      ASource converted for the target binding. }
+    class function ConvertSourceToTarget(const ASource: TValue): TValue;
+      virtual; abstract;
 
     { Converts a property value from a data binding target to a property value
       for the data binding source.
@@ -71,19 +72,20 @@ type
       the opposite direction (from target to source).
 
       Parameters:
-        ATarget: the property value of the data binding target.
+      ATarget: the property value of the data binding target.
 
       Returns:
-        ATarget converted for the source binding.
+      ATarget converted for the source binding.
 
       This method is optional. It returns ATarget by default. }
-    class function ConvertTargetToSource(const ATarget: TValue): TValue; virtual;
+    class function ConvertTargetToSource(const ATarget: TValue)
+      : TValue; virtual;
   end;
 
   RSourcePair = record
-    public
-      Source: TObject;
-      Alias : String;
+  public
+    Source: TObject;
+    Alias: String;
   end;
 
   TSourcePairArray = TArray<RSourcePair>;
@@ -92,17 +94,17 @@ type
 
   TBindExtraParams = TArray<TPair<String, String>>;
 
-  { Acciones Bindables } //DAVID: no me gusta como queda por las interfaces
+  { Acciones Bindables } // DAVID: no me gusta como queda por las interfaces
 
   { The type of method to invoke when an IBindableAction is executed. }
   TExecuteMethod = TProc;
-  //TExecuteMethod = procedure of Object;
+  // TExecuteMethod = procedure of Object;
 
   { The type of method to invoke to check whether an IBindableAction can be
     executed. The Enabled property of the action will be set to the result of
     this function. }
   TCanExecuteMethod = TFunc<Boolean>;
-  //TCanExecuteMethod = function:Boolean of object;
+  // TCanExecuteMethod = function:Boolean of object;
 
   TCollectionChangedAction = (
     { An item was added or inserted into the collection.
@@ -134,15 +136,17 @@ type
 
   { The arguments passed to an ICollectionChangedEvent. }
   TCollectionChangedEventArgs = record
-  {$REGION 'Internal Declarations'}
+{$REGION 'Internal Declarations'}
   private
     FAction: TCollectionChangedAction;
     FItem: TObject;
     FItemIndex: Integer;
     FPropertyName: String;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
-    constructor Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
+    constructor Create(const AAction: TCollectionChangedAction;
+      const AItem: TObject; const AItemIndex: Integer;
+      const APropertyName: String);
 
     { The action that caused the event. The availability of the other properties
       depends on this action. }
@@ -174,14 +178,17 @@ implementation
 
 { TBindingValueConverter }
 
-class function TBindingValueConverter.ConvertTargetToSource(const ATarget: TValue): TValue;
+class function TBindingValueConverter.ConvertTargetToSource
+  (const ATarget: TValue): TValue;
 begin
   Result := ATarget;
 end;
 
 { TCollectionChangedEventArgs }
 
-constructor TCollectionChangedEventArgs.Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
+constructor TCollectionChangedEventArgs.Create(const AAction
+  : TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer;
+  const APropertyName: String);
 begin
   FAction := AAction;
   FItem := AItem;

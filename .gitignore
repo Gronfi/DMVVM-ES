@@ -287,3 +287,8 @@
 /Source/MVVM.Binding.Strategies/LiveBindings/Obj/Win32/Debug
 /Source/MVVM.Binding.Strategies/LiveBindings/Src/__history
 /Source/MVVM.Binding.Strategies/LiveBindings/__history
+/Demos/MyTunes/FMX/*.identcache
+/Demos/MyTunes/FMX/Obj/Win32/Debug
+/Demos/MyTunes/Shared/Models/__history
+/Source/MVVM.Binding.Strategies/LiveBindings.FMX/*.identcache
+/Source/MVVM.Binding.Strategies/LiveBindings/*.identcache

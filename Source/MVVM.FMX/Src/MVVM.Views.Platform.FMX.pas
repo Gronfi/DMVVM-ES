@@ -14,14 +14,14 @@ uses
   MVVM.Bindings;
 
 type
-  TFrameView<T:IViewModel> = class(TFrame, IView, IView<T>)
-  {$REGION 'Internal Declarations'}
+  TFrameView<T: IViewModel> = class(TFrame, IView, IView<T>)
+{$REGION 'Internal Declarations'}
   private
     FBinder: TBindingManager;
     FViewModel: T;
   protected
     function GetViewModel: T; virtual;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   protected
     procedure SetupView; virtual;
 
@@ -36,20 +36,20 @@ type
     property Binder: TBindingManager read FBinder;
   end;
 
-  TFormView<T:IViewModel> = class(TForm, IView, IView<T>, IViewForm<T>)
-  {$REGION 'Internal Declarations'}
+  TFormView<T: IViewModel> = class(TForm, IView, IView<T>, IViewForm<T>)
+{$REGION 'Internal Declarations'}
   private
-    {$IFNDEF MOBILE}
+{$IFNDEF MOBILE}
     FPrevForm: TCommonCustomForm;
     FOverlay: TRectangle;
-    {$ENDIF}
+{$ENDIF}
     FBinder: TBindingManager;
     FViewModel: T;
     FGrayOutPreviousForm: Boolean;
   protected
     procedure DoClose(var CloseAction: TCloseAction); override;
     function GetViewModel: T; virtual;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   protected
     procedure SetupView; virtual;
 
@@ -63,7 +63,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
-    property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm write FGrayOutPreviousForm;
+    property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm
+      write FGrayOutPreviousForm;
 
     property Binder: TBindingManager read FBinder;
   end;
@@ -79,11 +80,11 @@ uses
 
 constructor TFormView<T>.Create(AOwner: TComponent);
 begin
-  {$IFNDEF MOBILE}
-  FPrevForm            := Screen.ActiveForm;
-  {$ENDIF}
+{$IFNDEF MOBILE}
+  FPrevForm := Screen.ActiveForm;
+{$ENDIF}
   inherited;
-  FBinder              := TBindingManager.Create;
+  FBinder := TBindingManager.Create;
   FGrayOutPreviousForm := True;
 end;
 
@@ -105,13 +106,13 @@ begin
     results in a callback, }
   if (ModalResult = mrNone) then
     ModalResult := mrCancel;
-  {$IFNDEF MOBILE}
+{$IFNDEF MOBILE}
   if Assigned(FPrevForm) and (FGrayOutPreviousForm) then
   begin
     FPrevForm.RemoveObject(FOverlay);
     FOverlay.DisposeOf;
   end;
-  {$ENDIF}
+{$ENDIF}
 end;
 
 procedure TFormView<T>.Execute;
@@ -129,7 +130,7 @@ var
   PrevForm: TCommonCustomForm;
 {$ENDIF}
 begin
-  {$IFNDEF MOBILE}
+{$IFNDEF MOBILE}
   PrevForm := Screen.ActiveForm;
   if (PrevForm <> nil) then
     FPrevForm := PrevForm;
@@ -142,7 +143,7 @@ begin
     FOverlay.Fill.Color := $50000000;
     FPrevForm.AddObject(FOverlay);
   end;
-  {$ENDIF}
+{$ENDIF}
   ShowModal(AResultProc);
 end;
 

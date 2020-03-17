@@ -16,14 +16,15 @@ uses
 type
 
   { Forward Declarations }
-  TMessage                  = class;
-  TMessageClass             = class of TMessage;
+  TMessage = class;
+  TMessageClass = class of TMessage;
   TThreadMessageHandlerBase = class;
-  TThreadMessageHandler     = class;
-  TMessageChannel           = class;
+  TThreadMessageHandler = class;
+  TMessageChannel = class;
   TThreadMessageHandlerType = class of TThreadMessageHandler;
 
 {$REGION 'TMessage'}
+
   TMessage = class abstract(TInterfacedObject, IMessage)
   private
     FCreationDateTime: TDateTime;
@@ -41,15 +42,16 @@ type
     property CreationDateTime: TDateTime read GetCreationDateTime;
   end;
 {$ENDREGION}
-
 {$REGION 'TMessageListener'}
-  TMessageListener = class abstract(TInterfacedObject, IMessageListener, IObject)
+
+  TMessageListener = class abstract(TInterfacedObject,
+    IMessageListener, IObject)
   private
-    FIsCodeToExecuteInUIMainThread : Boolean;
-    FThreadMensajes                : TThreadMessageHandler;
-    FPoolMensajes                  : TMessageChannel;
-    FTypeRestriction               : EMessageTypeRestriction;
-    FFilterCondition               : TListenerFilter;
+    FIsCodeToExecuteInUIMainThread: Boolean;
+    FThreadMensajes: TThreadMessageHandler;
+    FPoolMensajes: TMessageChannel;
+    FTypeRestriction: EMessageTypeRestriction;
+    FFilterCondition: TListenerFilter;
 
     function GetIsCodeToExecuteInUIMainThread: Boolean;
     procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
@@ -57,7 +59,8 @@ type
     function GetThreadMensajes: TThreadMessageHandler;
 
     function GetTypeRestriction: EMessageTypeRestriction;
-    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
+    procedure SetTypeRestriction(const ATypeRestriction
+      : EMessageTypeRestriction);
 
     function GetListenerFilter: TListenerFilter;
     procedure SetListenerFilter(const AFilter: TListenerFilter);
@@ -67,8 +70,16 @@ type
   public
     procedure AfterConstruction; override;
 
-    constructor Create(const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); reintroduce; overload; virtual;
-    constructor Create(const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); reintroduce; overload; virtual;
+    constructor Create(const AThreadMensajes: TThreadMessageHandler;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); reintroduce; overload; virtual;
+    constructor Create(const APoolThreadsMensajes: TMessageChannel;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); reintroduce; overload; virtual;
 
     destructor Destroy; override;
 
@@ -83,9 +94,13 @@ type
 
     procedure NewMessage(AMessage: IMessage); virtual;
 
-    property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
-    property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
-    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
+    property IsCodeToExecuteInUIMainThread: Boolean
+      read GetIsCodeToExecuteInUIMainThread
+      write SetIsCodeToExecuteInUIMainThread;
+    property FilterCondition: TListenerFilter read GetListenerFilter
+      write SetListenerFilter;
+    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction
+      write SetTypeRestriction;
   end;
 
   TMessageListener<T: TMessage> = class abstract(TMessageListener)
@@ -95,8 +110,16 @@ type
     function GetOnMessage: IEvent<TNotifyMessage>;
     procedure NewMessage(AMessage: IMessage); override; final;
   public
-    constructor Create(const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload; override;
-    constructor Create(const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload; override;
+    constructor Create(const AThreadMensajes: TThreadMessageHandler;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload; override;
+    constructor Create(const APoolThreadsMensajes: TMessageChannel;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload; override;
     destructor Destroy; override;
 
     function GetMensajeClass: TClass; override; final;
@@ -108,35 +131,55 @@ type
   private
     FModel: IModel;
   public
-    constructor Create(AModel: IModel; const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
-    constructor Create(AModel: IModel; const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
+    constructor Create(AModel: IModel;
+      const AThreadMensajes: TThreadMessageHandler;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload;
+    constructor Create(AModel: IModel;
+      const APoolThreadsMensajes: TMessageChannel;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload;
   end;
 
-  TMessageListenerViewModel<T: TMessage; K: IViewModel> = class(TMessageListener<T>)
+  TMessageListenerViewModel<T: TMessage; K: IViewModel> = class
+    (TMessageListener<T>)
   private
     FViewModel: IViewModel;
   public
-    constructor Create(AViewModel: IViewModel; const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
-    constructor Create(AViewModel: IViewModel; const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
+    constructor Create(AViewModel: IViewModel;
+      const AThreadMensajes: TThreadMessageHandler;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload;
+    constructor Create(AViewModel: IViewModel;
+      const APoolThreadsMensajes: TMessageChannel;
+      const AFilterCondition: TListenerFilter = nil;
+      const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+      mtrAllowDescendants); overload;
   end;
 
 {$ENDREGION}
-
 {$REGION 'TThreadedQueue<T>'}
+
   TThreadedQueue<T> = class
   private
     FQueue: array of T;
     FQueueSize, FQueueOffset: Integer;
-    FQueueUnLock,
-    FQueueNotEmpty,
-    FQueueNotFull: TObject;
+    FQueueUnLock, FQueueNotEmpty, FQueueNotFull: TObject;
     FQueueLock: TObject;
     FShutDown: Boolean;
     FPushTimeout, FPopTimeout: Cardinal;
     FTotalItemsPushed, FTotalItemsPopped: Cardinal;
 
   public
-    constructor Create(AQueueDepth: Integer = 10; PushTimeout: Cardinal = INFINITE; PopTimeout: Cardinal = INFINITE);
+    constructor Create(AQueueDepth: Integer = 10;
+      PushTimeout: Cardinal = INFINITE; PopTimeout: Cardinal = INFINITE);
     destructor Destroy; override;
 
     procedure Grow(ADelta: Integer);
@@ -144,12 +187,15 @@ type
     function PushItem(AItem: T; var AQueueSize: Integer): TWaitResult; overload;
     function PopItem: T; overload;
     function PopItem(var AQueueSize: Integer): T; overload;
-    function PopItem(var AQueueSize: Integer; var AItem: T): TWaitResult; overload;
+    function PopItem(var AQueueSize: Integer; var AItem: T)
+      : TWaitResult; overload;
     function PopItem(var AItem: T): TWaitResult; overload;
     procedure DoShutDown;
 
-    function PushItem(AItem: T; var AQueueSize: Integer; const ATimeout: Cardinal): TWaitResult; overload;
-    function PopItem(var AQueueSize: Integer; var AItem: T; const ATimeout: Cardinal): TWaitResult; overload;
+    function PushItem(AItem: T; var AQueueSize: Integer;
+      const ATimeout: Cardinal): TWaitResult; overload;
+    function PopItem(var AQueueSize: Integer; var AItem: T;
+      const ATimeout: Cardinal): TWaitResult; overload;
 
     property QueueSize: Integer read FQueueSize;
     property ShutDown: Boolean read FShutDown;
@@ -157,17 +203,17 @@ type
     property TotalItemsPopped: Cardinal read FTotalItemsPopped;
   end;
 {$ENDREGION}
-
 {$REGION 'TThreadMessageHandlerBase'}
+
   TThreadMessageHandlerBase = class abstract(TThread)
   const
     CTE_INITIAL_QUEUE_SIZE = 10;
-    CTE_PUSH_TIMEOUT       = 100;
+    CTE_PUSH_TIMEOUT = 100;
   private
-    //FPerformance      : TPerformanceCounter;
-    FSynchronizer : IReadWriteSync;
-    FMessageCount : Int64;
-    FMessages     : TThreadedQueue<IMessage>;
+    // FPerformance      : TPerformanceCounter;
+    FSynchronizer: IReadWriteSync;
+    FMessageCount: Int64;
+    FMessages: TThreadedQueue<IMessage>;
 
     procedure AdquireWrite;
     procedure ReleaseWrite;
@@ -177,7 +223,8 @@ type
     procedure ProcessQueuedMessage(AMessage: IMessage);
     procedure ProcessMessages;
 
-    function GetNextMessage(out AQueueSize: Integer; var AMessage: IMessage): TWaitResult;
+    function GetNextMessage(out AQueueSize: Integer; var AMessage: IMessage)
+      : TWaitResult;
   protected
     procedure Execute; override;
 
@@ -194,13 +241,13 @@ type
   end;
 
 {$ENDREGION}
-
 {$REGION 'TThreadMessageHandler'}
+
   TThreadMessageHandler = class(TThreadMessageHandlerBase)
   private
-    FListeners             : IList<IMessageListener>;
-    FSynchronizerListeners : IReadWriteSync;
-    FPool                  : TMessageChannel;
+    FListeners: IList<IMessageListener>;
+    FSynchronizerListeners: IReadWriteSync;
+    FPool: TMessageChannel;
   protected
     procedure ProcessMessage(AMessage: IMessage); override;
 
@@ -224,18 +271,19 @@ type
     procedure UnRegister;
   end;
 {$ENDREGION}
-
 {$REGION 'TMessageChannel'}
+
   TMessageChannel = class abstract(TThreadMessageHandlerBase)
   private
-    FSynchronizer    :  IReadWriteSync;
-    FThreadsMensajes  : IList<TThreadMessageHandler>;
-    //FRegistrationMode : TMensajeRegistrationMode;
-    FThreadCount      : Integer;
+    FSynchronizer: IReadWriteSync;
+    FThreadsMensajes: IList<TThreadMessageHandler>;
+    // FRegistrationMode : TMensajeRegistrationMode;
+    FThreadCount: Integer;
     FThreadCountTarget: Integer;
 
     procedure AddThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
-    procedure RemoveThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
+    procedure RemoveThreadMensajes(const AThreadMensajes
+      : TThreadMessageHandler);
 
     procedure CreateThreads;
     procedure DestroyThreads;
@@ -268,8 +316,8 @@ type
     property ThreadCount: Integer read GetThreadCount write SetThreadCount;
   end;
 {$ENDREGION}
-
 {$REGION 'TMessageChannel<T>'}
+
   TMessageChannel<T: TThreadMessageHandler> = class(TMessageChannel)
   protected
     function GetMensajeThreadType: TThreadMessageHandlerType; override; final;
@@ -277,16 +325,18 @@ type
 {$ENDREGION}
 
   TMessageChannel_GENERAL = class(TMessageChannel<TThreadMessageHandler>);
-  TMessageChannel_GENERAL_OneThread = class(TMessageChannel<TThreadMessageHandler>);
+  TMessageChannel_GENERAL_OneThread = class
+    (TMessageChannel<TThreadMessageHandler>);
 
 {$REGION 'Messages'}
+
   Messages = record
   private
-    class var FSynchronizerThreadsMensajes : IReadWriteSync;
-    class var FSynchronizerPools           : IReadWriteSync;
-    class var FThreadsMensajes             : IList<TThreadMessageHandler>;
-    class var FPools                       : IList<TMessageChannel>;
-    class var FTerminando                  : Boolean;
+    class var FSynchronizerThreadsMensajes: IReadWriteSync;
+    class var FSynchronizerPools: IReadWriteSync;
+    class var FThreadsMensajes: IList<TThreadMessageHandler>;
+    class var FPools: IList<TMessageChannel>;
+    class var FTerminando: Boolean;
 
     class procedure CreateIni; static;
     class procedure DestroyIni; static;
@@ -294,26 +344,30 @@ type
     class procedure QueueInThreads(AMessage: IMessage); static;
     class procedure QueueInPools(AMessage: IMessage); static;
   public
-    //Registra un pool de mensajes
+    // Registra un pool de mensajes
     class procedure RegisterPool(const APoolMensajes: TMessageChannel); static;
-    class procedure UnregisterPool(const APoolMensajes: TMessageChannel); static;
+    class procedure UnregisterPool(const APoolMensajes
+      : TMessageChannel); static;
 
-    //Registra un thread de mensajes
-    class procedure RegisterThreadMensajes(const AThreadMensajes: TThreadMessageHandler); static;
-    class procedure UnregisterThreadMensajes(const AThreadMensajes: TThreadMessageHandler); static;
+    // Registra un thread de mensajes
+    class procedure RegisterThreadMensajes(const AThreadMensajes
+      : TThreadMessageHandler); static;
+    class procedure UnregisterThreadMensajes(const AThreadMensajes
+      : TThreadMessageHandler); static;
 
-    //Se pasa al motor de eventos un mensaje a transmitir (utilizará todos los métodos de transmisión posibles)
+    // Se pasa al motor de eventos un mensaje a transmitir (utilizará todos los métodos de transmisión posibles)
     class procedure QueueMessage(AMessage: IMessage); static;
   end;
 {$ENDREGION}
-
 {$REGION 'TMessage_Generic'}
+
   TMessage_Generic<T> = class(TMessage)
   public
     Data: T;
   end;
 
-  TMessageListener_Generic<T> = class(TMessageListener<TMessage_Generic<T>>);
+  TMessageListener_Generic<T> = class(TMessageListener <
+    TMessage_Generic < T >> );
 {$ENDREGION}
 
 implementation
@@ -327,13 +381,14 @@ uses
 
 {$REGION 'TThreadedQueueHelper<T>'}
 
-constructor TThreadedQueue<T>.Create(AQueueDepth: Integer = 10; PushTimeout: Cardinal = INFINITE; PopTimeout: Cardinal = INFINITE);
+constructor TThreadedQueue<T>.Create(AQueueDepth: Integer = 10;
+  PushTimeout: Cardinal = INFINITE; PopTimeout: Cardinal = INFINITE);
 begin
   inherited Create;
   SetLength(FQueue, AQueueDepth);
   FQueueLock := TObject.Create;
   FQueueNotEmpty := TObject.Create;
-  FQueueUnLock   := TObject.Create;
+  FQueueUnLock := TObject.Create;
   FQueueNotFull := TObject.Create;
   FPushTimeout := PushTimeout;
   FPopTimeout := PopTimeout;
@@ -352,9 +407,9 @@ end;
 procedure TThreadedQueue<T>.Grow(ADelta: Integer);
 var
   LQueue: array of T;
-  LTmp  : Integer;
-  LCnt  : Integer;
-  I     : Integer;
+  LTmp: Integer;
+  LCnt: Integer;
+  I: Integer;
 begin
   TMonitor.Enter(FQueueLock);
   try
@@ -371,7 +426,7 @@ begin
       for I := 0 to FQueueSize - 1 do
         FQueue[I] := LQueue[I];
       for I := FQueueSize to LTmp - 1 do
-        FQueue[I] := default(T);
+        FQueue[I] := default (T);
 
       FQueueOffset := 0;
     end;
@@ -391,9 +446,10 @@ begin
   PopItem(LQueueSize, Result);
 end;
 
-function TThreadedQueue<T>.PopItem(var AQueueSize: Integer; var AItem: T): TWaitResult;
+function TThreadedQueue<T>.PopItem(var AQueueSize: Integer; var AItem: T)
+  : TWaitResult;
 begin
-  AItem := Default(T);
+  AItem := Default (T);
 
   TMonitor.Enter(FQueueLock);
   try
@@ -407,7 +463,7 @@ begin
 
     AItem := FQueue[FQueueOffset];
 
-    FQueue[FQueueOffset] := Default(T);
+    FQueue[FQueueOffset] := Default (T);
 
     Dec(FQueueSize);
     Inc(FQueueOffset);
@@ -441,9 +497,10 @@ begin
   Result := PushItem(AItem, LQueueSize);
 end;
 
-function TThreadedQueue<T>.PushItem(AItem: T; var AQueueSize: Integer): TWaitResult;
+function TThreadedQueue<T>.PushItem(AItem: T; var AQueueSize: Integer)
+  : TWaitResult;
 begin
-  Result := Pushitem(AItem, AqueueSize, FPushTimeOut);
+  Result := PushItem(AItem, AQueueSize, FPushTimeout);
 end;
 
 procedure TThreadedQueue<T>.DoShutDown;
@@ -458,12 +515,14 @@ begin
   TMonitor.PulseAll(FQueueNotEmpty);
 end;
 
-function TThreadedQueue<T>.PushItem(AItem: T; var AQueueSize: Integer; const ATimeout: Cardinal): TWaitResult;
+function TThreadedQueue<T>.PushItem(AItem: T; var AQueueSize: Integer;
+  const ATimeout: Cardinal): TWaitResult;
 begin
   TMonitor.Enter(FQueueLock);
   try
     Result := wrSignaled;
-    while (Result = wrSignaled) and (FQueueSize = Length(FQueue)) and not FShutDown do
+    while (Result = wrSignaled) and (FQueueSize = Length(FQueue)) and
+      not FShutDown do
       if not TMonitor.Wait(FQueueNotFull, FQueueLock, ATimeout) then
         Result := wrTimeout;
 
@@ -481,9 +540,10 @@ begin
   TMonitor.Pulse(FQueueNotEmpty);
 end;
 
-function TThreadedQueue<T>.PopItem(var AQueueSize: Integer; var AItem: T; const ATimeout: Cardinal): TWaitResult;
+function TThreadedQueue<T>.PopItem(var AQueueSize: Integer; var AItem: T;
+  const ATimeout: Cardinal): TWaitResult;
 begin
-  AItem := Default(T);
+  AItem := Default (T);
   TMonitor.Enter(FQueueLock);
   try
     Result := wrSignaled;
@@ -496,7 +556,7 @@ begin
 
     AItem := FQueue[FQueueOffset];
 
-    FQueue[FQueueOffset] := Default(T);
+    FQueue[FQueueOffset] := Default (T);
 
     Dec(FQueueSize);
     Inc(FQueueOffset);
@@ -511,7 +571,6 @@ begin
   TMonitor.Pulse(FQueueNotFull);
 end;
 {$ENDREGION}
-
 {$REGION 'TMessage'}
 
 constructor TMessage.Create;
@@ -542,35 +601,45 @@ end;
 
 procedure TMessage.Queue;
 begin
-  //FrMensajes.QueueEvent(Self);
+  // FrMensajes.QueueEvent(Self);
 end;
 {$ENDREGION}
-
 {$REGION 'TMessageListener'}
+
 procedure TMessageListener.AfterConstruction;
 begin
   inherited;
   Register;
 end;
 
-constructor TMessageListener.Create(const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants);
+constructor TMessageListener.Create(const APoolThreadsMensajes: TMessageChannel;
+  const AFilterCondition: TListenerFilter = nil;
+  const ACodeExecutesInMainUIThread: Boolean = False;
+  const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+  mtrAllowDescendants);
 begin
-  Guard.CheckNotNull(APoolThreadsMensajes, 'The listener must have a Pool assigned');
+  Guard.CheckNotNull(APoolThreadsMensajes,
+    'The listener must have a Pool assigned');
   inherited Create;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
-  FThreadMensajes                := nil;
-  FPoolMensajes                  := APoolThreadsMensajes;
-  FFilterCondition               := AFilterCondition;
+  FThreadMensajes := nil;
+  FPoolMensajes := APoolThreadsMensajes;
+  FFilterCondition := AFilterCondition;
 end;
 
-constructor TMessageListener.Create(const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants);
+constructor TMessageListener.Create(const AThreadMensajes
+  : TThreadMessageHandler; const AFilterCondition: TListenerFilter = nil;
+  const ACodeExecutesInMainUIThread: Boolean = False;
+  const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.
+  mtrAllowDescendants);
 begin
-  Guard.CheckNotNull(AThreadMensajes, 'The listener must have a Thread assigned');
+  Guard.CheckNotNull(AThreadMensajes,
+    'The listener must have a Thread assigned');
   inherited Create;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
-  FThreadMensajes           := AThreadMensajes;
-  FPoolMensajes             := nil;
-  FFilterCondition               := AFilterCondition;
+  FThreadMensajes := AThreadMensajes;
+  FPoolMensajes := nil;
+  FFilterCondition := AFilterCondition;
 end;
 
 destructor TMessageListener.Destroy;
@@ -593,7 +662,8 @@ function TMessageListener.GetConditionsMatch(AMessage: IMessage): Boolean;
 begin
   if Assigned(FFilterCondition) then
     Result := FFilterCondition(AMessage)
-  else Result := True
+  else
+    Result := True
 end;
 
 function TMessageListener.GetDefaultTypeRestriction: EMessageTypeRestriction;
@@ -628,12 +698,13 @@ begin
     FThreadMensajes.RegisterListener(Self);
   end
   else if FPoolMensajes <> nil then
-       begin
-         FPoolMensajes.RegisterListener(Self);
-       end;
+  begin
+    FPoolMensajes.RegisterListener(Self);
+  end;
 end;
 
-procedure TMessageListener.SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
+procedure TMessageListener.SetIsCodeToExecuteInUIMainThread
+  (const AValue: Boolean);
 begin
   FIsCodeToExecuteInUIMainThread := AValue;
 end;
@@ -643,7 +714,8 @@ begin
   FFilterCondition := AFilter
 end;
 
-procedure TMessageListener.SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
+procedure TMessageListener.SetTypeRestriction(const ATypeRestriction
+  : EMessageTypeRestriction);
 begin
   FTypeRestriction := ATypeRestriction;
 end;
@@ -653,18 +725,24 @@ begin
   if FThreadMensajes <> nil then
     FThreadMensajes.UnregisterListener(Self)
   else if FPoolMensajes <> nil then
-         FPoolMensajes.UnregisterListener(Self);
+    FPoolMensajes.UnregisterListener(Self);
 end;
 {$ENDREGION}
-
 {$REGION 'TMessageListener<T>'}
-constructor TMessageListener<T>.Create(const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+
+constructor TMessageListener<T>.Create(const APoolThreadsMensajes
+  : TMessageChannel; const AFilterCondition: TListenerFilter;
+  const ACodeExecutesInMainUIThread: Boolean;
+  const ATypeRestriction: EMessageTypeRestriction);
 begin
   inherited;
   FOnMessage := Utils.CreateEvent<TNotifyMessage>;
 end;
 
-constructor TMessageListener<T>.Create(const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListener<T>.Create(const AThreadMensajes
+  : TThreadMessageHandler; const AFilterCondition: TListenerFilter;
+  const ACodeExecutesInMainUIThread: Boolean;
+  const ATypeRestriction: EMessageTypeRestriction);
 begin
   inherited;
   FOnMessage := Utils.CreateEvent<TNotifyMessage>;
@@ -692,17 +770,18 @@ begin
   begin
     if MVVMCore.PlatformServices.IsMainThreadUI then
       MVVMCore.DelegateExecution<IMessage>(AMessage,
-                                           procedure (AAMessage: IMessage)
-                                           begin
-                                             FOnMessage.Invoke(AAMessage)
-                                           end, EDelegatedExecutionMode.medQueue)
-    else FOnMessage.Invoke(AMessage);
+        procedure(AAMessage: IMessage)
+        begin
+          FOnMessage.Invoke(AAMessage)
+        end, EDelegatedExecutionMode.medQueue)
+    else
+      FOnMessage.Invoke(AMessage);
   end
-  else FOnMessage.Invoke(AMessage);
+  else
+    FOnMessage.Invoke(AMessage);
 end;
 
 {$ENDREGION}
-
 {$REGION 'TThreadMessageHandlerBase'}
 
 procedure TThreadMessageHandlerBase.AdquireRead;
@@ -719,7 +798,8 @@ constructor TThreadMessageHandlerBase.Create;
 begin
   inherited Create(False);
   FSynchronizer := TMREWSync.Create;
-  FMessages     := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
+  FMessages := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE,
+    CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
   FMessageCount := 0;
 end;
 
@@ -737,24 +817,25 @@ begin
   Result := FMessageCount
 end;
 
-function TThreadMessageHandlerBase.GetNextMessage(out AQueueSize: Integer; var AMessage: IMessage): TWaitResult;
-//var
-//  LI   : IInterface;
-//  LData: TValue;
+function TThreadMessageHandlerBase.GetNextMessage(out AQueueSize: Integer;
+var AMessage: IMessage): TWaitResult;
+// var
+// LI   : IInterface;
+// LData: TValue;
 begin
   Result := FMessages.PopItem(AQueueSize, AMessage);
-//  if Result = TWaitResult.wrSignaled then
-//  begin
-//    LI       := LData.AsInterface;
-//    AMessage := LI as IMessage;
-//  end;
+  // if Result = TWaitResult.wrSignaled then
+  // begin
+  // LI       := LData.AsInterface;
+  // AMessage := LI as IMessage;
+  // end;
 end;
 
 procedure TThreadMessageHandlerBase.ProcessMessages;
 var
-  LRes                 : TWaitResult;
-  LSize                : Integer;
-  LMsg                 : IMessage;
+  LRes: TWaitResult;
+  LSize: Integer;
+  LMsg: IMessage;
 begin
   while not(Terminated) do
   begin
@@ -768,9 +849,12 @@ begin
               try
                 ProcessQueuedMessage(LMsg);
               except
-                on E:Exception do
+                on E: Exception do
                 begin
-                  Utils.IdeDebugMsg('Exception at <TThreadMessageHandlerBase.ProcessEvents> ' + TThread.CurrentThread.ThreadID.ToString + ' - ' + LSize.ToString + ' - Error: ' + E.Message);
+                  Utils.IdeDebugMsg
+                    ('Exception at <TThreadMessageHandlerBase.ProcessEvents> ' +
+                    TThread.CurrentThread.ThreadID.ToString + ' - ' +
+                    LSize.ToString + ' - Error: ' + E.Message);
                 end;
               end;
             end
@@ -792,27 +876,28 @@ procedure TThreadMessageHandlerBase.ProcessQueuedMessage(AMessage: IMessage);
 var
   LProcessStarted: Double;
 begin
-  //LProcessStarted := FrPlataforma.GetReferenceTime;
+  // LProcessStarted := FrPlataforma.GetReferenceTime;
   ProcessMessage(AMessage);
   Inc(FMessageCount);
-  //FPerformance.RecordSample(FrPlataforma.GetReferenceTime - LProcessStarted);
+  // FPerformance.RecordSample(FrPlataforma.GetReferenceTime - LProcessStarted);
 end;
 
 procedure TThreadMessageHandlerBase.AddMessage(AMessage: IMessage);
 var
   LSize: Integer;
-  LRes : TWaitResult;
-//  LData: TValue;
+  LRes: TWaitResult;
+  // LData: TValue;
 begin
   Guard.CheckNotNull(AMessage, 'The message can not be nil');
   repeat
-    //LData:= TValue.From<IMessage>(AMessage);
+    // LData:= TValue.From<IMessage>(AMessage);
     LRes := FMessages.PushItem(AMessage, LSize);
     case LRes of
       wrTimeout:
         begin
           FMessages.Grow(LSize);
-          if Terminated then Exit;
+          if Terminated then
+            Exit;
         end;
     end;
   until LRes = TWaitResult.wrSignaled;
@@ -833,8 +918,8 @@ begin
   ProcessMessages;
 end;
 {$ENDREGION}
-
 {$REGION 'TThreadMessageHandler'}
+
 procedure TThreadMessageHandler.AfterConstruction;
 begin
   inherited;
@@ -844,9 +929,9 @@ end;
 constructor TThreadMessageHandler.Create;
 begin
   inherited Create;
-  FSynchronizerListeners:= TMREWSync.Create;
-  FPool                 := nil;
-  FListeners            := TCollections.CreateList<IMessageListener>;
+  FSynchronizerListeners := TMREWSync.Create;
+  FPool := nil;
+  FListeners := TCollections.CreateList<IMessageListener>;
   InitializeListeners;
 end;
 
@@ -860,16 +945,16 @@ destructor TThreadMessageHandler.Destroy;
 begin
   UnRegister;
   FinalizeListeners;
-  FListeners        := nil;
+  FListeners := nil;
 
-  FSynchronizerListeners        := nil;
+  FSynchronizerListeners := nil;
   inherited Destroy;
 end;
 
 procedure TThreadMessageHandler.FinalizeListeners;
 var
   LListener: IMessageListener;
-  LLista   : IList<IMessageListener>;
+  LLista: IList<IMessageListener>;
 begin
   // Nada de momento
   LLista := TCollections.CreateList<IMessageListener>;
@@ -906,13 +991,16 @@ end;
 
 procedure TThreadMessageHandler.ProcessMessage(AMessage: IMessage);
 var
-  I  : Integer;
+  I: Integer;
 begin
   FSynchronizerListeners.BeginRead;
   try
     for I := 0 to FListeners.Count - 1 do
     begin
-      if (((FListeners[I].TypeRestriction = mtrAllowDescendants) and (AMessage is FListeners[I].GetMensajeClass)) or ((FListeners[I].GetTypeRestriction = mtrDefinedTypeOnly) and (AMessage.GetAsObject.ClassType = FListeners[I].GetMensajeClass))) and
+      if (((FListeners[I].TypeRestriction = mtrAllowDescendants) and
+        (AMessage is FListeners[I].GetMensajeClass)) or
+        ((FListeners[I].GetTypeRestriction = mtrDefinedTypeOnly) and
+        (AMessage.GetAsObject.ClassType = FListeners[I].GetMensajeClass))) and
         (FListeners[I].GetConditionsMatch(AMessage)) then
       begin
         try
@@ -920,7 +1008,9 @@ begin
         except
           on E: Exception do
           begin
-            Utils.IdeDebugMsg('Exception executing the listener: ' + FListeners[I].GetAsObject.QualifiedClassName + ' - Error: ' + E.Message);
+            Utils.IdeDebugMsg('Exception executing the listener: ' +
+              FListeners[I].GetAsObject.QualifiedClassName + ' - Error: ' +
+              E.Message);
           end;
         end;
       end;
@@ -938,7 +1028,8 @@ begin
     Messages.RegisterThreadMensajes(Self);
 end;
 
-procedure TThreadMessageHandler.RegisterListener(AMessageListener: IMessageListener);
+procedure TThreadMessageHandler.RegisterListener(AMessageListener
+  : IMessageListener);
 begin
   FSynchronizerListeners.BeginWrite;
   try
@@ -957,7 +1048,8 @@ begin
     Messages.UnregisterThreadMensajes(Self);
 end;
 
-procedure TThreadMessageHandler.UnregisterListener(AMessageListener: IMessageListener);
+procedure TThreadMessageHandler.UnregisterListener(AMessageListener
+  : IMessageListener);
 begin
   FSynchronizerListeners.BeginWrite;
   try
@@ -968,26 +1060,26 @@ begin
   end;
 end;
 {$ENDREGION}
-
 {$REGION 'Messages' }
+
 class procedure Messages.CreateIni;
 begin
   FThreadsMensajes := TCollections.CreateList<TThreadMessageHandler>;
-  FPools           := TCollections.CreateList<TMessageChannel>;
-  FTerminando      := False;
+  FPools := TCollections.CreateList<TMessageChannel>;
+  FTerminando := False;
 
   FSynchronizerThreadsMensajes := TMREWSync.Create;
-  FSynchronizerPools           := TMREWSync.Create;
+  FSynchronizerPools := TMREWSync.Create;
 end;
 
 class procedure Messages.DestroyIni;
 begin
-  FTerminando                  := True;
+  FTerminando := True;
 
   FSynchronizerThreadsMensajes := nil;
-  FSynchronizerPools           := nil;
+  FSynchronizerPools := nil;
 
-  FPools           := nil;
+  FPools := nil;
   FThreadsMensajes := nil;
 end;
 
@@ -1036,7 +1128,8 @@ begin
   end;
 end;
 
-class procedure Messages.RegisterThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
+class procedure Messages.RegisterThreadMensajes(const AThreadMensajes
+  : TThreadMessageHandler);
 begin
   if FTerminando then
     Exit;
@@ -1050,7 +1143,8 @@ begin
   end;
 end;
 
-class procedure Messages.UnregisterThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
+class procedure Messages.UnregisterThreadMensajes(const AThreadMensajes
+  : TThreadMessageHandler);
 var
   LIndex: Integer;
 begin
@@ -1078,8 +1172,8 @@ begin
   end;
 end;
 {$ENDREGION}
-
 {$REGION 'TMessageChannel'}
+
 procedure TMessageChannel.AdquireRead;
 begin
   FSynchronizer.BeginRead;
@@ -1090,10 +1184,13 @@ begin
   FSynchronizer.BeginWrite;
 end;
 
-procedure TMessageChannel.AddThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
+procedure TMessageChannel.AddThreadMensajes(const AThreadMensajes
+  : TThreadMessageHandler);
 begin
   if not(AThreadMensajes is GetMensajeThreadType) then
-    raise Exception.CreateFmt('Event Pool quiere Threads de Mensajes del tipo "%s", pero se ha intentado registrar un thread de mensajes del tipo "%s"', [GetMensajeThreadType.ClassName, AThreadMensajes.ClassName]);
+    raise Exception.CreateFmt
+      ('Event Pool quiere Threads de Mensajes del tipo "%s", pero se ha intentado registrar un thread de mensajes del tipo "%s"',
+      [GetMensajeThreadType.ClassName, AThreadMensajes.ClassName]);
   AdquireWrite;
   try
     if (not FThreadsMensajes.Contains(AThreadMensajes)) then
@@ -1113,10 +1210,10 @@ end;
 constructor TMessageChannel.Create(const AThreadCount: Integer);
 begin
   inherited Create;
-  FThreadCount       := AThreadCount;
+  FThreadCount := AThreadCount;
   FThreadCountTarget := AThreadCount;
-  FThreadsMensajes   := TCollections.CreateList<TThreadMessageHandler>;
-  FSynchronizer      := TMREWSync.Create;
+  FThreadsMensajes := TCollections.CreateList<TThreadMessageHandler>;
+  FSynchronizer := TMREWSync.Create;
 end;
 
 procedure TMessageChannel.CreateThreads;
@@ -1131,7 +1228,7 @@ destructor TMessageChannel.Destroy;
 begin
   DestroyThreads;
   FThreadsMensajes := nil;
-  FSynchronizer   := nil;
+  FSynchronizer := nil;
   inherited;
 end;
 
@@ -1141,12 +1238,12 @@ var
 begin
   AdquireWrite;
   try
-    FThreadCount       := 0;
+    FThreadCount := 0;
     FThreadCountTarget := 0;
     AdquireWrite;
     try
       LCount := FThreadsMensajes.Count;
-      for I  := LCount - 1 downto 0 do
+      for I := LCount - 1 downto 0 do
         FThreadsMensajes[I].Free;
     finally
       ReleaseWrite;
@@ -1166,7 +1263,8 @@ begin
   end;
 end;
 
-function Comparador_TThreadMessageHandler(const DatoI, DatoD: TThreadMessageHandler): Integer;
+function Comparador_TThreadMessageHandler(const DatoI,
+  DatoD: TThreadMessageHandler): Integer;
 var
   LThisThreadEventCountI, LThisThreadEventCountD: Int64;
 begin
@@ -1183,27 +1281,29 @@ end;
 
 procedure TMessageChannel.PoolMessage(AMessage: IMessage);
 var
-  LFinal                                    : IEnumerable<TThreadMessageHandler>;
-  LData                                     : IList<TThreadMessageHandler>;
-  LSeleccion                                : TThreadMessageHandler;
+  LFinal: IEnumerable<TThreadMessageHandler>;
+  LData: IList<TThreadMessageHandler>;
+  LSeleccion: TThreadMessageHandler;
 begin
   AdquireRead;
   try
     LData := TCollections.CreateList<TThreadMessageHandler>;
     LData.AddRange(FThreadsMensajes.ToArray);
     LData.Sort(Comparador_TThreadMessageHandler);
-    LFinal := LData.Where(function (const AData: TThreadMessageHandler): Boolean
-                                   begin
-                                     Result := AData.GetEventRelevant(AMessage);
-                                   end);
+    LFinal := LData.Where(
+      function(const AData: TThreadMessageHandler): Boolean
+      begin
+        Result := AData.GetEventRelevant(AMessage);
+      end);
     if LFinal.Count <> 0 then
     begin
       LSeleccion := LFinal.First;
       LSeleccion.AddMessage(AMessage);
     end
-    else begin
-           Utils.IdeDebugMsg('No thread selected! ' + QualifiedClassName);
-         end;
+    else
+    begin
+      Utils.IdeDebugMsg('No thread selected! ' + QualifiedClassName);
+    end;
   finally
     ReleaseRead;
   end;
@@ -1245,7 +1345,8 @@ begin
   FSynchronizer.EndWrite
 end;
 
-procedure TMessageChannel.RemoveThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
+procedure TMessageChannel.RemoveThreadMensajes(const AThreadMensajes
+  : TThreadMessageHandler);
 var
   LIndex: Integer;
 begin
@@ -1274,7 +1375,8 @@ begin
   Messages.UnregisterPool(Self);
 end;
 
-procedure TMessageChannel.UnregisterListener(AMessageListener: IMessageListener);
+procedure TMessageChannel.UnregisterListener(AMessageListener
+  : IMessageListener);
 var
   I: Integer;
 begin
@@ -1290,39 +1392,59 @@ begin
 end;
 
 {$ENDREGION}
-
 {$REGION 'TMessageChannel<T>'}
+
 function TMessageChannel<T>.GetMensajeThreadType: TThreadMessageHandlerType;
 begin
   Result := T;
 end;
 {$ENDREGION}
-
 {$REGION 'TMessageListenerModel<T, K>'}
-constructor TMessageListenerModel<T, K>.Create(AModel: IModel; const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+
+constructor TMessageListenerModel<T, K>.Create(AModel: IModel;
+const APoolThreadsMensajes: TMessageChannel;
+const AFilterCondition: TListenerFilter;
+const ACodeExecutesInMainUIThread: Boolean;
+const ATypeRestriction: EMessageTypeRestriction);
 begin
   FModel := AModel;
-  Create(APoolThreadsMensajes, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
+  Create(APoolThreadsMensajes, AFilterCondition, ACodeExecutesInMainUIThread,
+    ATypeRestriction);
 end;
 
-constructor TMessageListenerModel<T, K>.Create(AModel: IModel; const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListenerModel<T, K>.Create(AModel: IModel;
+const AThreadMensajes: TThreadMessageHandler;
+const AFilterCondition: TListenerFilter;
+const ACodeExecutesInMainUIThread: Boolean;
+const ATypeRestriction: EMessageTypeRestriction);
 begin
   FModel := AModel;
-  Create(AThreadMensajes, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
+  Create(AThreadMensajes, AFilterCondition, ACodeExecutesInMainUIThread,
+    ATypeRestriction);
 end;
 {$ENDREGION}
-
 {$REGION 'TMessageListenerViewModel<T, K>'}
-constructor TMessageListenerViewModel<T, K>.Create(AViewModel: IViewModel; const APoolThreadsMensajes: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+
+constructor TMessageListenerViewModel<T, K>.Create(AViewModel: IViewModel;
+const APoolThreadsMensajes: TMessageChannel;
+const AFilterCondition: TListenerFilter;
+const ACodeExecutesInMainUIThread: Boolean;
+const ATypeRestriction: EMessageTypeRestriction);
 begin
   FViewModel := AViewModel;
-  Create(APoolThreadsMensajes, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
+  Create(APoolThreadsMensajes, AFilterCondition, ACodeExecutesInMainUIThread,
+    ATypeRestriction);
 end;
 
-constructor TMessageListenerViewModel<T, K>.Create(AViewModel: IViewModel; const AThreadMensajes: TThreadMessageHandler; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListenerViewModel<T, K>.Create(AViewModel: IViewModel;
+const AThreadMensajes: TThreadMessageHandler;
+const AFilterCondition: TListenerFilter;
+const ACodeExecutesInMainUIThread: Boolean;
+const ATypeRestriction: EMessageTypeRestriction);
 begin
   FViewModel := AViewModel;
-  Create(AThreadMensajes, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
+  Create(AThreadMensajes, AFilterCondition, ACodeExecutesInMainUIThread,
+    ATypeRestriction);
 end;
 {$ENDREGION}
 
@@ -1331,7 +1453,9 @@ initialization
 MVVMCore.Container.RegisterType<TMessageChannel_GENERAL>(
   function: TMessageChannel_GENERAL
   begin
-    Result := TMessageChannel_GENERAL.Create(Utils.iif<Integer>((TThread.ProcessorCount > 2), 2, TThread.ProcessorCount));
+    Result := TMessageChannel_GENERAL.Create
+      (Utils.iif<Integer>((TThread.ProcessorCount > 2), 2,
+      TThread.ProcessorCount));
   end).AsSingleton;
 
 MVVMCore.Container.RegisterType<TMessageChannel_GENERAL_OneThread>(

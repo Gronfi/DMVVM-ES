@@ -7,7 +7,7 @@ uses
   MVVM.Types;
 
 type
-  TViewModel<T:IModel> = class abstract(TInterfacedObject, IViewModel<T>)
+  TViewModel<T: IModel> = class abstract(TInterfacedObject, IViewModel<T>)
   private
     FModel: T;
   protected

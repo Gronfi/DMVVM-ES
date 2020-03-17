@@ -14,27 +14,31 @@ uses
 type
   MVVMCore = record
   private
-    class var
-      FPlatformServicesClass: TPlatformServicesClass;
-      FContainer: TContainer;
-      FDefaultBindingStrategy: String;
-      FSynchronizer : IReadWriteSync;
+  class var
+    FPlatformServicesClass: TPlatformServicesClass;
+    FContainer: TContainer;
+    FDefaultBindingStrategy: String;
+    FSynchronizer: IReadWriteSync;
     class constructor CreateC;
     class destructor DestroyC;
 
     class function GetDefaultBindingStrategy: String; static;
-    class procedure SetDefaultBindingStrategy(const AStrategyName: String); static;
+    class procedure SetDefaultBindingStrategy(const AStrategyName
+      : String); static;
 
   public
-    class procedure RegisterPlatformServices(AServicioClass: TPlatformServicesClass); static;
+    class procedure RegisterPlatformServices(AServicioClass
+      : TPlatformServicesClass); static;
     class function PlatformServices: IPlatformServices; static;
     class function Container: TContainer; static;
 
     class procedure InitializationDone; static;
 
-    class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode); overload; static;
+    class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>;
+      AExecutionMode: EDelegatedExecutionMode); overload; static;
 
-    class property DefaultBindingStrategy: String read GetDefaultBindingStrategy write SetDefaultBindingStrategy;
+    class property DefaultBindingStrategy: String read GetDefaultBindingStrategy
+      write SetDefaultBindingStrategy;
   end;
 
 implementation
@@ -52,7 +56,7 @@ end;
 
 class constructor MVVMCore.CreateC;
 begin
-  FContainer    := TContainer.Create;
+  FContainer := TContainer.Create;
   FSynchronizer := TMREWSync.Create;
 end;
 
@@ -66,29 +70,33 @@ begin
   end;
 end;
 
-class procedure MVVMCore.DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode);
+class procedure MVVMCore.DelegateExecution<T>(AData: T; AProc: TProc<T>;
+  AExecutionMode: EDelegatedExecutionMode);
 begin
   case AExecutionMode of
     medQueue:
       begin
-        TThread.Queue(TThread.CurrentThread, procedure
-                                             begin
-                                               AProc(AData);
-                                             end);
+        TThread.Queue(TThread.CurrentThread,
+          procedure
+          begin
+            AProc(AData);
+          end);
       end;
     medSynchronize:
       begin
-        TThread.Synchronize(TThread.CurrentThread, procedure
-                                                   begin
-                                                     AProc(AData)
-                                                   end);
+        TThread.Synchronize(TThread.CurrentThread,
+          procedure
+          begin
+            AProc(AData)
+          end);
       end;
     medNewTask:
       begin
-        TTask.Create(procedure
-                     begin
-                       AProc(AData)
-                     end).Start;
+        TTask.Create(
+          procedure
+          begin
+            AProc(AData)
+          end).Start;
       end;
     medNormal:
       begin
@@ -107,7 +115,8 @@ begin
   FContainer.Build;
 end;
 
-class procedure MVVMCore.RegisterPlatformServices(AServicioClass: TPlatformServicesClass);
+class procedure MVVMCore.RegisterPlatformServices(AServicioClass
+  : TPlatformServicesClass);
 begin
   FPlatformServicesClass := AServicioClass;
 end;
@@ -124,7 +133,8 @@ end;
 
 class function MVVMCore.PlatformServices: IPlatformServices;
 begin
-  Spring.Guard.CheckNotNull(FPlatformServicesClass, 'No hay registrado ningun servicio para la plataforma');
+  Spring.Guard.CheckNotNull(FPlatformServicesClass,
+    'No hay registrado ningun servicio para la plataforma');
   Result := FPlatformServicesClass.Create;
 end;
 

@@ -11,15 +11,17 @@ uses
 type
   TFMXPlatformServices = class(TPlatformServicesBase)
   public
-    function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; override;
+    function MessageDlg(const ATitulo: string; const ATexto: String)
+      : Boolean; override;
     function IsMainThreadUI: Boolean; override;
     function LoadBitmap(const AFileName: String): TObject; overload; override;
     function LoadBitmap(const AStream: TStream): TObject; overload; override;
     function LoadBitmap(const AData: TBytes): TObject; overload; override;
-    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; override;
+    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject;
+      overload; override;
   end;
 
-  procedure InitializePlatform;
+procedure InitializePlatform;
 
 implementation
 
@@ -42,7 +44,7 @@ function TFMXPlatformServices.LoadBitmap(const AFileName: String): TObject;
 var
   Stream: TFileStream;
 begin
-  Stream := TFileStream.Create(AFilename, fmOpenRead or fmShareDenyWrite);
+  Stream := TFileStream.Create(AFileName, fmOpenRead or fmShareDenyWrite);
   try
     Result := TBitmap.CreateFromStream(Stream);
   finally
@@ -67,7 +69,8 @@ begin
   end;
 end;
 
-function TFMXPlatformServices.LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject;
+function TFMXPlatformServices.LoadBitmap(const AMemory: Pointer;
+  const ASize: Integer): TObject;
 var
   Stream: TMemoryStream;
 begin
@@ -81,17 +84,19 @@ begin
   end;
 end;
 
-function TFMXPlatformServices.MessageDlg(const ATitulo, ATexto: String): Boolean;
+function TFMXPlatformServices.MessageDlg(const ATitulo, ATexto: String)
+  : Boolean;
 begin
-  Result := FMX.Dialogs.MessageDlg(ATitulo, TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes
+  Result := FMX.Dialogs.MessageDlg(ATitulo, TMsgDlgType.mtConfirmation,
+    [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes
 end;
 
 procedure InitializePlatform;
-begin
-  ;
+begin;
 end;
 
 initialization
-  MVVMCore.RegisterPlatformServices(TFMXPlatformServices);
+
+MVVMCore.RegisterPlatformServices(TFMXPlatformServices);
 
 end.

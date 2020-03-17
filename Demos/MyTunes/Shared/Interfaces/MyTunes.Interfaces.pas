@@ -8,6 +8,7 @@ uses
   System.Generics.Collections,
   FMX.Graphics,
 
+  MVVM.Observable,
   MVVM.Interfaces,
   MVVM.Types,
 
@@ -15,11 +16,14 @@ uses
 
 type
   IAlbum = interface;
+
+  TAlbums = TObservableCollection<IAlbum>;
+
   IAlbumTrack = interface;
 
   IMyModel = interface(IModel)
   ['{F4DF3FEE-0EE9-4261-9ABA-03D699AD5674}']
-    constructor CreateSingleton(const ADummy: Integer = 0);
+    //constructor CreateSingleton(const ADummy: Integer = 0);
     procedure LoadAlbums(const ASource: TArray<TDataAlbum>);
     procedure LoadTracks(const ASource: TArray<TDataTrack>; const AAlbum: IAlbum);
 

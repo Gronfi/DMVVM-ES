@@ -15,10 +15,11 @@ type
   public
     class function CreateEvent<T>: IEvent<T>; static;
     class procedure IdeDebugMsg(const AMsg: String); static;
-    class function iif<T>(const ACondition: Boolean; AResult_True, AResult_False: T): T; overload; static;
-    class function iif<T>(const ACondition: Boolean; AResult_True, AResult_False: TFunc<T>): T; overload; static;
+    class function iif<T>(const ACondition: Boolean;
+      AResult_True, AResult_False: T): T; overload; static;
+    class function iif<T>(const ACondition: Boolean;
+      AResult_True, AResult_False: TFunc<T>): T; overload; static;
   end;
-
 
 implementation
 
@@ -38,7 +39,8 @@ begin
 {$ENDIF}
 end;
 
-class function Utils.iif<T>(const ACondition: Boolean; AResult_True, AResult_False: TFunc<T>): T;
+class function Utils.iif<T>(const ACondition: Boolean;
+  AResult_True, AResult_False: TFunc<T>): T;
 begin
   if ACondition then
     Result := AResult_True
@@ -46,7 +48,8 @@ begin
     Result := AResult_False;
 end;
 
-class function Utils.iif<T>(const ACondition: Boolean; AResult_True, AResult_False: T): T;
+class function Utils.iif<T>(const ACondition: Boolean;
+  AResult_True, AResult_False: T): T;
 begin
   if ACondition then
     Result := AResult_True

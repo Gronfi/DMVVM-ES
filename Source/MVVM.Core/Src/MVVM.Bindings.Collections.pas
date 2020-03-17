@@ -9,20 +9,21 @@ uses
   MVVM.Types;
 
 type
-{ Abstract base class for views that implement the IgoCollectionView
+  { Abstract base class for views that implement the IgoCollectionView
     interface.
 
     NOTE: This class implements an interface but is not reference counted. }
   TCollectionView = class abstract(TInterfacedObject, ICollectionView)
-  {$REGION 'Internal Declarations'}
+{$REGION 'Internal Declarations'}
   private
-    FSource  : TCollectionSource; // Reference
+    FSource: TCollectionSource; // Reference
     FTemplate: TDataTemplateClass;
   private
     procedure AddItemsToView;
     procedure UpdateItemsInView;
   private
-    procedure CollectionChanged(const ASender: TObject; const AArg: TCollectionChangedEventArgs);
+    procedure CollectionChanged(const ASender: TObject;
+      const AArg: TCollectionChangedEventArgs);
   protected
     { IgoCollectionView }
     function GetSource: TCollectionSource;
@@ -30,7 +31,7 @@ type
     function GetTemplate: TDataTemplateClass;
     procedure SetTemplate(const AValue: TDataTemplateClass);
     function GetComponent: TComponent; virtual; abstract;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   protected
     { Must be overridden to clear all items in the view.
       For example, when used with a TListBox, it would call the TListBox.Clear
@@ -50,8 +51,8 @@ type
     { Must be overridden to add an item to the view.
 
       Parameters:
-        AItem: the item to add to the view. The type of the item is the same as
-          the type of the objects in the Source collection.
+      AItem: the item to add to the view. The type of the item is the same as
+      the type of the objects in the Source collection.
 
       For example, when used with a TListBox, it would create a TListBoxItem
       object, associate it with AItem, and add it to the list box. }
@@ -60,7 +61,7 @@ type
     { Must be overridden to delete an item from the view.
 
       Parameters:
-        AItemIndex: the index of the item to delete.
+      AItemIndex: the index of the item to delete.
 
       For example, when used with a TListBox, it would delete item AItemIndex
       from the list box. }
@@ -69,13 +70,14 @@ type
     { Must be overridden to update an item in the view.
 
       Parameters:
-        AItem: the item that has changed. The type of the item is the same as
-          the type of the objects in the Source collection.
-        APropertyName: the name of the property of AItem that has changed.
+      AItem: the item that has changed. The type of the item is the same as
+      the type of the objects in the Source collection.
+      APropertyName: the name of the property of AItem that has changed.
 
       For example, when used with a TListBox, it would find the TListBoxItem
       associated with AItem and change one of its properties. }
-    procedure UpdateItemInView(const AItem: TObject; const APropertyName: String); virtual; abstract;
+    procedure UpdateItemInView(const AItem: TObject;
+      const APropertyName: String); virtual; abstract;
 
     { Must be overridden to update all items in the view with new data.
       This method is called when the order of the items in the source collection
@@ -129,7 +131,8 @@ begin
   end;
 end;
 
-procedure TCollectionView.CollectionChanged(const ASender: TObject; const AArg: TCollectionChangedEventArgs);
+procedure TCollectionView.CollectionChanged(const ASender: TObject;
+  const AArg: TCollectionChangedEventArgs);
 begin
   if (FTemplate = nil) then
     Exit;
@@ -170,14 +173,14 @@ begin
 end;
 
 procedure TCollectionView.SetSource(AValue: TCollectionSource);
-//var
-//  NCC: INotifyCollectionChanged;
+// var
+// NCC: INotifyCollectionChanged;
 begin
   if (AValue <> FSource) then
   begin
     { Unsubscribe from collection changed event of old source. }
-//    if Assigned(FSource) and (Supports(FSource, INotifyCollectionChanged, NCC)) then
-//      NCC.GetCollectionChangedEvent.Remove(CollectionChanged);
+    // if Assigned(FSource) and (Supports(FSource, INotifyCollectionChanged, NCC)) then
+    // NCC.GetCollectionChangedEvent.Remove(CollectionChanged);
 
     FSource := AValue;
     if Assigned(FTemplate) then
@@ -187,8 +190,8 @@ begin
     end;
 
     { Subscribe to collection changed event of new source. }
-//    if Assigned(FSource) and (Supports(FSource, IgoNotifyCollectionChanged, NCC)) then
-//      NCC.GetCollectionChangedEvent.Add(CollectionChanged);
+    // if Assigned(FSource) and (Supports(FSource, IgoNotifyCollectionChanged, NCC)) then
+    // NCC.GetCollectionChangedEvent.Add(CollectionChanged);
   end;
 end;
 

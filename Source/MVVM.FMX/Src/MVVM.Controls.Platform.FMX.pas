@@ -28,359 +28,403 @@ type
 {$REGION 'FMX.StdCtrls'}
   { TCheckBox with support for light-weight two-way data binding.
     Supports property changed notifications for: IsChecked }
-  TCheckBox = class(FMX.StdCtrls.TCheckBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TCheckBox = class(FMX.StdCtrls.TCheckBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FOrigOnChange     : TNotifyEvent;
-    FEstrategiaBinding: IBindingStrategy;
-  private
+    FOrigOnChange: TNotifyEvent;
+    FManager: IStrategyEventedObject;
     procedure HandleOnChange(Sender: TObject);
   protected
     procedure Loaded; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
   { TTrackBar with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TTrackBar = class(FMX.StdCtrls.TTrackBar, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TTrackBar = class(FMX.StdCtrls.TTrackBar, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
+    function GetManager: IStrategyEventedObject;
     procedure DoChanged; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
   { TSwitch with support for light-weight two-way data binding.
     Supports property changed notifications for: IsChecked }
-  TSwitch = class(FMX.StdCtrls.TSwitch, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TSwitch = class(FMX.StdCtrls.TSwitch, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
+    function GetManager: IStrategyEventedObject;
     procedure DoSwitch; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
   { TArcDial with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TArcDial = class(FMX.StdCtrls.TArcDial, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TArcDial = class(FMX.StdCtrls.TArcDial, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
+    function GetManager: IStrategyEventedObject;
     procedure AfterChangedProc(Sender: TObject); override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.StdCtrls'}
-
 {$REGION 'FMX.ActnList'}
+
   TAction = class(FMX.ActnList.TAction, IBindableAction)
-  {$REGION 'Internal Declarations'}
+{$REGION 'Internal Declarations'}
   private
-    FExecute   : TExecuteMethod;
+    FExecute: TExecuteMethod;
     FCanExecute: TCanExecuteMethod;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
     { IBindableAction }
-    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const AEstrategiaBinding: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteMethod;
+      const ACanExecute: TCanExecuteMethod = nil;
+      const AEstrategiaBinding: String = ''); overload;
   public
     constructor Create(AOwner: TComponent); override;
     function Update: Boolean; override;
     function Execute: Boolean; override;
   end;
 {$ENDREGION 'FMX.ActnList'}
-
 {$REGION 'FMX.Edit'}
+
 type
   { TEdit with support for light-weight two-way data binding.
     Supports property changed notifications for: Text
     Supports property changing notifications for: Text }
-  TEdit = class(FMX.Edit.TEdit, INotifyPropertyChanged, INotifyPropertyChangeTracking)
-  {$REGION 'Internal Declarations'}
+  TEdit = class(FMX.Edit.TEdit, INotifyChangedProperty,
+    INotifyPropertyTrackingChanged)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+    function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
+      read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION 'FMX.Edit'}
-
 {$REGION 'FMX.Memo'}
+
 type
   { TMemo with support for light-weight two-way data binding.
     Supports property changed notifications for: Text
     Supports property changing notifications for: Text }
-  TMemo = class(FMX.Memo.TMemo, INotifyPropertyChanged, INotifyPropertyChangeTracking)
-  {$REGION 'Internal Declarations'}
+  TMemo = class(FMX.Memo.TMemo, INotifyChangedProperty,
+    INotifyPropertyTrackingChanged)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+    function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
+      read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION 'FMX.Memo'}
-
 {$REGION 'FMX.ComboEdit'}
+
 type
   { TComboEdit with support for light-weight two-way data binding.
     Supports property changed notifications for: Text
     Supports property changing notifications for: Text }
-  TComboEdit = class(FMX.ComboEdit.TComboEdit, INotifyPropertyChanged, INotifyPropertyChangeTracking)
-  {$REGION 'Internal Declarations'}
+  TComboEdit = class(FMX.ComboEdit.TComboEdit, INotifyChangedProperty,
+    INotifyPropertyTrackingChanged)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+    function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
+      read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION 'FMX.ComboEdit'}
-
 {$REGION 'FMX.Colors'}
+
 type
   { TColorPanel with support for light-weight two-way data binding.
     Supports property changed notifications for: Color }
-  TColorPanel = class(FMX.Colors.TColorPanel, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TColorPanel = class(FMX.Colors.TColorPanel, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
     FOrigOnChange: TNotifyEvent;
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   private
     procedure HandleOnChange(Sender: TObject);
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
   protected
     procedure Loaded; override;
-  protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TComboColorBox with support for light-weight two-way data binding.
     Supports property changed notifications for: Color }
-  TComboColorBox = class(FMX.Colors.TComboColorBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TComboColorBox = class(FMX.Colors.TComboColorBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoColorChange(Sender: TObject); override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TColorListBox with support for light-weight two-way data binding.
     Supports property changed notifications for: Color }
-  TColorListBox = class(FMX.Colors.TColorListBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TColorListBox = class(FMX.Colors.TColorListBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChange; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TColorComboBox with support for light-weight two-way data binding.
     Supports property changed notifications for: Color }
-  TColorComboBox = class(FMX.Colors.TColorComboBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TColorComboBox = class(FMX.Colors.TColorComboBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChange; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { THueTrackBar with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  THueTrackBar = class(FMX.Colors.THueTrackBar, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  THueTrackBar = class(FMX.Colors.THueTrackBar, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChanged; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TAlphaTrackBar with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TAlphaTrackBar = class(FMX.Colors.TAlphaTrackBar, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TAlphaTrackBar = class(FMX.Colors.TAlphaTrackBar, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChanged; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TBWTrackBar with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TBWTrackBar = class(FMX.Colors.TBWTrackBar, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TBWTrackBar = class(FMX.Colors.TBWTrackBar, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChanged; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.Colors'}
-
 {$REGION 'FMX.DateTimeCtrls'}
+
 type
   { TTimeEdit with support for light-weight two-way data binding.
     Supports property changed notifications for: Time }
-  TTimeEdit = class(FMX.DateTimeCtrls.TTimeEdit, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TTimeEdit = class(FMX.DateTimeCtrls.TTimeEdit, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoDateTimeChanged; override;
-    procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
+    procedure HandlerPickerDateTimeChanged(Sender: TObject;
+      const ADate: TDateTime); override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 
 type
   { TDateEdit with support for light-weight two-way data binding.
     Supports property changed notifications for: Date }
-  TDateEdit = class(FMX.DateTimeCtrls.TDateEdit, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TDateEdit = class(FMX.DateTimeCtrls.TDateEdit, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoDateTimeChanged; override;
-    procedure HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime); override;
+    procedure HandlerPickerDateTimeChanged(Sender: TObject;
+      const ADate: TDateTime); override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.DateTimeCtrls'}
-
 {$REGION 'FMX.SpinBox'}
+
 type
   { TSpinBox with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TSpinBox = class(FMX.SpinBox.TSpinBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TSpinBox = class(FMX.SpinBox.TSpinBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.SpinBox'}
-
 {$REGION 'FMX.NumberBox'}
+
 type
   { TNumberBox with support for light-weight two-way data binding.
     Supports property changed notifications for: Value }
-  TNumberBox = class(FMX.NumberBox.TNumberBox, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TNumberBox = class(FMX.NumberBox.TNumberBox, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.NumberBox'}
-
 {$REGION 'FMX.ListBox'}
+
 type
   { TListBox with support for light-weight two-way data binding.
     Supports property changed notifications for: ItemIndex, Selected, SelectedItem.
     NOTE: When used with data binding, the TListBoxItem.Data property is used
-          to store the associated object. }
-  TListBox = class(FMX.ListBox.TListBox, ICollectionViewProvider, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+    to store the associated object. }
+  TListBox = class(FMX.ListBox.TListBox, ICollectionViewProvider,
+    INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
     FView: ICollectionView;
 
     function GetSelectedItem: TObject; inline;
@@ -394,9 +438,9 @@ type
     { IgoCollectionViewProvider }
     function GetCollectionView: ICollectionView;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
     { Destructor }
     destructor Destroy; override;
@@ -407,21 +451,25 @@ type
       no item selected or there is no object associated with the selected item.
       The associated object is the object in the TListBoxItem.Data property. }
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.ListBox'}
-
 {$REGION 'FMX.ListView'}
+
   { TListView with support for light-weight two-way data binding.
     Supports property changed notifications for: ItemIndex, Selected, SelectedItem
     NOTE: When used with data binding, the TListViewItem.Tag property is used
-          to store the associated object. This is an unsafe reference, so you
-          must make sure that the associated objects are available for the
-          lifetime of the list view. }
-  TListView = class(FMX.ListView.TListView, ICollectionViewProvider, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+    to store the associated object. This is an unsafe reference, so you
+    must make sure that the associated objects are available for the
+    lifetime of the list view. }
+  TListView = class(FMX.ListView.TListView, ICollectionViewProvider,
+    INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
     FView: ICollectionView;
     function GetSelectedItem: TObject; inline;
     procedure SetSelectedItem(const Value: TObject);
@@ -433,9 +481,9 @@ type
     { IgoCollectionViewProvider }
     function GetCollectionView: ICollectionView;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
     { Destructor }
     destructor Destroy; override;
@@ -446,53 +494,58 @@ type
       This is an unsafe reference, so you must make sure that the associated
       objects are available for the lifetime of the list view. }
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.ListView'}
-
 {$REGION 'FMX.Objects'}
+
 type
   { TImage with support for light-weight two-way data binding.
     Supports property changed notifications for: Bitmap }
-  TImage = class(FMX.Objects.TImage, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TImage = class(FMX.Objects.TImage, INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
   protected
     procedure DoChanged; override;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-  {$ENDREGION 'Internal Declarations'}
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+{$ENDREGION 'Internal Declarations'}
   public
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.Objects'}
-
 {$REGION 'FMX.TreeView'}
+
 type
-  TTreeView = class(Fmx.TreeView.TTreeView, ICollectionViewProvider, INotifyPropertyChanged)
-  {$REGION 'Internal Declarations'}
+  TTreeView = class(FMX.TreeView.TTreeView, ICollectionViewProvider,
+    INotifyChangedProperty)
+{$REGION 'Internal Declarations'}
   private
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
     FView: ICollectionView;
-    FOnChanged_ : TNotifyEvent;
+    FOnChanged_: TNotifyEvent;
     function GetSelectedNode: TObject; inline;
     procedure SetSelectedNode(const Value: TObject);
   private
     function FindTreeNode(const AItem: TObject): TTreeViewItem;
   protected
     procedure Loaded; override;
-    procedure Change( Sender: TObject);
+    procedure Change(Sender: TObject);
     procedure DoSelectNode(Node: TTreeViewItem; Selected: Boolean);
   protected
     { IgoCollectionViewProvider }
     function GetCollectionView: ICollectionView;
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
   protected
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
     { Destructor }
     constructor Create(AOwner: TComponent); override;
@@ -502,10 +555,11 @@ type
       no item selected or there is no object associated with the selected item.
       The associated object is the object in the TListItem.Data property. }
     property SelectedNode: TObject read GetSelectedNode write SetSelectedNode;
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.TreeView'}
-
 {$REGION 'FMX.ComboBox'}
 
   { TComboBox with support for light-weight two-way data binding.
@@ -513,11 +567,12 @@ type
     Supports property changing notifications for: Text
     NOTE: Both PropertyChanged and PropertyChangeTracking notifications are
     fired for each individual keypress. }
-  TComboBox = class(Fmx.ListBox.TComboBox, INotifyPropertyChanged,  ICollectionViewProvider, INotifyPropertyChangeTracking)
-  {$REGION 'Internal Declarations'}
+  TComboBox = class(FMX.ListBox.TComboBox, INotifyChangedProperty,
+    ICollectionViewProvider, INotifyPropertyTrackingChanged)
+{$REGION 'Internal Declarations'}
   private
-    FView             : ICollectionView;
-    FEstrategiaBinding: IBindingStrategy;
+    FManager: IStrategyEventedObject;
+    FView: ICollectionView;
 
     FSelectedItem: TObject;
     function GetSelectedItem: TObject; inline;
@@ -525,18 +580,23 @@ type
   protected
     FChanged_: TNotifyEvent;
     procedure Loaded; override;
-    procedure Change (Sender: TObject);
+    procedure Change(Sender: TObject);
   protected
-    function GetBindingStrategy: IBindingStrategy;
-    procedure SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+    function GetManager: IStrategyEventedObject;
+    function GetOnPropertyChangedEvent: IChangedPropertyEvent;
+    function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 
     function GetCollectionView: ICollectionView;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
     { Destructor }
     destructor Destroy; override;
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property EstrategiaBinding: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
+    property Manager: IStrategyEventedObject read GetManager;
+    property OnPropertyChangedEvent: IChangedPropertyEvent
+      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
+      read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION 'FMX.ComboBox'}
 
@@ -546,6 +606,8 @@ uses
   FMX.Forms,
   FMX.Graphics,
   FMX.ListView.Appearances,
+
+  Spring,
 
   MVVM.Bindings.Collections;
 
@@ -580,7 +642,8 @@ type
 
   TListBoxCollectionView = class(TCollectionView)
   private
-    [weak] FListBox: TListBox;
+    [weak]
+    FListBox: TListBox;
   private
     procedure UpdateListBoxItem(const AListBoxItem: TListBoxItem;
       const AItem: TObject);
@@ -601,16 +664,19 @@ type
 
   TListViewCollectionView = class(TCollectionView)
   private
-    [weak] FListView: TListView;
+    [weak]
+    FListView: TListView;
   private
-    procedure UpdateListViewItem(const AListViewItem: TListViewItem; const AItem: TObject);
+    procedure UpdateListViewItem(const AListViewItem: TListViewItem;
+      const AItem: TObject);
   protected
     procedure ClearItemsInView; override;
     procedure BeginUpdateView; override;
     procedure EndUpdateView; override;
     procedure AddItemToView(const AItem: TObject); override;
     procedure DeleteItemFromView(const AItemIndex: Integer); override;
-    procedure UpdateItemInView(const AItem: TObject; const APropertyName: String); override;
+    procedure UpdateItemInView(const AItem: TObject;
+      const APropertyName: String); override;
     procedure UpdateAllItemsInView; override;
 
     function GetComponent: TComponent; override;
@@ -622,7 +688,8 @@ type
   private
     FTreeView: TTreeView;
   private
-    procedure UpdateTreeNode(const ATreeViewItem: TTreeViewItem; const AItem: TObject);
+    procedure UpdateTreeNode(const ATreeViewItem: TTreeViewItem;
+      const AItem: TObject);
   protected
     procedure ClearItemsInView; override;
     procedure BeginUpdateView; override;
@@ -656,12 +723,13 @@ type
     constructor Create(const AComboBox: TComboBox);
   end;
 
-{ TAction }
+  { TAction }
 
-procedure TAction.Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod; const AEstrategiaBinding: String);
+procedure TAction.Bind(const AExecute: TExecuteMethod;
+  const ACanExecute: TCanExecuteMethod; const AEstrategiaBinding: String);
 begin
-  //le da igual la estrategia de binding, hace siempre lo mismo
-  FExecute    := AExecute;
+  // le da igual la estrategia de binding, hace siempre lo mismo
+  FExecute := AExecute;
   FCanExecute := ACanExecute;
 end;
 
@@ -690,16 +758,27 @@ end;
 
 { TCheckBox }
 
-function TCheckBox.GetBindingStrategy: IBindingStrategy;
+function TCheckBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TCheckBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 procedure TCheckBox.HandleOnChange(Sender: TObject);
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'IsChecked');
-
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'IsChecked');
+    FManager.BindingStrategy.Notify(Self, 'IsChecked');
+  end;
   if Assigned(FOrigOnChange) then
     FOrigOnChange(Sender);
 end;
@@ -708,73 +787,85 @@ procedure TCheckBox.Loaded;
 begin
   inherited;
   FOrigOnChange := OnChange;
-  OnChange      := HandleOnChange;
-end;
-
-procedure TCheckBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  OnChange := HandleOnChange;
 end;
 
 { TTrackBar }
 
 procedure TTrackBar.DoChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Value');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+    FManager.BindingStrategy.Notify(Self, 'Value');
+  end;
   inherited;
 end;
 
-function TTrackBar.GetBindingStrategy: IBindingStrategy;
+function TTrackBar.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TSwitch }
 
 procedure TSwitch.DoSwitch;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'IsChecked');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'IsChecked');
+    FManager.BindingStrategy.Notify(Self, 'IsChecked');
+  end;
   inherited;
 end;
 
-function TSwitch.GetBindingStrategy: IBindingStrategy;
+function TSwitch.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TSwitch.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TSwitch.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TArcDial }
 
 procedure TArcDial.AfterChangedProc(Sender: TObject);
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Value');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+    FManager.BindingStrategy.Notify(Self, 'Value');
+  end;
   inherited;
 end;
 
-function TArcDial.GetBindingStrategy: IBindingStrategy;
+function TArcDial.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TArcDial.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TArcDial.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TEdit }
@@ -784,15 +875,23 @@ begin
   Result := TBindableEditModel;
 end;
 
-function TEdit.GetBindingStrategy: IBindingStrategy;
+function TEdit.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TEdit.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+function TEdit.GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedTrackingEvent;
 end;
 
 { TBindableEditModel }
@@ -806,8 +905,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TEdit);
-    if Assigned(LEdit.FEstrategiaBinding) then
-      LEdit.FEstrategiaBinding.Notify(LEdit, 'Text');
+    if Assigned(LEdit.FManager) then
+    begin
+      if LEdit.FManager.IsAssignedPropertyChangedEvent then
+        LEdit.FManager.OnPropertyChangedEvent.Invoke(LEdit, 'Text');
+      LEdit.FManager.BindingStrategy.Notify(LEdit, 'Text');
+    end;
   end;
   inherited;
 end;
@@ -822,8 +925,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TEdit);
-    if Assigned(LEdit.FEstrategiaBinding) then
-      LEdit.FEstrategiaBinding.Notify(LEdit, 'Text');
+    if Assigned(LEdit.FManager) then
+    begin
+      if LEdit.FManager.IsAssignedPropertyChangedTrackingEvent then
+        LEdit.FManager.OnPropertyChangedTrackingEvent.Invoke(LEdit, 'Text');
+      LEdit.FManager.BindingStrategy.Notify(LEdit, 'Text');
+    end;
   end;
 end;
 
@@ -834,15 +941,23 @@ begin
   Result := TBindableMemoModel;
 end;
 
-function TMemo.GetBindingStrategy: IBindingStrategy;
+function TMemo.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TMemo.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TMemo.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+function TMemo.GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedTrackingEvent;
 end;
 
 { TBindableMemoModel }
@@ -856,8 +971,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TMemo);
-    if Assigned(LMemo.FEstrategiaBinding) then
-      LMemo.FEstrategiaBinding.Notify(LMemo, 'Text');
+    if Assigned(LMemo.FManager) then
+    begin
+      if LMemo.FManager.IsAssignedPropertyChangedEvent then
+        LMemo.FManager.OnPropertyChangedEvent.Invoke(LMemo, 'Text');
+      LMemo.FManager.BindingStrategy.Notify(LMemo, 'Text');
+    end;
   end;
   inherited;
 end;
@@ -872,8 +991,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TMemo);
-    if Assigned(LMemo.FEstrategiaBinding) then
-      LMemo.FEstrategiaBinding.Notify(LMemo, 'Text');
+    if Assigned(LMemo.FManager) then
+    begin
+      if LMemo.FManager.IsAssignedPropertyChangedTrackingEvent then
+        LMemo.FManager.OnPropertyChangedTrackingEvent.Invoke(LMemo, 'Text');
+      LMemo.FManager.BindingStrategy.Notify(LMemo, 'Text');
+    end;
   end;
 end;
 
@@ -884,15 +1007,24 @@ begin
   Result := TBindableComboEditModel;
 end;
 
-function TComboEdit.GetBindingStrategy: IBindingStrategy;
+function TComboEdit.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TComboEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TComboEdit.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+function TComboEdit.GetOnPropertyChangedTrackingEvent
+  : IPropertyChangedTrackingEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedTrackingEvent;
 end;
 
 { TBindableComboEditModel }
@@ -906,8 +1038,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TComboEdit);
-    if Assigned(LComboEdit.FEstrategiaBinding) then
-      LComboEdit.FEstrategiaBinding.Notify(LComboEdit, 'Text');
+    if Assigned(LComboEdit.FManager) then
+    begin
+      if LComboEdit.FManager.IsAssignedPropertyChangedEvent then
+        LComboEdit.FManager.OnPropertyChangedEvent.Invoke(LComboEdit, 'Text');
+      LComboEdit.FManager.BindingStrategy.Notify(LComboEdit, 'Text');
+    end;
   end;
   inherited;
 end;
@@ -922,23 +1058,38 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TComboEdit);
-    if Assigned(LComboEdit.FEstrategiaBinding) then
-      LComboEdit.FEstrategiaBinding.Notify(LComboEdit, 'Text');
+    if Assigned(LComboEdit.FManager) then
+    begin
+      if LComboEdit.FManager.IsAssignedPropertyChangedTrackingEvent then
+        LComboEdit.FManager.OnPropertyChangedTrackingEvent.Invoke(LComboEdit, 'Text');
+      LComboEdit.FManager.BindingStrategy.Notify(LComboEdit, 'Text');
+    end;
   end;
 end;
 
 { TColorPanel }
 
-function TColorPanel.GetBindingStrategy: IBindingStrategy;
+function TColorPanel.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TColorPanel.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 procedure TColorPanel.HandleOnChange(Sender: TObject);
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Color');
-
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Color');
+    FManager.BindingStrategy.Notify(Self, 'Color');
+  end;
   if Assigned(FOrigOnChange) then
     FOrigOnChange(Sender);
 end;
@@ -947,150 +1098,193 @@ procedure TColorPanel.Loaded;
 begin
   inherited;
   FOrigOnChange := OnChange;
-  OnChange      := HandleOnChange;
-end;
-
-procedure TColorPanel.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  OnChange := HandleOnChange;
 end;
 
 { TComboColorBox }
 
 procedure TComboColorBox.DoColorChange(Sender: TObject);
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Color');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Color');
+    FManager.BindingStrategy.Notify(Self, 'Color');
+  end;
   inherited;
 end;
 
-function TComboColorBox.GetBindingStrategy: IBindingStrategy;
+function TComboColorBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TComboColorBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TComboColorBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TColorListBox }
 
 procedure TColorListBox.DoChange;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Color');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Color');
+    FManager.BindingStrategy.Notify(Self, 'Color');
+  end;
   inherited;
 end;
 
-function TColorListBox.GetBindingStrategy: IBindingStrategy;
+function TColorListBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TColorListBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TColorListBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TColorComboBox }
 
 procedure TColorComboBox.DoChange;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Color');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Color');
+    FManager.BindingStrategy.Notify(Self, 'Color');
+  end;
   inherited;
 end;
 
-function TColorComboBox.GetBindingStrategy: IBindingStrategy;
+function TColorComboBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TColorComboBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TColorComboBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { THueTrackBar }
 
 procedure THueTrackBar.DoChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Value');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+    FManager.BindingStrategy.Notify(Self, 'Value');
+  end;
   inherited;
 end;
 
-function THueTrackBar.GetBindingStrategy: IBindingStrategy;
+function THueTrackBar.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure THueTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function THueTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TAlphaTrackBar }
 
 procedure TAlphaTrackBar.DoChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Value');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+    FManager.BindingStrategy.Notify(Self, 'Value');
+  end;
   inherited;
 end;
 
-function TAlphaTrackBar.GetBindingStrategy: IBindingStrategy;
+function TAlphaTrackBar.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TAlphaTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TAlphaTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TBWTrackBar }
 
 procedure TBWTrackBar.DoChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Value');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+    FManager.BindingStrategy.Notify(Self, 'Value');
+  end;
   inherited;
 end;
 
-function TBWTrackBar.GetBindingStrategy: IBindingStrategy;
+function TBWTrackBar.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TBWTrackBar.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TBWTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TTimeEdit }
 
 procedure TTimeEdit.DoDateTimeChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Time');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Time');
+    FManager.BindingStrategy.Notify(Self, 'Time');
+  end;
   inherited;
 end;
 
-function TTimeEdit.GetBindingStrategy: IBindingStrategy;
+function TTimeEdit.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TTimeEdit.HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime);
+function TTimeEdit.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TTimeEdit.HandlerPickerDateTimeChanged(Sender: TObject;
+  const ADate: TDateTime);
 begin
   { This method can be called from an OS specific picker (on iOS and Android).
     FMX does not protect those with the usual try..except block.
@@ -1101,29 +1295,36 @@ begin
   except
     Application.HandleException(Self);
   end;
-end;
-
-procedure TTimeEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 { TDateEdit }
 
 procedure TDateEdit.DoDateTimeChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Date');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Date');
+    FManager.BindingStrategy.Notify(Self, 'Date');
+  end;
   inherited;
 end;
 
-function TDateEdit.GetBindingStrategy: IBindingStrategy;
+function TDateEdit.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TDateEdit.HandlerPickerDateTimeChanged(Sender: TObject; const ADate: TDateTime);
+function TDateEdit.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TDateEdit.HandlerPickerDateTimeChanged(Sender: TObject;
+  const ADate: TDateTime);
 begin
   { This method can be called from an OS specific picker (on iOS and Android).
     FMX does not protect those with the usual try..except block.
@@ -1134,12 +1335,6 @@ begin
   except
     Application.HandleException(Self);
   end;
-end;
-
-procedure TDateEdit.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 { TSpinBox }
@@ -1149,30 +1344,36 @@ begin
   Result := TBindableSpinBoxModel;
 end;
 
-function TSpinBox.GetBindingStrategy: IBindingStrategy;
+function TSpinBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TSpinBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TSpinBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TBindableSpinBoxModel }
 
 procedure TBindableSpinBoxModel.DoChange;
 var
-  Owner   : TComponent;
+  Owner: TComponent;
   LSpinBox: TSpinBox absolute Owner;
 begin
   Owner := Self.Owner; // Strong reference
   if (Owner <> nil) then
   begin
     Assert(Owner is TSpinBox);
-    if Assigned(LSpinBox.FEstrategiaBinding) then
-      LSpinBox.FEstrategiaBinding.Notify(LSpinBox, 'Value');
+    if Assigned(LSpinBox.FManager) then
+    begin
+      if LSpinBox.FManager.IsAssignedPropertyChangedEvent then
+        LSpinBox.FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+      LSpinBox.FManager.BindingStrategy.Notify(Self, 'Value');
+    end;
   end;
   inherited;
 end;
@@ -1184,15 +1385,17 @@ begin
   Result := TBindableNumberBoxModel;
 end;
 
-function TNumberBox.GetBindingStrategy: IBindingStrategy;
+function TNumberBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TNumberBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TNumberBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TBindableNumberBoxModel }
@@ -1206,8 +1409,12 @@ begin
   if (Owner <> nil) then
   begin
     Assert(Owner is TNumberBox);
-    if Assigned(LNumberBox.FEstrategiaBinding) then
-      LNumberBox.FEstrategiaBinding.Notify(LNumberBox, 'Value');
+    if Assigned(LNumberBox.FManager) then
+    begin
+      if LNumberBox.FManager.IsAssignedPropertyChangedEvent then
+        LNumberBox.FManager.OnPropertyChangedEvent.Invoke(Self, 'Value');
+      LNumberBox.FManager.BindingStrategy.Notify(Self, 'Value');
+    end;
   end;
   inherited;
 end;
@@ -1237,8 +1444,17 @@ end;
 
 procedure TListBox.DoSelectionChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, ['ItemIndex', 'Selected', 'SelectedItem']);
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+    begin
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'ItemIndex');
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Selected');
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'SelectedItem');
+    end;
+    FManager.BindingStrategy.Notify(Self, ['ItemIndex', 'Selected',
+      'SelectedItem']);
+  end;
 end;
 
 function TListBox.FindListBoxItem(const AItem: TObject): Integer;
@@ -1263,9 +1479,17 @@ begin
   Result := FView;
 end;
 
-function TListBox.GetBindingStrategy: IBindingStrategy;
+function TListBox.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TListBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 function TListBox.GetSelectedItem: TObject;
@@ -1277,12 +1501,6 @@ begin
     Result := Sel.Data
   else
     Result := nil;
-end;
-
-procedure TListBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 procedure TListBox.SetSelectedItem(const Value: TObject);
@@ -1374,7 +1592,8 @@ begin
   end;
 end;
 
-procedure TListBoxCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+procedure TListBoxCollectionView.UpdateItemInView(const AItem: TObject;
+  const APropertyName: String);
 var
   ListBox: TListBox;
   Index: Integer;
@@ -1388,13 +1607,14 @@ begin
   end;
 end;
 
-procedure TListBoxCollectionView.UpdateListBoxItem(const AListBoxItem: TListBoxItem; const AItem: TObject);
+procedure TListBoxCollectionView.UpdateListBoxItem(const AListBoxItem
+  : TListBoxItem; const AItem: TObject);
 begin
-  AListBoxItem.ItemData.Text   := Template.GetTitle(AItem);
+  AListBoxItem.ItemData.Text := Template.GetTitle(AItem);
   AListBoxItem.ItemData.Detail := Template.GetDetail(AItem);
-  AListBoxItem.ImageIndex      := Template.GetImageIndex(AItem);
-  AListBoxItem.Data            := AItem;
-  AListBoxItem.StyleLookup     := Template.GetStyle(AItem);
+  AListBoxItem.ImageIndex := Template.GetImageIndex(AItem);
+  AListBoxItem.Data := AItem;
+  AListBoxItem.StyleLookup := Template.GetStyle(AItem);
 end;
 
 { TListView }
@@ -1407,8 +1627,18 @@ end;
 
 procedure TListView.DoChange;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, ['ItemIndex', 'Selected', 'SelectedItem']);
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+    begin
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'ItemIndex');
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Selected');
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'SelectedItem');
+    end;
+    FManager.BindingStrategy.Notify(Self, ['ItemIndex', 'Selected',
+      'SelectedItem']);
+  end;
+  inherited;
 end;
 
 function TListView.FindListViewItem(const AItem: TObject): Integer;
@@ -1425,16 +1655,24 @@ begin
   Result := -1;
 end;
 
-function TListView.GetBindingStrategy: IBindingStrategy;
-begin
-  Result := FEstrategiaBinding
-end;
-
 function TListView.GetCollectionView: ICollectionView;
 begin
   if (FView = nil) then
     FView := TListViewCollectionView.Create(Self);
   Result := FView;
+end;
+
+function TListView.GetManager: IStrategyEventedObject;
+begin
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TListView.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 function TListView.GetSelectedItem: TObject;
@@ -1446,12 +1684,6 @@ begin
     Result := TObject(Sel.Tag)
   else
     Result := nil;
-end;
-
-procedure TListView.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
 end;
 
 procedure TListView.SetSelectedItem(const Value: TObject);
@@ -1542,7 +1774,8 @@ begin
   end;
 end;
 
-procedure TListViewCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+procedure TListViewCollectionView.UpdateItemInView(const AItem: TObject;
+  const APropertyName: String);
 var
   ListView: TListView;
   Index: Integer;
@@ -1556,7 +1789,8 @@ begin
   end;
 end;
 
-procedure TListViewCollectionView.UpdateListViewItem(const AListViewItem: TListViewItem; const AItem: TObject);
+procedure TListViewCollectionView.UpdateListViewItem(const AListViewItem
+  : TListViewItem; const AItem: TObject);
 begin
   AListViewItem.Text := Template.GetTitle(AItem);
   AListViewItem.Detail := Template.GetDetail(AItem);
@@ -1568,20 +1802,28 @@ end;
 
 procedure TImage.DoChanged;
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Bitmap');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+    begin
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Bitmap');
+    end;
+    FManager.BindingStrategy.Notify(Self, 'Bitmap');
+  end;
   inherited;
 end;
 
-function TImage.GetBindingStrategy: IBindingStrategy;
+function TImage.GetManager: IStrategyEventedObject;
 begin
-  Result := FEstrategiaBinding
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
 end;
 
-procedure TImage.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
+function TImage.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 { TTreeView }
@@ -1591,13 +1833,13 @@ var
   Node: TTreeViewItem;
   tV: TTreeView;
 begin
-  tv := (Sender as TTreeView);
-  if assigned( tv.selected) then
+  tV := (Sender as TTreeView);
+  if Assigned(tV.Selected) then
   begin
-    Node := (Sender as TTreeView).selected;
-    if Assigned( FOnChanged_) then
-      FOnChanged_( node);
-    DoSelectNode( Node, True);
+    Node := (Sender as TTreeView).Selected;
+    if Assigned(FOnChanged_) then
+      FOnChanged_(Node);
+    DoSelectNode(Node, True);
   end;
 end;
 
@@ -1614,30 +1856,30 @@ end;
 
 procedure TTreeView.DoSelectNode(Node: TTreeViewItem; Selected: Boolean);
 begin
-  if Selected and Assigned(FEstrategiaBinding) then
+  if Assigned(FManager) then
   begin
-    FEstrategiaBinding.Notify(Self, ['Selected', 'SelectedNode']);
+    if FManager.IsAssignedPropertyChangedEvent then
+    begin
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Selected');
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'SelectedItem');
+    end;
+    FManager.BindingStrategy.Notify(Self, ['Selected', 'SelectedItem']);
   end;
   inherited;
 end;
 
 function TTreeView.FindTreeNode(const AItem: TObject): TTreeViewItem;
 var
-  node: TTreeViewItem;
-  i: Integer;
+  Node: TTreeViewItem;
+  I: Integer;
 begin
   Result := nil;
-  for i := 0 to Count - 1 do
+  for I := 0 to Count - 1 do
   begin
-    node := Items[i];
-    if node.TagObject = AItem then
-      Result := node;
+    Node := Items[I];
+    if Node.TagObject = AItem then
+      Result := Node;
   end;
-end;
-
-function TTreeView.GetBindingStrategy: IBindingStrategy;
-begin
-  Result := FEstrategiaBinding
 end;
 
 function TTreeView.GetCollectionView: ICollectionView;
@@ -1646,6 +1888,19 @@ begin
     FView := TTreeViewCollectionView.Create(Self);
 
   Result := FView;
+end;
+
+function TTreeView.GetManager: IStrategyEventedObject;
+begin
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TTreeView.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
 end;
 
 function TTreeView.GetSelectedNode: TObject;
@@ -1666,12 +1921,6 @@ begin
   OnChange := Change;
 end;
 
-procedure TTreeView.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
-end;
-
 procedure TTreeView.SetSelectedNode(const Value: TObject);
 begin
   Selected := FindTreeNode(Value);
@@ -1681,8 +1930,14 @@ end;
 
 procedure TComboBox.Change(Sender: TObject);
 begin
-  if Assigned(FEstrategiaBinding) then
-    FEstrategiaBinding.Notify(Self, 'Text');
+  if Assigned(FManager) then
+  begin
+    if FManager.IsAssignedPropertyChangedEvent then
+      FManager.OnPropertyChangedEvent.Invoke(Self, 'Text');
+    if FManager.IsAssignedPropertyChangedTrackingEvent then
+      FManager.OnPropertyChangedTrackingEvent.Invoke(Self, 'Text');
+    FManager.BindingStrategy.Notify(Self, 'Text');
+  end;
 
   SetSelectedItem(Items.Objects[ItemIndex]);
   inherited;
@@ -1694,17 +1949,32 @@ begin
   inherited;
 end;
 
-function TComboBox.GetBindingStrategy: IBindingStrategy;
-begin
-  Result := FEstrategiaBinding
-end;
-
 function TComboBox.GetCollectionView: ICollectionView;
 begin
   if (FView = nil) then
     FView := TComboBoxCollectionView.Create(Self);
 
   Result := FView;
+end;
+
+function TComboBox.GetManager: IStrategyEventedObject;
+begin
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result := FManager;
+end;
+
+function TComboBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedEvent;
+end;
+
+function TComboBox.GetOnPropertyChangedTrackingEvent
+  : IPropertyChangedTrackingEvent;
+begin
+  Guard.CheckNotNull(FManager, 'Manager is null');
+  Result := FManager.OnPropertyChangedTrackingEvent;
 end;
 
 function TComboBox.GetSelectedItem: TObject;
@@ -1715,14 +1985,8 @@ end;
 procedure TComboBox.Loaded;
 begin
   inherited;
-  FChanged_ := onChange;
-  onChange  := Change;
-end;
-
-procedure TComboBox.SetBindingStrategy(AEstrategiaBinding: IBindingStrategy);
-begin
-  if FEstrategiaBinding <> AEstrategiaBinding then
-    FEstrategiaBinding := AEstrategiaBinding;
+  FChanged_ := OnChange;
+  OnChange := Change;
 end;
 
 procedure TComboBox.SetSelectedItem(const Value: TObject);
@@ -1731,8 +1995,12 @@ begin
   begin
     FSelectedItem := Value;
 
-    if Assigned(FEstrategiaBinding) then
-      FEstrategiaBinding.Notify(Self, 'SelectedItem');
+    if Assigned(FManager) then
+    begin
+      if FManager.IsAssignedPropertyChangedEvent then
+        FManager.OnPropertyChangedEvent.Invoke(Self, 'SelectedItem');
+      FManager.BindingStrategy.Notify(Self, 'SelectedItem');
+    end;
   end;
 end;
 
@@ -1745,7 +2013,7 @@ begin
   if Assigned(FComboBox) then
   begin
     sItem := Template.GetTitle(AItem);
-    FComboBox.Items.AddObject( sItem, AItem);
+    FComboBox.Items.AddObject(sItem, AItem);
   end;
 end;
 
@@ -1776,7 +2044,7 @@ procedure TComboBoxCollectionView.DeleteItemFromView(const AItemIndex: Integer);
 begin
   if Assigned(FComboBox) then
   begin
-    FComboBox.Items.Delete( AItemIndex);
+    FComboBox.Items.Delete(AItemIndex);
   end;
 end;
 
@@ -1805,25 +2073,26 @@ begin
     for Item in Source do
     begin
       sItem := FComboBox.Items.Strings[index];
-      FComboBox.Items.Strings[Index] := Template.GetTitle( Item);
+      FComboBox.Items.Strings[Index] := Template.GetTitle(Item);
       FComboBox.Items.Objects[Index] := Item;
       Inc(Index);
     end;
   end;
 end;
 
-procedure TComboBoxCollectionView.UpdateItemInView(const AItem: TObject; const APropertyName: String);
+procedure TComboBoxCollectionView.UpdateItemInView(const AItem: TObject;
+  const APropertyName: String);
 var
   Index: Integer;
 begin
   if Assigned(FComboBox) then
   begin
-    Index := FComboBox.Items.IndexOfObject( AItem);
-     if (Index >= 0) then
-     begin
-       FComboBox.Items.Strings[Index] := Template.GetTitle( AItem);
-       FComboBox.Items.Objects[Index] := AItem;
-     end;
+    Index := FComboBox.Items.IndexOfObject(AItem);
+    if (Index >= 0) then
+    begin
+      FComboBox.Items.Strings[Index] := Template.GetTitle(AItem);
+      FComboBox.Items.Objects[Index] := AItem;
+    end;
   end;
 end;
 
@@ -1833,27 +2102,27 @@ procedure TTreeViewCollectionView.AddItemToView(const AItem: TObject);
 var
   Item: TTreeViewItem;
 
-  procedure Branch( Parent: TTreeViewItem; AItem: TObject );
+  procedure Branch(Parent: TTreeViewItem; AItem: TObject);
   var
     Item: TTreeViewItem;
     obj: TObject;
   begin
-    for obj in Template.GetChildren( AItem) do
+    for obj in Template.GetChildren(AItem) do
     begin
-      Item := TTreeViewItem.Create( FTreeView );
+      Item := TTreeViewItem.Create(FTreeView);
       Item.Parent := Parent;
-      Item.Text := Template.GetTitle( obj);
+      Item.Text := Template.GetTitle(obj);
       UpdateTreeNode(Item, obj);
-      Branch( Item, obj);
+      Branch(Item, obj);
     end;
   end;
 
 begin
-  Item := TTreeViewItem.Create( FTreeView );
+  Item := TTreeViewItem.Create(FTreeView);
   Item.Parent := FTreeView;
-  Item.Text := Template.GetTitle( AItem);
+  Item.Text := Template.GetTitle(AItem);
   UpdateTreeNode(Item, AItem);
-  Branch( Item, AItem);
+  Branch(Item, AItem);
 end;
 
 procedure TTreeViewCollectionView.BeginUpdateView;
@@ -1863,12 +2132,11 @@ end;
 
 procedure TTreeViewCollectionView.ClearItemsInView;
 var
-  //Item: TTreeViewItem;
-  i: Integer;
+  I: Integer;
 begin
-  for i := 0 to FtreeView.Count -1 do
+  for I := 0 to FTreeView.Count - 1 do
   begin
-    FtreeView.Items[ i].Free;
+    FTreeView.Items[I].Free;
   end;
 end;
 
@@ -1881,7 +2149,7 @@ end;
 
 procedure TTreeViewCollectionView.DeleteItemFromView(const AItemIndex: Integer);
 begin
-  FTreeView.Items[ AItemIndex].Free;
+  FTreeView.Items[AItemIndex].Free;
 end;
 
 procedure TTreeViewCollectionView.EndUpdateView;
@@ -1903,8 +2171,8 @@ begin
   Index := 0;
   for Item in Source do
   begin
-    Node := FTreeView.Items[ Index];
-    UpdateTreeNode( Node, Item);
+    Node := FTreeView.Items[Index];
+    UpdateTreeNode(Node, Item);
     Inc(Index);
   end;
 end;
@@ -1919,8 +2187,8 @@ begin
     UpdateTreeNode(Node, AItem);
 end;
 
-procedure TTreeViewCollectionView.UpdateTreeNode(
-  const ATreeViewItem: TTreeViewItem; const AItem: TObject);
+procedure TTreeViewCollectionView.UpdateTreeNode(const ATreeViewItem
+  : TTreeViewItem; const AItem: TObject);
 begin
   ATreeViewItem.TagObject := TObject(AItem);
 end;
