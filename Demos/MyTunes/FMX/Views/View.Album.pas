@@ -3,6 +3,7 @@ unit View.Album;
 interface
 
 uses
+  System.RTTI,
   System.SysUtils,
   System.Types,
   System.UITypes,
@@ -22,12 +23,18 @@ uses
   FMX.Memo,
   FMX.DateTimeCtrls,
   FMX.Colors,
-  Grijjy.Mvvm.Controls.Fmx, // MUST be listed AFTER all other FMX.* units!
-  Grijjy.Mvvm.Views.Fmx,
+
+  MyTunes.Interfaces,
+
+  MVVM.Controls.Platform.FMX,
+  MVVM.Views.Platform.FMX,
+  //Grijjy.Mvvm.Controls.Fmx, // MUST be listed AFTER all other FMX.* units!
+  //Grijjy.Mvvm.Views.Fmx,
+
   ViewModel.Album;
 
 type
-  TViewAlbum = class(TgoFormView<TViewModelAlbum>)
+  TViewAlbum = class(TFormView<IViewModelAlbum>)
     ToolBar: TToolBar;
     ButtonCancel: TButton;
     ButtonOK: TButton;
@@ -57,10 +64,14 @@ implementation
 
 uses
   System.SysConst,
-  Grijjy.Mvvm.Rtti,
-  Grijjy.Mvvm.Types,
-  Grijjy.Mvvm.DataBinding,
-  Grijjy.Mvvm.ViewFactory,
+
+  MVVM.Interfaces,
+  MVVM.ViewFactory,
+  MVVM.Types,
+//  Grijjy.Mvvm.Rtti,
+//  Grijjy.Mvvm.Types,
+//  Grijjy.Mvvm.DataBinding,
+//  Grijjy.Mvvm.ViewFactory,
   Converter.TitleToCaption;
 
 {$R *.fmx}
@@ -71,46 +82,39 @@ uses
 
 type
   { Prefix an album title with the text 'Album: ' }
-  TTrackCountToText = class(TgoValueConverter)
+  TTrackCountToText = class(TBindingValueConverter)
   public
-    class function ConvertSourceToTarget(const ASource: TgoValue): TgoValue; override;
+    class function ConvertSourceToTarget(const ASource: TValue): TValue; override;
   end;
 
 { TViewAlbum }
 
 procedure TViewAlbum.ListBoxItemTracksClick(Sender: TObject);
 begin
-  ViewModel.EditTracks;
+  TViewModelAlbum(ViewModel).EditTracks;
 end;
 
 procedure TViewAlbum.SetupView;
 begin
   { Bind properties }
-  Binder.Bind(ViewModel.Album, 'Title', Self, 'Caption',
-    TgoBindDirection.OneWay, [], TTitleToCaption);
-  Binder.Bind(ViewModel.Album, 'Title', EditTitle, 'Text',
-    TgoBindDirection.TwoWay, [TgoBindFlag.TargetTracking]);
-  Binder.Bind(ViewModel.Album, 'Artist', EditArtist, 'Text',
-    TgoBindDirection.TwoWay, [TgoBindFlag.TargetTracking]);
-  Binder.Bind(ViewModel.Album, 'RecordLabel', EditRecordLabel, 'Text');
-  Binder.Bind(ViewModel.Album, 'Copyright', EditCopyright, 'Text');
-  Binder.Bind(ViewModel.Album, 'ReleaseDate', DateEditReleaseDate, 'Date');
-  Binder.Bind(ViewModel.Album, 'BackgroundColor', ComboColorBoxBackground, 'Color');
-  Binder.Bind(ViewModel.Album, 'Notes', MemoNotes, 'Text');
-  Binder.Bind(ViewModel.Album, 'TrackCount', ListBoxItemTracks.ItemData, 'Detail',
-    TgoBindDirection.OneWay, [], TTrackCountToText);
-  Binder.Bind(ViewModel.Album, 'IsValid', ButtonOK, 'Enabled',
-    TgoBindDirection.OneWay);
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'Title', Self, 'Caption', EBindDirection.OneWay, [], TTitleToCaption);
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'Title', EditTitle, 'Text', EBindDirection.TwoWay, [EBindFlag.TargetTracking]);
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'Artist', EditArtist, 'Text', EBindDirection.TwoWay, [EBindFlag.TargetTracking]);
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'RecordLabel', EditRecordLabel, 'Text');
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'Copyright', EditCopyright, 'Text');
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'ReleaseDate', DateEditReleaseDate, 'Date');
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'BackgroundColor', ComboColorBoxBackground, 'Color');
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'Notes', MemoNotes, 'Text');
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'TrackCount', ListBoxItemTracks.ItemData, 'Detail', EBindDirection.OneWay, [], TTrackCountToText);
+  Binder.Bind(TViewModelAlbum(ViewModel).Album, 'IsValid', ButtonOK, 'Enabled', EBindDirection.OneWay);
 end;
 
 { TTrackCountToText }
 
-class function TTrackCountToText.ConvertSourceToTarget(
-  const ASource: TgoValue): TgoValue;
+class function TTrackCountToText.ConvertSourceToTarget(const ASource: TValue): TValue;
 var
   Count: Integer;
 begin
-  Assert(ASource.ValueType = TgoValueType.Ordinal);
   Count := ASource.AsOrdinal;
   case Count of
     0: Result := 'No tracks';
@@ -121,6 +125,6 @@ begin
 end;
 
 initialization
-  TgoViewFactory.Register(TViewAlbum, 'Album');
+  TViewFactory.Register(TViewAlbum, 'Album');
 
 end.

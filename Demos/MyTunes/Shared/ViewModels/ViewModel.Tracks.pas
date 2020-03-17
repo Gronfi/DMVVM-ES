@@ -4,11 +4,12 @@ interface
 
 uses
   System.Generics.Collections,
-  Grijjy.Mvvm.Observable,
+  MVVM.Observable,
+  MyTunes.Interfaces,
   Model.Track;
 
 type
-  TViewModelTracks = class(TgoObservable)
+  TViewModelTracks = class(TObservable, IViewModelTracks)
   {$REGION 'Internal Declarations'}
   private
     FTracks: TAlbumTracks;
@@ -27,6 +28,10 @@ type
     procedure AddTrack;
     procedure DeleteTrack;
     function HasSelectedTrack: Boolean;
+
+    procedure SetupViewModel;
+
+    function GetAsObject: TObject;
 
     { Bindable properties }
     property Tracks: TEnumerable<TAlbumTrack> read GetTracks;
@@ -63,6 +68,11 @@ begin
   Assert(Assigned(FSelectedTrack));
   FTracks.Remove(FSelectedTrack);
   SetSelectedTrack(nil);
+end;
+
+function TViewModelTracks.GetAsObject: TObject;
+begin
+  Result := Self
 end;
 
 function TViewModelTracks.GetSelectedTrackDurationMinutes: Integer;
@@ -114,6 +124,11 @@ procedure TViewModelTracks.SetSelectedTrackDurationSeconds(
 begin
   if Assigned(FSelectedTrack) then
     FSelectedTrack.Duration := TTimeSpan.Create(0, FSelectedTrack.Duration.Minutes, Value);
+end;
+
+procedure TViewModelTracks.SetupViewModel;
+begin
+  //
 end;
 
 end.

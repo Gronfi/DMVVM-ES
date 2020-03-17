@@ -545,11 +545,11 @@ type
   // //property DataBinder: IDataBinder read GetDataBinder;  DAVID
   // end;
 
-  IModel = interface
+  IModel = interface(IObject)
     ['{28C9B05B-A5F5-49E1-913E-2AB10F9FB8F3}']
   end;
 
-  IViewModel = interface
+  IViewModel = interface(IObject)
     ['{37E13CBF-FDB2-4C6B-948A-7D5F7A6D0AC5}']
     procedure SetupViewModel;
   end;
@@ -562,12 +562,12 @@ type
     property Model: T read GetModel;
   end;
 
-  IView = interface
+  IView = interface(IObject)
     ['{44055F6F-42A8-43DD-B393-1CC700B8C7F8}']
     procedure SetupView;
   end;
 
-  IView<T: IViewModel> = interface
+  IView<T: IViewModel> = interface(IView)
     ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
     function GetViewModel: T;
     procedure InitView(AViewModel: T);
@@ -576,6 +576,7 @@ type
   end;
 
   IViewForm<T: IViewModel> = interface(IView<T>)
+  ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
     procedure Execute;
     procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
   end;

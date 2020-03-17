@@ -1,5 +1,7 @@
 unit MVVM.Views.Platform.FMX;
 
+{$HPPEMIT 'MVVM.Views.Platform.FMX'}
+
 interface
 
 uses
@@ -33,6 +35,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
 
+    function GetAsObject: TObject;
+
     property Binder: TBindingManager read FBinder;
   end;
 
@@ -62,6 +66,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+
+    function GetAsObject: TObject;
 
     property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm
       write FGrayOutPreviousForm;
@@ -147,6 +153,11 @@ begin
   ShowModal(AResultProc);
 end;
 
+function TFormView<T>.GetAsObject: TObject;
+begin
+  Result := Self
+end;
+
 function TFormView<T>.GetViewModel: T;
 begin
   Result := FViewModel;
@@ -177,6 +188,11 @@ destructor TFrameView<T>.Destroy;
 begin
   FBinder.Free;
   inherited;
+end;
+
+function TFrameView<T>.GetAsObject: TObject;
+begin
+  Result := Self
 end;
 
 function TFrameView<T>.GetViewModel: T;

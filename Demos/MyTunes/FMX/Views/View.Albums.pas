@@ -38,7 +38,7 @@ uses
   ViewModel.Albums;
 
 type
-  TViewAlbums = class(TFormView<TViewModelAlbums>)
+  TViewAlbums = class(TFormView<IViewModelAlbums>)
     ActionList: TActionList;
     ActionAddAlbum: TAction;
     ActionDeleteAlbum: TAction;
@@ -78,7 +78,11 @@ var
 implementation
 
 uses
-  Grijjy.Mvvm.DataBinding,
+  System.Generics.Collections,
+
+  //Grijjy.Mvvm.DataBinding,
+  MVVM.Types,
+
   Template.Album,
   Template.Track,
   Model.Album,
@@ -99,27 +103,26 @@ begin
   { Always show master view, also on mobile. }
   MultiView.ShowMaster;
 
-  InitView(TViewModelAlbums.Create, True);
+  InitView(TViewModelAlbums.Create);
 end;
 
 procedure TViewAlbums.DeleteAlbum;
 begin
-  Assert(Assigned(ViewModel.SelectedAlbum));
+  Assert(Assigned(TViewModelAlbums(ViewModel).SelectedAlbum));
   TDialogService.MessageDialog(
-    Format('Are you sure you want to delete album "%s"?', [ViewModel.SelectedAlbum.Title]),
+    Format('Are you sure you want to delete album "%s"?', [TViewModelAlbums(ViewModel).SelectedAlbum.Title]),
     TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo],
     TMsgDlgBtn.mbNo, 0,
     procedure(const AResult: TModalResult)
     begin
       if (AResult = mrYes) then
-        ViewModel.DeleteAlbum;
+        TViewModelAlbums(ViewModel).DeleteAlbum;
     end);
 end;
 
 procedure TViewAlbums.ListViewAlbumsChange(Sender: TObject);
 begin
-  Binder.BindCollection<TAlbumTrack>(ViewModel.SelectedAlbum.Tracks,
-    ListViewTracks, TTemplateTrack);
+  Binder.BindCollection<TAlbumTrack>(TViewModelAlbums(ViewModel).SelectedAlbum.Tracks, ListViewTracks, TTemplateTrack);
 end;
 
 procedure TViewAlbums.ListViewAlbumsDeleteItem(Sender: TObject;
@@ -133,27 +136,21 @@ begin
   inherited;
 
   { Bind properties }
-  Binder.Bind(ViewModel, 'SelectedAlbum', ListViewAlbums, 'SelectedItem');
-  Binder.Bind(ViewModel, 'SelectedAlbum.BackgroundColor',
-    RectangleBackground.Fill, 'Color', TgoBindDirection.OneWay);
-  Binder.Bind(ViewModel, 'SelectedAlbum.Title', TextTitle, 'Text',
-    TgoBindDirection.OneWay);
-  Binder.Bind(ViewModel, 'SelectedAlbum.TextColor1',
-    TextTitle.TextSettings, 'FontColor', TgoBindDirection.OneWay);
-  Binder.Bind(ViewModel, 'SelectedAlbum.Artist', TextArtist, 'Text',
-    TgoBindDirection.OneWay);
-  Binder.Bind(ViewModel, 'SelectedAlbum.TextColor2',
-    TextArtist.TextSettings, 'FontColor', TgoBindDirection.OneWay);
-  Binder.Bind(ViewModel, 'SelectedAlbum.Bitmap', ImageAlbumCover, 'Bitmap',
-    TgoBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum', ListViewAlbums, 'SelectedItem');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.BackgroundColor', RectangleBackground.Fill, 'Color', EBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.Title', TextTitle, 'Text', EBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.TextColor1', TextTitle.TextSettings, 'FontColor', EBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.Artist', TextArtist, 'Text', EBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.TextColor2', TextArtist.TextSettings, 'FontColor', EBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedAlbum.Bitmap', ImageAlbumCover, 'Bitmap', EBindDirection.OneWay);
 
   { Bind collections }
-  Binder.BindCollection<TAlbum>(ViewModel.Albums, ListViewAlbums, TTemplateAlbum);
+  Binder.BindCollection<TAlbum>(TViewModelAlbums(ViewModel).Albums, ListViewAlbums, TTemplateAlbum);
 
   { Bind actions }
-  ActionAddAlbum.Bind(ViewModel.AddAlbum);
-  ActionDeleteAlbum.Bind(Self.DeleteAlbum, ViewModel.HasSelectedAlbum);
-  ActionEditAlbum.Bind(ViewModel.EditAlbum, ViewModel.HasSelectedAlbum);
+  ActionAddAlbum.Bind(TViewModelAlbums(ViewModel).AddAlbum);
+  ActionDeleteAlbum.Bind(Self.DeleteAlbum, TViewModelAlbums(ViewModel).HasSelectedAlbum);
+  ActionEditAlbum.Bind(TViewModelAlbums(ViewModel).EditAlbum, TViewModelAlbums(ViewModel).HasSelectedAlbum);
 end;
 
 end.

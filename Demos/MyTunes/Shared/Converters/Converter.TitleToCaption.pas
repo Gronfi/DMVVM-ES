@@ -3,14 +3,15 @@ unit Converter.TitleToCaption;
 interface
 
 uses
-  Grijjy.Mvvm.Rtti,
-  Grijjy.Mvvm.Types;
+  System.RTTI,
+
+  Mvvm.Types;
 
 type
   { Prefix an album title with the text 'Album: ' }
-  TTitleToCaption = class(TgoValueConverter)
+  TTitleToCaption = class(TBindingValueConverter)
   public
-    class function ConvertSourceToTarget(const ASource: TgoValue): TgoValue; override;
+    class function ConvertSourceToTarget(const ASource: TValue): TValue; override;
   end;
 
 implementation
@@ -21,10 +22,8 @@ uses
 
 { TTitleToCaption }
 
-class function TTitleToCaption.ConvertSourceToTarget(
-  const ASource: TgoValue): TgoValue;
+class function TTitleToCaption.ConvertSourceToTarget(const ASource: TValue): TValue;
 begin
-  Assert(ASource.ValueType = TgoValueType.Str);
   Result := 'Album: ' + ASource.AsString;
 end;
 

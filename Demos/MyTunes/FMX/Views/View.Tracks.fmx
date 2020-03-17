@@ -226,8 +226,8 @@ object ViewTracks: TViewTracks
           Size.Height = 69.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 0
-          Viewport.Width = 262.000000000000000000
-          Viewport.Height = 69.000000000000000000
+          Viewport.Width = 258.000000000000000000
+          Viewport.Height = 65.000000000000000000
         end
       end
     end

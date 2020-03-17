@@ -1,5 +1,7 @@
 unit MVVM.Bindings.LiveBindings;
 
+{$HPPEMIT 'MVVM.Bindings.LiveBindings'}
+
 interface
 
 uses

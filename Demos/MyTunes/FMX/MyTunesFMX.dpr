@@ -3,6 +3,10 @@ program MyTunesFMX;
 uses
   System.StartUpCopy,
   FMX.Forms,
+
+  MVVM.Binding.LiveBindings.Controls.FMX,
+  MVVM.Core,
+
   Data in '..\Shared\Data\Data.pas',
   Model.Album in '..\Shared\Models\Model.Album.pas',
   Model in '..\Shared\Models\Model.pas',
@@ -16,12 +20,14 @@ uses
   View.Album in 'Views\View.Album.pas' {ViewAlbum},
   ViewModel.Album in '..\Shared\ViewModels\ViewModel.Album.pas',
   Converter.TitleToCaption in '..\Shared\Converters\Converter.TitleToCaption.pas',
-  MyTunes.Interfaces in '..\Shared\Interfaces\MyTunes.Interfaces.pas';
+  MyTunes.Interfaces in '..\Shared\Interfaces\MyTunes.Interfaces.pas',
+  MyTunes.Types in '..\Shared\Types\MyTunes.Types.pas';
 
 {$R *.res}
 
 begin
   Application.Initialize;
+  MVVMCore.DefaultBindingStrategy := 'LIVEBINDINGS';
   Application.CreateForm(TViewAlbums, ViewAlbums);
   Application.Run;
 end.

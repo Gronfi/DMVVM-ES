@@ -8,7 +8,6 @@ inherited ViewTracks_iPhone4in: TViewTracks_iPhone4in
     inherited ToolBarDetails: TToolBar
       Size.Width = 320.000000000000000000
       inherited SpeedButtonMaster: TSpeedButton
-        Size.Height = 44.000000000000000000
         Visible = True
       end
       inherited LabelTrackDetails: TLabel
@@ -43,24 +42,22 @@ inherited ViewTracks_iPhone4in: TViewTracks_iPhone4in
           inherited LayoutDurationMinutes: TLayout
             Size.Width = 96.000000000000000000
             inherited LabelDurationMinutes: TLabel
-              Position.X = 62.000000000000000000
-              Size.Width = 30.000000000000000000
+              Position.X = 71.000000000000000000
             end
             inherited SpinBoxDurationMinutes: TSpinBox
               Position.Y = 3.000000000000000000
-              Size.Width = 58.000000000000000000
+              Size.Width = 67.000000000000000000
               Size.Height = 30.000000000000000000
             end
           end
           inherited LayoutDurationSeconds: TLayout
             Size.Width = 96.000000000000000000
             inherited LabelSeconds: TLabel
-              Position.X = 70.000000000000000000
-              Size.Width = 26.000000000000000000
+              Position.X = 77.000000000000000000
             end
             inherited SpinBoxDurationSeconds: TSpinBox
               Position.Y = 3.000000000000000000
-              Size.Width = 66.000000000000000000
+              Size.Width = 73.000000000000000000
               Size.Height = 30.000000000000000000
             end
           end

@@ -3,10 +3,10 @@ unit Template.Track;
 interface
 
 uses
-  Grijjy.Mvvm.Types;
+  Mvvm.Interfaces;
 
 type
-  TTemplateTrack = class(TgoDataTemplate)
+  TTemplateTrack = class(TDataTemplate)
   public
     class function GetTitle(const AItem: TObject): String; override;
     class function GetDetail(const AItem: TObject): String; override;

@@ -6,12 +6,17 @@ uses
   System.UITypes,
   System.SysUtils,
   System.Generics.Collections,
-  Grijjy.Mvvm.Observable,
+
+  MVVM.Observable,
+  MVVM.Interfaces,
+  //Grijjy.Mvvm.Observable,
+
+  MyTunes.Interfaces,
   Model.Album,
   Model;
 
 type
-  TViewModelAlbums = class(TgoObservable)
+  TViewModelAlbums = class(TObservable, IViewModelAlbums)
   {$REGION 'Internal Declarations'}
   private
     FSelectedAlbum: TAlbum;
@@ -23,10 +28,14 @@ type
   {$ENDREGION 'Internal Declarations'}
   public
     { Actions }
+    procedure SetupViewModel;
+
     procedure AddAlbum;
     procedure DeleteAlbum;
     procedure EditAlbum;
     function HasSelectedAlbum: Boolean;
+
+    function GetAsObject: TObject;
 
     { Bindable properties }
     property Albums: TEnumerable<TAlbum> read GetAlbums;
@@ -36,8 +45,8 @@ type
 implementation
 
 uses
-  Grijjy.Mvvm.Types,
-  Grijjy.Mvvm.ViewFactory,
+  //Grijjy.Mvvm.Types,
+  MVVM.ViewFactory,
   ViewModel.Album;
 
 { TViewModelAlbums }
@@ -102,6 +111,11 @@ begin
 end;
 
 
+function TViewModelAlbums.GetAsObject: TObject;
+begin
+  Result := Self
+end;
+
 function TViewModelAlbums.HasSelectedAlbum: Boolean;
 begin
   Result := Assigned(FSelectedAlbum);
@@ -116,19 +130,24 @@ begin
   end;
 end;
 
+procedure TViewModelAlbums.SetupViewModel;
+begin
+  //
+end;
+
 procedure TViewModelAlbums.ShowAlbumView(const AAlbum: TAlbum;
   const AResultProc: TProc<TModalResult>);
 var
-  ViewModel: TViewModelAlbum;
-  View: IgoView;
+  ViewModel: IViewModelAlbum;
+  View: IView<IViewModelAlbum>;
 begin
   Assert(Assigned(AAlbum));
   Assert(Assigned(AResultProc));
   ViewModel := TViewModelAlbum.Create(AAlbum);
 
   { The view becomes owner of the view model. }
-  View := TgoViewFactory.CreateView('Album', nil, ViewModel);
-  View.ExecuteModal(
+  View := TViewFactory.CreateView('Album', nil, ViewModel);
+  (View as IViewForm<IViewModelAlbum>).ExecuteModal(
     procedure (AModalResult: TModalResult)
     begin
       AResultProc(AModalResult);

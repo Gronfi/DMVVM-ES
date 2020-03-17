@@ -3,10 +3,10 @@ unit Template.Album;
 interface
 
 uses
-  Grijjy.Mvvm.Types;
+  MVVM.Interfaces;
 
 type
-  TTemplateAlbum = class(TgoDataTemplate)
+  TTemplateAlbum = class(TDataTemplate)
   public
     class function GetTitle(const AItem: TObject): String; override;
     class function GetDetail(const AItem: TObject): String; override;

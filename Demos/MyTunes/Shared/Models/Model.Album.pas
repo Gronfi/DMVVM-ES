@@ -14,7 +14,7 @@ uses
 
 type
   { A model that represents a musical album }
-  TAlbum = class(TObservable)
+  TAlbum = class(TObservable, IAlbum)
   {$REGION 'Internal Declarations'}
   private
     FTitle: String;
@@ -54,6 +54,8 @@ type
     procedure RemoveTrack(const ATrack: TAlbumTrack);
     procedure SetTracks(const ATracks: TAlbumTracks);
 
+    function GetAsObject: TObject;
+
     property RawImage: TBytes read FRawImage write FRawImage;
 
     { Bindable properties }
@@ -74,12 +76,12 @@ type
   end;
 
 type
-  TAlbums = TObservableCollection<IAlbum>;
+  TAlbums = TObservableCollection<TAlbum>;
 
 implementation
 
 uses
-  Grijjy.Mvvm.Types;
+  MVVM.Core;
 
 { TAlbum }
 
@@ -128,11 +130,16 @@ begin
   inherited;
 end;
 
+function TAlbum.GetAsObject: TObject;
+begin
+  Result := Self
+end;
+
 function TAlbum.GetBitmap: TObject;
 begin
   if (FBitmap = nil) and (FRawImage <> nil) then
   begin
-    FBitmap := TgoBitmap.Load(FRawImage);
+    FBitmap := MVVMCore.PlatformServices.LoadBitmap(FRawImage);
 
     { Don't need raw image anymore. Release it. }
     FRawImage := nil;

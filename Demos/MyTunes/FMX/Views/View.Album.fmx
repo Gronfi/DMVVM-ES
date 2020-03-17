@@ -203,8 +203,8 @@ object ViewAlbum: TViewAlbum
         Size.Height = 105.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        Viewport.Width = 496.000000000000000000
-        Viewport.Height = 105.000000000000000000
+        Viewport.Width = 492.000000000000000000
+        Viewport.Height = 101.000000000000000000
       end
     end
     object ListBoxItemTracks: TListBoxItem

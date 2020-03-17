@@ -292,3 +292,7 @@
 /Demos/MyTunes/Shared/Models/__history
 /Source/MVVM.Binding.Strategies/LiveBindings.FMX/*.identcache
 /Source/MVVM.Binding.Strategies/LiveBindings/*.identcache
+/Demos/MyTunes/Shared/Converters/__history
+/Demos/MyTunes/Shared/ViewModels/__history
+/Demos/MyTunes/Shared/Templates/__history
+/Demos/MyTunes/Shared/Types/__history

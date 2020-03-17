@@ -49,7 +49,7 @@ type
       const ATargetAlias: String; const ATargetPropertyPath: String;
       const AFlags: EBindFlags = []; const ABindingStrategy: String = '';
       const AExtraParams: TBindExtraParams = []); overload;
-    procedure BindCollection<T: Class>(const ACollection: TEnumerable<TObject>;
+    procedure BindCollection<T: Class>(const ACollection: TEnumerable<T>;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
     procedure BindDataSet(const ADataSet: TDataSet;
@@ -136,13 +136,13 @@ begin
 end;
 
 procedure TBindingManager.BindCollection<T>(const ACollection
-  : TEnumerable<TObject>; const ATarget: ICollectionViewProvider;
+  : TEnumerable<T>; const ATarget: ICollectionViewProvider;
   const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindCollection(TypeInfo(T), ACollection, ATarget, ATemplate);
+  LEstrategia.BindCollection(TypeInfo(T), TEnumerable<TObject>(ACollection), ATarget, ATemplate);
 end;
 
 procedure TBindingManager.BindDataSet(const ADataSet: TDataSet;

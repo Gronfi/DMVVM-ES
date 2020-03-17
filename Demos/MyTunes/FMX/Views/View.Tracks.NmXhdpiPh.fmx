@@ -10,7 +10,7 @@ inherited ViewTracks_NmXhdpiPh: TViewTracks_NmXhdpiPh
       Size.Height = 48.000000000000000000
       inherited SpeedButtonMaster: TSpeedButton
         Size.Width = 48.000000000000000000
-        Size.Height = 48.000000000000000000
+        Size.Height = 40.000000000000000000
         Visible = True
       end
       inherited LabelTrackDetails: TLabel
@@ -46,24 +46,22 @@ inherited ViewTracks_NmXhdpiPh: TViewTracks_NmXhdpiPh
           inherited LayoutDurationMinutes: TLayout
             Size.Width = 136.000000000000000000
             inherited LabelDurationMinutes: TLabel
-              Position.X = 101.000000000000000000
-              Size.Width = 31.000000000000000000
+              Position.X = 111.000000000000000000
             end
             inherited SpinBoxDurationMinutes: TSpinBox
               Position.Y = 2.000000000000000000
-              Size.Width = 97.000000000000000000
+              Size.Width = 107.000000000000000000
               Size.Height = 32.000000000000000000
             end
           end
           inherited LayoutDurationSeconds: TLayout
             Size.Width = 136.000000000000000000
             inherited LabelSeconds: TLabel
-              Position.X = 106.000000000000000000
-              Size.Width = 30.000000000000000000
+              Position.X = 117.000000000000000000
             end
             inherited SpinBoxDurationSeconds: TSpinBox
               Position.Y = 2.000000000000000000
-              Size.Width = 102.000000000000000000
+              Size.Width = 113.000000000000000000
               Size.Height = 32.000000000000000000
             end
           end

@@ -30,12 +30,17 @@ uses
   FMX.ScrollBox,
   FMX.Memo,
   FMX.DialogService,
-  Grijjy.Mvvm.Controls.Fmx, // MUST be listed AFTER all other FMX.* units!
-  Grijjy.Mvvm.Views.Fmx,
+
+  MyTunes.Interfaces,
+
+  MVVM.Controls.Platform.FMX,
+  MVVM.Views.Platform.FMX,
+  //Grijjy.Mvvm.Controls.Fmx, // MUST be listed AFTER all other FMX.* units!
+  //Grijjy.Mvvm.Views.Fmx,
   ViewModel.Tracks;
 
 type
-  TViewTracks = class(TgoFormView<TViewModelTracks>)
+  TViewTracks = class(TFormView<IViewModelTracks>)
     ActionList: TActionList;
     ActionAddTrack: TAction;
     ActionDeleteTrack: TAction;
@@ -77,8 +82,9 @@ type
 implementation
 
 uses
-  Grijjy.Mvvm.ViewFactory,
-  Grijjy.Mvvm.DataBinding,
+  MVVM.ViewFactory,
+  MVVM.Types,
+  //Grijjy.Mvvm.DataBinding,
   Model.Album,
   Model.Track,
   Model,
@@ -92,15 +98,15 @@ uses
 
 procedure TViewTracks.DeleteTrack;
 begin
-  Assert(Assigned(ViewModel.SelectedTrack));
+  Assert(Assigned(TViewModelTracks(ViewModel).SelectedTrack));
   TDialogService.MessageDialog(
-    Format('Are you sure you want to delete track "%s"?', [ViewModel.SelectedTrack.Name]),
+    Format('Are you sure you want to delete track "%s"?', [TViewModelTracks(ViewModel).SelectedTrack.Name]),
     TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo],
     TMsgDlgBtn.mbNo, 0,
     procedure(const AResult: TModalResult)
     begin
       if (AResult = mrYes) then
-        ViewModel.DeleteTrack;
+        TViewModelTracks(ViewModel).DeleteTrack;
     end);
 end;
 
@@ -110,29 +116,27 @@ begin
   MultiView.ShowMaster;
 
   { Bind properties }
-  Binder.Bind(ViewModel, 'SelectedTrack', ListViewTracks, 'SelectedItem');
-  Binder.Bind(ViewModel, 'SelectedTrack.Name', EditName, 'Text',
-    TgoBindDirection.TwoWay, [TgoBindFlag.TargetTracking]);
-  Binder.Bind(ViewModel, 'SelectedTrack.TrackNumber', SpinBoxTrackNumber, 'Value');
-  Binder.Bind(ViewModel, 'SelectedTrackDurationMinutes', SpinBoxDurationMinutes, 'Value');
-  Binder.Bind(ViewModel, 'SelectedTrackDurationSeconds', SpinBoxDurationSeconds, 'Value');
-  Binder.Bind(ViewModel, 'SelectedTrack.Genres', MemoGenres, 'Text');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrack', ListViewTracks, 'SelectedItem');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrack.Name', EditName, 'Text', EBindDirection.TwoWay, [EBindFlag.TargetTracking]);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrack.TrackNumber', SpinBoxTrackNumber, 'Value');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrackDurationMinutes', SpinBoxDurationMinutes, 'Value');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrackDurationSeconds', SpinBoxDurationSeconds, 'Value');
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrack.Genres', MemoGenres, 'Text');
 
   { Note that you can bind an Object property (SelectedTrack) to a Boolean
     property (Enabled). The target property will be False if the object is nil,
     or True otherwise. This obviously only works in one direction. }
-  Binder.Bind(ViewModel, 'SelectedTrack', ListBoxDetails, 'Enabled',
-    TgoBindDirection.OneWay);
+  Binder.Bind(ViewModel.GetAsObject, 'SelectedTrack', ListBoxDetails, 'Enabled', EBindDirection.OneWay);
 
   { Bind collections }
-  Binder.BindCollection<TAlbumTrack>(ViewModel.Tracks, ListViewTracks, TTemplateTrack);
+  Binder.BindCollection<TAlbumTrack>(TViewModelTracks(ViewModel).Tracks, ListViewTracks, TTemplateTrack);
 
   { Bind actions }
-  ActionAddTrack.Bind(ViewModel.AddTrack);
-  ActionDeleteTrack.Bind(Self.DeleteTrack, ViewModel.HasSelectedTrack);
+  ActionAddTrack.Bind(TViewModelTracks(ViewModel).AddTrack);
+  ActionDeleteTrack.Bind(Self.DeleteTrack, TViewModelTracks(ViewModel).HasSelectedTrack);
 end;
 
 initialization
-  TgoViewFactory.Register(TViewTracks, 'Tracks');
+  TViewFactory.Register(TViewTracks, 'Tracks');
 
 end.

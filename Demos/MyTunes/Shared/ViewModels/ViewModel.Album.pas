@@ -3,11 +3,13 @@ unit ViewModel.Album;
 interface
 
 uses
-  Grijjy.Mvvm.Observable,
+  MVVM.Observable,
+  MyTunes.Interfaces,
+  //Grijjy.Mvvm.Observable,
   Model.Album;
 
 type
-  TViewModelAlbum = class(TgoObservable)
+  TViewModelAlbum = class(TObservable, IViewModelAlbum)
   {$REGION 'Internal Declarations'}
   private
     FAlbum: TAlbum;
@@ -18,6 +20,10 @@ type
     { Actions }
     procedure EditTracks;
 
+    procedure SetupViewModel;
+
+    function GetAsObject: TObject;
+
     { Bindable properties }
     property Album: TAlbum read FAlbum;
   end;
@@ -26,8 +32,9 @@ implementation
 
 uses
   System.UITypes,
-  Grijjy.Mvvm.Types,
-  Grijjy.Mvvm.ViewFactory,
+  //Grijjy.Mvvm.Types,
+  MVVM.Interfaces,
+  MVVM.ViewFactory,
   Model.Track,
   ViewModel.Tracks;
 
@@ -43,8 +50,8 @@ end;
 procedure TViewModelAlbum.EditTracks;
 var
   Clone: TAlbumTracks;
-  ViewModel: TViewModelTracks;
-  View: IgoView;
+  ViewModel: IViewModelTracks;
+  View: IView<IViewModelTracks>;
 begin
   Clone := TAlbumTracks.Create;
   try
@@ -52,8 +59,8 @@ begin
     ViewModel := TViewModelTracks.Create(Clone);
 
     { The view becomes owner of the view model }
-    View := TgoViewFactory.CreateView('Tracks', nil, ViewModel);
-    View.ExecuteModal(
+    View := TViewFactory.CreateView('Tracks', nil, ViewModel);
+    (View as IViewForm<IViewModelTracks>).ExecuteModal(
       procedure (AModalResult: TModalResult)
       begin
         if (AModalResult = mrOk) then
@@ -64,6 +71,16 @@ begin
     Clone.DisposeOf;
     raise;
   end;
+end;
+
+function TViewModelAlbum.GetAsObject: TObject;
+begin
+  Result := Self
+end;
+
+procedure TViewModelAlbum.SetupViewModel;
+begin
+  //
 end;
 
 end.

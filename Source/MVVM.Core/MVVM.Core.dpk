@@ -40,6 +40,7 @@ contains
   MVVM.Classes in 'Src\MVVM.Classes.pas',
   MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
   MVVM.Utils in 'Src\MVVM.Utils.pas',
-  MVVM.Observable in 'Src\MVVM.Observable.pas';
+  MVVM.Observable in 'Src\MVVM.Observable.pas',
+  MVVM.ViewFactory in 'Src\MVVM.ViewFactory.pas';
 
 end.
