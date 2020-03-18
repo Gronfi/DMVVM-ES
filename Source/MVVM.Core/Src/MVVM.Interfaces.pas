@@ -143,8 +143,9 @@ type
   IStrategyBased = interface
     ['{3F645E49-CD84-430C-982F-2B2ADC128203}']
     function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(ABindingStrategy: IBindingStrategy);
 
-    property BindingStrategy: IBindingStrategy read GetBindingStrategy;
+    property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 
   IStrategyEventedObject = interface;
@@ -152,8 +153,9 @@ type
   IStrategyEventedBased = interface
     ['{72613457-8EBA-47F0-B277-47F66FD4A427}']
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
 
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
   end;
 
 {$REGION 'INotifyFree'}
@@ -247,6 +249,7 @@ type
     FOnCollectionChangedEvent: IChangedCollectionEvent;
 
     function GetBindingStrategy: IBindingStrategy;
+    procedure SetBindingStrategy(ABindingStrategy: IBindingStrategy);
 
     procedure CheckObjectHasFreeInterface;
     procedure CheckObjectHasPropertyChangedInterface;
@@ -276,7 +279,7 @@ type
     property OnCollectionChangedEvent: IChangedCollectionEvent
       read GetOnCollectionChangedEvent;
 
-    property BindingStrategy: IBindingStrategy read GetBindingStrategy;
+    property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION}
 
@@ -285,6 +288,9 @@ type
   IBinding = interface
     ['{13B534D5-094F-4DF3-AE62-C2BD8B703215}']
     function GetBindingStrategy: IBindingStrategy;
+
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
 
     procedure CheckNotificationSupport(AObject: TObject; ATracking: Boolean);
 
@@ -297,14 +303,21 @@ type
     procedure RemoveFreeNotification(const AInstance: TObject);
     procedure HandleFreeEvent(const ASender, AInstance: TObject);
 
+    procedure SetManager(const AInstance: TObject);
+
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
   TBindingBase = class abstract(TComponent, IBinding)
   protected
+    FEnabled: Boolean;
     FSynchronizer: IReadWriteSync;
     FBindingStrategy: IBindingStrategy;
     FTrackedInstances: ISet<Pointer>;
+
+    function GetEnabled: Boolean; virtual;
+    procedure SetEnabled(const AValue: Boolean); virtual;
 
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
@@ -326,7 +339,10 @@ type
     procedure RemoveFreeNotification(const AInstance: TObject); virtual;
     procedure HandleFreeEvent(const ASender, AInstance: TObject); virtual;
 
+    procedure SetManager(const AInstance: TObject); virtual;
+
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
 {$ENDREGION}
@@ -696,6 +712,11 @@ begin
   Result := FBindingStrategy
 end;
 
+function TBindingBase.GetEnabled: Boolean;
+begin
+  Result := FEnabled
+end;
+
 procedure TBindingBase.HandleFreeEvent(const ASender, AInstance: TObject);
 begin
   FSynchronizer.BeginWrite;
@@ -732,9 +753,14 @@ begin
     TComponent(AInstance).RemoveFreeNotification(Self);
 end;
 
+procedure TBindingBase.SetEnabled(const AValue: Boolean);
+begin
+  FEnabled := AValue;
+end;
+
 procedure TBindingBase.SetFreeNotification(const AInstance: TObject);
 var
-  NotifyFree: INotifyFree;
+  [weak] LNotifyFree: INotifyFree;
 begin
   if (AInstance is TComponent) then
   begin
@@ -746,15 +772,54 @@ begin
     end;
     TComponent(AInstance).FreeNotification(Self);
   end
-  else if Supports(AInstance, INotifyFree, NotifyFree) then
+  else if Supports(AInstance, INotifyFree, LNotifyFree) then
   begin
     FSynchronizer.BeginWrite;
     try
       FTrackedInstances.Add(AInstance);
-      NotifyFree.OnFreeEvent.Add(HandleFreeEvent);
+      LNotifyFree.OnFreeEvent.Add(HandleFreeEvent);
     finally
       FSynchronizer.EndWrite;
     end;
+  end;
+end;
+
+procedure TBindingBase.SetManager(const AInstance: TObject);
+var
+  [weak] LNotifyProperty        : INotifyChangedProperty;
+  [weak] LNotifyPropertyTracking: INotifyPropertyTrackingChanged;
+  [weak] LNotifyCollection      : INotifyCollectionChanged;
+  LManager                      : IStrategyEventedObject;
+begin
+  if Supports(AInstance, INotifyChangedProperty, LNotifyProperty) then
+  begin
+    LManager := LNotifyProperty.Manager;
+    if LManager = nil then
+    begin
+      LManager                := TStrategyEventedObject.Create(AInstance);
+      LNotifyProperty.Manager := LManager;
+    end;
+    LManager.BindingStrategy := FBindingStrategy;
+  end;
+  if Supports(AInstance, INotifyPropertyTrackingChanged, LNotifyPropertyTracking) then
+  begin
+    LManager := LNotifyPropertyTracking.Manager;
+    if LManager = nil then
+    begin
+      LManager                        := TStrategyEventedObject.Create(AInstance);
+      LNotifyPropertyTracking.Manager := LManager;
+    end;
+    LManager.BindingStrategy := FBindingStrategy;
+  end;
+  if Supports(AInstance, INotifyCollectionChanged, LNotifyCollection) then
+  begin
+    LManager := LNotifyCollection.Manager;
+    if LManager = nil then
+    begin
+      LManager                  := TStrategyEventedObject.Create(AInstance);
+      LNotifyCollection.Manager := LManager;
+    end;
+    LManager.BindingStrategy := FBindingStrategy;
   end;
 end;
 
@@ -869,6 +934,11 @@ end;
 function TStrategyEventedObject.IsAssignedPropertyChangedTrackingEvent: Boolean;
 begin
   Result := Assigned(FOnPropertyChangedTrackingEvent)
+end;
+
+procedure TStrategyEventedObject.SetBindingStrategy(ABindingStrategy: IBindingStrategy);
+begin
+  FBindingStrategy := ABindingStrategy;
 end;
 
 end.

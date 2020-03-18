@@ -205,6 +205,7 @@ var
   ViewClass: TComponentClass;
   ViewComp: TComponent;
   View: IView<TVM>;
+  LVIewForm: IViewForm<TVM>;
 begin
   try
     ViewClass := nil;
@@ -215,8 +216,14 @@ begin
       raise EListError.CreateFmt('Cannot create view. View "%s" is not registered.', [AViewName]);
 
     ViewComp := ViewClass.Create(AOwner);
-    View := ViewComp as IView<TVM>;
-    Result := TViewProxy<TVM>.Create(View);
+    if Supports(ViewComp, IViewForm<TVM>, LViewForm) then
+    begin
+      Result := TViewProxy<TVM>.Create(LViewForm);
+    end
+    else begin
+           View := ViewComp as IView<TVM>;
+           Result := TViewProxy<TVM>.Create(View);
+         end;
     Result.InitView(AViewModel);
   except
     AViewModel := nil;

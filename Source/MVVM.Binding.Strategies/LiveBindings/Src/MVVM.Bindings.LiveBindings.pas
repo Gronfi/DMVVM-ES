@@ -140,7 +140,10 @@ begin
   lManaged := TInternalBindindExpression.Create(Self, [lAssocInput],
     LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
   // Asociacion de evento de fin
+
+  lManaged.SetManager(ASource);
   lManaged.SetFreeNotification(ASource);
+  lManaged.SetManager(ATarget);
   lManaged.SetFreeNotification(ATarget);
   AddBinding(lManaged);
   if ADirection = EBindDirection.TwoWay then
@@ -162,7 +165,9 @@ begin
     lManaged := TInternalBindindExpression.Create(Self, [lAssocInput],
       LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
     // Asociacion de evento de fin
+    lManaged.SetManager(ASource);
     lManaged.SetFreeNotification(ASource);
+    lManaged.SetManager(ATarget);
     lManaged.SetFreeNotification(ATarget);
     AddBinding(lManaged);
   end;
@@ -224,6 +229,7 @@ begin
   begin
     lManaged.SetFreeNotification(ASources[I].Source);
   end;
+  lManaged.SetManager(ATarget);
   lManaged.SetFreeNotification(ATarget);
   FBindings.Add(lManaged);
 end;
@@ -345,7 +351,7 @@ end;
 function TStrategy_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo;
   AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
 var
-  LProc: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>;
+//  LProc: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>;
   LClass: TClass;
 begin
   Result := false;
@@ -353,7 +359,7 @@ begin
   begin
     if AComponent.ClassType.InheritsFrom(LClass) then
     begin
-      LProc(AServiceType, AComponent, ACollection);
+      FObjectListLinkers[LClass](AServiceType, AComponent, ACollection);
       Exit(True);
     end;
   end;
@@ -362,7 +368,7 @@ end;
 function TStrategy_LiveBindings.InternalBindDataSet(ADataSet: TDataSet;
   AComponent: TComponent): Boolean;
 var
-  LProc: TProc<TDataSet, TComponent>;
+//  LProc: TProc<TDataSet, TComponent>;
   LClass: TClass;
 begin
   Result := false;
@@ -370,7 +376,7 @@ begin
   begin
     if AComponent.ClassType.InheritsFrom(LClass) then
     begin
-      LProc(ADataSet, AComponent);
+      FObjectDataSetLinkers[LClass](ADataSet, AComponent);
       Exit(True);
     end;
   end;
@@ -406,7 +412,6 @@ begin
   inherited Create(ABindingStrategy);
   FExpression := TBindings.CreateManagedBinding(InputScopes, BindExprStr,
     OutputScopes, OutputExpr, nil, nil, Options);
-
 end;
 
 destructor TStrategy_LiveBindings.TInternalBindindExpression.Destroy;
