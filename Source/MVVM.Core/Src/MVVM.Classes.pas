@@ -7,7 +7,7 @@ uses
   MVVM.Types;
 
 type
-  TViewModel<T:IModel> = class abstract(TInterfacedObject, IViewModel<T>)
+  TViewModel<T: IModel> = class abstract(TInterfacedObject, IViewModel<T>)
   private
     FModel: T;
   protected
@@ -15,6 +15,7 @@ type
   public
     procedure SetModel(AModel: T); virtual;
     procedure SetupViewModel; virtual; abstract;
+    function GetAsObject: TObject;
 
     property Model: T read GetModel;
   end;
@@ -25,6 +26,11 @@ uses
   Spring;
 
 { TViewModel<T> }
+
+function TViewModel<T>.GetAsObject: TObject;
+begin
+  Result := Self
+end;
 
 function TViewModel<T>.GetModel: T;
 begin
