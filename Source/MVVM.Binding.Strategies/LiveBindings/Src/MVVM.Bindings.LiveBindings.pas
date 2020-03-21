@@ -26,7 +26,7 @@ const
 type
   TStrategy_LiveBindings = class(TBindingStrategyBase)
   private type
-    TInternalBindindExpression = class(TBindingBase)
+    TInternalBindindExpression = class(TBindingDefault)
     private
       FExpression: TBindingExpression;
     public
@@ -49,11 +49,15 @@ type
     TExpressionList = TObjectList<TBindingBase>;
   private
   var
+    FEnabled : Boolean;
     FBindings: TExpressionList;
 
     class constructor CreateC;
     class destructor DestroyC;
   protected
+    function GetEnabled: Boolean; override;
+    procedure SetEnabled(const AValue: Boolean); override;
+
     function InternalBindCollection(AServiceType: PTypeInfo;
       AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
     function InternalBindDataSet(ADataSet: TDataSet;
@@ -66,6 +70,8 @@ type
     procedure AddBinding(ABinding: TBindingBase); override;
     function BindsCount: Integer; override;
     procedure ClearBindings; override;
+
+    function GetPlatformBindActionCommandType: TBindingCommandClass; override;
 
     procedure Notify(const AObject: TObject; const APropertyName: string = '');
       overload; override;
@@ -88,13 +94,15 @@ type
     procedure BindDataSet(const ADataSet: TDataSet;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass); override;
-    procedure BindAction(AAction: IBindingCommand; const ACanExecute: TCanExecuteMethod = nil); overload; override;
+    procedure BindAction(AAction: IBindableAction); overload; override;
 
     class procedure RegisterClassObjectListCollectionBinder
       (const AClass: TClass; AProcedure: TProc < PTypeInfo, TComponent,
       TEnumerable < TObject >> ); static;
     class procedure RegisterClassDataSetCollectionBinder(const AClass: TClass;
       AProcedure: TProc<TDataSet, TComponent>); static;
+
+    property Enabled : Boolean read GetEnabled write SetEnabled;
   end;
 
 implementation
@@ -232,10 +240,12 @@ begin
   FBindings.Add(lManaged);
 end;
 
-procedure TStrategy_LiveBindings.BindAction(AAction: IBindingCommand; const ACanExecute: TCanExecuteMethod = nil);
+procedure TStrategy_LiveBindings.BindAction(AAction: IBindableAction);
+var
+  LCommandClass: TBindingCommandClass;
 begin
-  Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) no puede ser null');
-  AAction.Bind(AExecute, ACanExecute);
+  Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) cannot be null');
+
 end;
 
 procedure TStrategy_LiveBindings.BindCollection(AServiceType: PTypeInfo;
@@ -245,9 +255,9 @@ var
   LView: ICollectionView;
 begin
   Guard.CheckNotNull(ATarget,
-    '<BindCollection> (Param=ATarget) no puede ser null');
+    '<BindCollection> (Param=ATarget) cannot be null');
   Guard.CheckNotNull(ATarget,
-    '<BindCollection> (Param=ATemplate) no puede ser null');
+    '<BindCollection> (Param=ATemplate) cannot be null');
 
   LView := ATarget.GetCollectionView;
   if (LView = nil) then
@@ -269,11 +279,11 @@ var
   LView: ICollectionView;
 begin
   Guard.CheckNotNull(ATarget,
-    '<BindDataSet> (Param=ADataSet) no puede ser null');
+    '<BindDataSet> (Param=ADataSet) cannot be null');
   Guard.CheckNotNull(ATarget,
-    '<BindDataSet> (Param=ATarget) no puede ser null');
+    '<BindDataSet> (Param=ATarget) cannot be null');
   Guard.CheckNotNull(ATarget,
-    '<BindDataSet> (Param=ATemplate) no puede ser null');
+    '<BindDataSet> (Param=ATemplate) cannot be null');
 
   LView := ATarget.GetCollectionView;
   if (LView = nil) then
@@ -345,10 +355,14 @@ begin
   FObjectDataSetLinkers := nil;
 end;
 
+function TStrategy_LiveBindings.GetEnabled: Boolean;
+begin
+  FS
+end;
+
 function TStrategy_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo;
   AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
 var
-//  LProc: TProc<PTypeInfo, TComponent, TEnumerable<TObject>>;
   LClass: TClass;
 begin
   Result := false;
@@ -396,6 +410,12 @@ class procedure TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder
   TEnumerable < TObject >> );
 begin
   FObjectListLinkers.AddOrSetValue(AClass, AProcedure);
+end;
+
+procedure TStrategy_LiveBindings.SetEnabled(const AValue: Boolean);
+begin
+  inherited;
+
 end;
 
 { TStrategy_LiveBindings.TInternalBindindExpression }

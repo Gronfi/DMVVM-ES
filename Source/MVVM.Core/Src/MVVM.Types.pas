@@ -97,6 +97,7 @@ type
   { Acciones Bindables } // DAVID: no me gusta como queda por las interfaces
 
   { The type of method to invoke when an IBindableAction is executed. }
+  TExecuteRttiMethod = TRttiMethod;
   TExecuteAnonymous = TProc;
   TExecuteMethod = procedure of object;
   // TExecuteMethod = procedure of Object;

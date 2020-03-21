@@ -114,12 +114,23 @@ type
   private
     FExecute: TExecuteMethod;
     FCanExecute: TCanExecuteMethod;
+    FAnomExecute: TExecuteAnonymous;
+    FRttiExecute: TExecuteRttiMethod;
+  protected
+    procedure DoExecuteAnonymous;
+    procedure DoExecuteRtti;
 {$ENDREGION 'Internal Declarations'}
   public
     { IBindableAction }
     procedure Bind(const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil;
-      const AEstrategiaBinding: String = ''); overload;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const AEstrategiaBinding: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteAnonymous;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteRttiMethod;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
   public
     constructor Create(AOwner: TComponent); override;
     function Update: Boolean; override;
@@ -777,13 +788,26 @@ type
     constructor Create(const AComboBox: TComboBox);
   end;
 
-  { TAction }
+{ TAction }
 
 procedure TAction.Bind(const AExecute: TExecuteMethod;
   const ACanExecute: TCanExecuteMethod; const AEstrategiaBinding: String);
 begin
-  // le da igual la estrategia de binding, hace siempre lo mismo
-  FExecute := AExecute;
+  FExecute    := AExecute;
+  FCanExecute := ACanExecute;
+end;
+
+procedure TAction.Bind(const AExecute: TExecuteRttiMethod;
+  const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
+begin
+  FExecute    := DoExecuteRtti;
+  FCanExecute := ACanExecute;
+end;
+
+procedure TAction.Bind(const AExecute: TExecuteAnonymous;
+  const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
+begin
+  FExecute    := DoExecuteAnonymous;
   FCanExecute := ACanExecute;
 end;
 
@@ -791,6 +815,18 @@ constructor TAction.Create(AOwner: TComponent);
 begin
   inherited;
   DisableIfNoHandler := False;
+end;
+
+procedure TAction.DoExecuteAnonymous;
+begin
+  if Assigned(FAnomExecute) then
+    FAnomExecute();
+end;
+
+procedure TAction.DoExecuteRtti;
+begin
+  if Assigned(FRttiExecute) then
+    FRttiExecute.Invoke(Self.Owner, []);
 end;
 
 function TAction.Execute: Boolean;

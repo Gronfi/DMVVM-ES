@@ -57,14 +57,6 @@ type
       const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
 
     procedure BindAction(AAction: IBindableAction; const ABindingStrategy: String = ''); overload;
-    procedure BindAction(
-      const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil;
-      const ABindingStrategy: String = ''); overload;
-    procedure BindAction(
-      const AExecute: TExecuteAnonymous;
-      const ACanExecute: TCanExecuteMethod = nil;
-      const ABindingStrategy: String = ''); overload;
 
     procedure Notify(const AObject: TObject; const APropertyName: String);
       overload; virtual;
@@ -137,24 +129,6 @@ var
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
   LEstrategia.BindAction(AAction);
-end;
-
-procedure TBindingManager.BindAction(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod;
-                                     const ABindingStrategy: String);
-var
-  LEstrategia: IBindingStrategy;
-begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindAction(AExecute, ACanExecute);
-end;
-
-procedure TBindingManager.BindAction(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod;
-                                     const ABindingStrategy: String);
-var
-  LEstrategia: IBindingStrategy;
-begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindAction(AExecute, ACanExecute);
 end;
 
 procedure TBindingManager.BindCollection<T>(const ACollection

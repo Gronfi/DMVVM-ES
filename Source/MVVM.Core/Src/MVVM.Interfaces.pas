@@ -373,19 +373,26 @@ type
     function CanExecute: Boolean;
   end;
 
-  TBindingCommandBase<T> = class abstract(TBindingBase, IBindingCommand)
+  TBindingCommandBase = class abstract(TBindingBase, IBindingCommand)
+  protected
+    FCanExecute: TCanExecuteMethod;
+  public
+    function CanExecute: Boolean; virtual;
+    procedure Execute; virtual; abstract;
+  end;
+
+  TBindingCommandBase<T> = class abstract(TBindingCommandBase)
   protected
     FCommand: T;
-    FCanExecute: TCanExecuteMethod;
     procedure SetCommand(const AValue: T);
     function GetCommand: T;
     property Command:T read GetCommand write SetCommand;
   public
-    function CanExecute: Boolean; virtual;
-    procedure Execute; virtual; abstract;
     constructor Create(const ACommand: T); overload;
     constructor Create(const ACommand:T; const ACanExecute: TCanExecuteMethod = nil); overload;
   end;
+
+  TBindingCommandClass = class of TBindingCommandBase;
 
 (*
   TBindingBase = class abstract(TComponent, IBinding)
@@ -546,6 +553,12 @@ type
     procedure Bind(const AExecute: TExecuteMethod;
       const ACanExecute: TCanExecuteMethod = nil;
       const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteAnonymous;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteRttiMethod;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
   end;
 
   IBindingStrategy = interface
@@ -557,6 +570,9 @@ type
     procedure AdquireWrite;
     procedure ReleaseWrite;
 
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
+
     procedure Notify(const ASource: TObject;
       const APropertyName: String = ''); overload;
     procedure Notify(const ASource: TObject;
@@ -565,6 +581,8 @@ type
     procedure AddBinding(ABinding: TBindingBase);
     function BindsCount: Integer;
     procedure ClearBindings;
+
+    function GetPlatformBindActionCommandType: TBindingCommandClass;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
       const ATarget: TObject; const ATargetPropertyPath: String;
@@ -586,12 +604,8 @@ type
       const ATemplate: TDataTemplateClass);
 
     procedure BindAction(AAction: IBindableAction); overload;
-    procedure BindAction(
-      const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil); overload;
-    procedure BindAction(
-      const AExecute: TExecuteAnonymous;
-      const ACanExecute: TCanExecuteMethod = nil); overload;
+
+    property Enabled : Boolean read GetEnabled write SetEnabled;
   end;
 
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
@@ -608,6 +622,9 @@ type
     procedure AdquireWrite;
     procedure ReleaseWrite;
 
+    function GetEnabled: Boolean; virtual; abstract;
+    procedure SetEnabled(const AValue: Boolean); virtual; abstract;
+
     procedure Notify(const AObject: TObject; const APropertyName: String = '');
       overload; virtual; abstract;
     procedure Notify(const AObject: TObject;
@@ -616,6 +633,8 @@ type
     procedure AddBinding(ABinding: TBindingBase); virtual; abstract;
     procedure ClearBindings; virtual; abstract;
     function BindsCount: Integer; virtual;
+
+    function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
       const ATarget: TObject; const ATargetPropertyPath: String;
@@ -637,12 +656,8 @@ type
       const ATemplate: TDataTemplateClass); virtual; abstract;
 
     procedure BindAction(AAction: IBindableAction); overload; virtual; abstract;
-    procedure BindAction(
-      const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil); overload; virtual; abstract;
-    procedure BindAction(
-      const AExecute: TExecuteAnonymous;
-      const ACanExecute: TCanExecuteMethod = nil); overload; virtual; abstract;
+
+    property Enabled : Boolean read GetEnabled write SetEnabled;
   end;
 
   TClass_BindingStrategyBase = class of TBindingStrategyBase;
@@ -1001,16 +1016,6 @@ begin
   FCanExecute := nil;
 end;
 
-function TBindingCommandBase<T>.CanExecute: Boolean;
-begin
-  Result := Enabled;
-  if Result then
-  begin
-    if Assigned(FCanExecute) then
-      Result := FCanExecute;
-  end;
-end;
-
 constructor TBindingCommandBase<T>.Create(const ACommand: T; const ACanExecute: TCanExecuteMethod);
 begin
   inherited Create;
@@ -1144,6 +1149,18 @@ end;
 procedure TStrategyEventedObject.SetBindingStrategy(ABindingStrategy: IBindingStrategy);
 begin
   FBindingStrategy := ABindingStrategy;
+end;
+
+{ TBindingCommandBase }
+
+function TBindingCommandBase.CanExecute: Boolean;
+begin
+  Result := Enabled;
+  if Result then
+  begin
+    if Assigned(FCanExecute) then
+      Result := FCanExecute;
+  end;
 end;
 
 end.
