@@ -43,7 +43,6 @@ object frmCSV: TfrmCSV
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'btTNP'
-    OnClick = btTNPClick
   end
   object btTP: TButton
     Anchors = [akLeft, akRight, akBottom]
@@ -54,7 +53,6 @@ object frmCSV: TfrmCSV
     Size.PlatformDefault = False
     TabOrder = 6
     Text = 'btTP'
-    OnClick = btTPClick
   end
   object Label1: TLabel
     Position.X = 8.000000000000000000
@@ -145,11 +143,15 @@ object frmCSV: TfrmCSV
     Top = 64
     object DoCrearVista: TAction
       Text = 'Crear nueva Vista'
-      OnExecute = DoCrearVistaExecute
     end
     object DoSelectFile: TAction
       Text = '...'
-      OnExecute = DoSelectFileExecute
+    end
+    object DoParalelo: TAction
+      Text = 'DoParalelo'
+    end
+    object DoNoParalelo: TAction
+      Text = 'DoNoParalelo'
     end
   end
 end

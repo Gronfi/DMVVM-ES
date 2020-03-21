@@ -9,14 +9,15 @@ uses
   Spring.Collections,
 
   CSV.Interfaces,
+
+  MVVM.Observable,
   MVVM.Bindings;
 
 type
-  TCSVFile_Model = class(TInterfacedObject, ICSVFile_Model)
+  TCSVFile_Model = class(TObservable, ICSVFile_Model)
   const
     SEPARADOR = ';';
   private
-    FBinder  : TBindingHelper;
     FFileName: String;
     FProgreso: Integer;
 
@@ -36,15 +37,12 @@ type
     constructor Create;
     destructor Destroy; override;
 
+
+    function GetAsObject: TObject;
     function LoadFile: TStrings;
 
     function ProcesarFicheroCSV: Boolean;
     function ProcesarFicheroCSV_Parallel: Boolean;
-
-    procedure Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string); overload;
-    procedure Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string); overload;
-    procedure BindReverse(const ABindObject: TObject; const AProperty: string; const ABindToProperty: string); overload;
-    procedure BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression: string; const ADstAlias, ADstFormatedExpression: string); overload;
 
     property IsPathOk: Boolean read GetIsPathOK;
     property FileName: String read GetFileName write SetFileName;
@@ -61,32 +59,11 @@ uses
 
 { TCSVFile }
 
-procedure TCSVFile_Model.Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string);
-begin
-  FBinder.Bind(AProperty, ABindToObject, ABindToProperty);
-end;
-
-procedure TCSVFile_Model.Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string);
-begin
-  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
-end;
-
-procedure TCSVFile_Model.BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression: string);
-begin
-  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
-end;
-
-procedure TCSVFile_Model.BindReverse(const ABindObject: TObject; const AProperty, ABindToProperty: string);
-begin
-  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
-end;
-
 constructor TCSVFile_Model.Create;
 var
   I: Integer;
 begin
   inherited;
-  FBinder := TBindingHelper.Create(Self);
 
   FTest1:= TCollections.CreateList<String>;
   FTest2:= TCollections.CreateList<String>;
@@ -101,8 +78,12 @@ end;
 
 destructor TCSVFile_Model.Destroy;
 begin
-  FBinder.Free;
   inherited;
+end;
+
+function TCSVFile_Model.GetAsObject: TObject;
+begin
+  Result := Self
 end;
 
 function TCSVFile_Model.GetFileName: String;
@@ -134,7 +115,7 @@ end;
 
 procedure TCSVFile_Model.Notify(const APropertyName: string);
 begin
-  FBinder.Notify(APropertyName);
+  Notify(APropertyName);
 end;
 
 function TCSVFile_Model.ProcesarFicheroCSV: Boolean;

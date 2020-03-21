@@ -1,4 +1,4 @@
-unit MVVM.EnumerableAdapter;
+unit MVVM.Bindings.LiveBindings.EnumerableAdapter;
 
 interface
 

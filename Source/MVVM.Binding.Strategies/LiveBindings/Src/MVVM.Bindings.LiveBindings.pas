@@ -88,9 +88,7 @@ type
     procedure BindDataSet(const ADataSet: TDataSet;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass); override;
-    procedure BindAction(const AAction: IBindableAction;
-      const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil); overload; override;
+    procedure BindAction(AAction: IBindingCommand; const ACanExecute: TCanExecuteMethod = nil); overload; override;
 
     class procedure RegisterClassObjectListCollectionBinder
       (const AClass: TClass; AProcedure: TProc < PTypeInfo, TComponent,
@@ -234,8 +232,7 @@ begin
   FBindings.Add(lManaged);
 end;
 
-procedure TStrategy_LiveBindings.BindAction(const AAction: IBindableAction;
-  const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod);
+procedure TStrategy_LiveBindings.BindAction(AAction: IBindingCommand; const ACanExecute: TCanExecuteMethod = nil);
 begin
   Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) no puede ser null');
   AAction.Bind(AExecute, ACanExecute);

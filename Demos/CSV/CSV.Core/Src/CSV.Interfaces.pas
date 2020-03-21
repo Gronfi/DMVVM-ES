@@ -38,26 +38,24 @@ type
     procedure SetFileName(const AFileName: String);
 
     function GetProgresoProcesamiento: Integer;
-    procedure SetProgresoProcesamiento(const AValue: Integer);
 
     function GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
     function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
 
     function GetIsValidFile: Boolean;
-    procedure SetIsValidFile(const AValue: Boolean);
 
-    function ProcesarFicheroCSV: Boolean;
-    function ProcesarFicheroCSV_Parallel: Boolean;
+    procedure ProcesarFicheroCSV;
+    procedure ProcesarFicheroCSV_Parallel;
 
-    property IsValidFile: Boolean read GetIsValidFile write SetIsValidFile;
+    property IsValidFile: Boolean read GetIsValidFile;
     property FileName: String read GetFileName write SetFileName;
-    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento write SetProgresoProcesamiento;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
 
     property OnProcesamientoFinalizado: IEvent<TFinProcesamiento> read GetOnProcesamientoFinalizado;
     property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
-  ICSVFile_View = Interface(IView<ICSVFile_Model>)
+  ICSVFile_View = Interface(IView<ICSVFile_ViewModel>)
   ['{A4D5834F-FF1C-4044-BA22-9BCE213241D1}']
   end;
 

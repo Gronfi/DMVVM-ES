@@ -9,10 +9,13 @@ uses
   FMX.Controls.Presentation,
 
   MVVM.Interfaces,
-  CSV.Interfaces, FMX.Effects, FMX.Layouts, FMX.Objects;
+  CSV.Interfaces, FMX.Effects, FMX.Layouts, FMX.Objects,
+
+  MVVM.Controls.Platform.FMX,
+  MVVM.Views.Platform.FMX;
 
 type
-  TfrmCSV = class(TForm, ICSVFile_View)
+  TfrmCSV = class(TFormView<ICSVFile_ViewModel>, ICSVFile_View)
     Label1: TLabel;
     lePath: TEdit;
     btPath: TButton;
@@ -29,6 +32,8 @@ type
     ShadowEffect2: TShadowEffect;
     Label2: TLabel;
     pgBarra: TProgressBar;
+    DoParalelo: TAction;
+    DoNoParalelo: TAction;
     procedure btPathClick(Sender: TObject);
     procedure btTNPClick(Sender: TObject);
     procedure btTPClick(Sender: TObject);
@@ -45,8 +50,8 @@ type
 
     procedure DoSeleccionarFichero;
     procedure DoCrearNuevaVista;
-    procedure DoMetodoNoParalelo;
-    procedure DoMetodoParalelo;
+    procedure DoMetodoNoParalelo(Sender: TObject);
+    procedure DoMetodoParalelo(Sender: TObject);
   public
     { Public declarations }
     procedure AddViewModel(AViewModel: IViewModel<ICSVFile_Model>);
@@ -73,6 +78,12 @@ begin
     begin
       FViewModel := AViewModel as ICSVFile_ViewModel;
       //Bindings a capela
+
+      //DoCrearVista.Bind(FViewModel.);
+      DoParalelo.Bind(FViewModel.ProcesarFicheroCSV_Parallel, FViewModel.GetIsValidFile);
+      DoNoParalelo.Bind(FViewModel.ProcesarFicheroCSV, FViewModel.GetIsValidFile);
+      //Binder.
+      (*
       //1) boton ejecución no paralela
       FViewModel.Bind('src', '"Test-No Parallel, File: " + src.FileName', btTNP, 'dst', 'dst.Text'); //formateo del caption
       FViewModel.Bind('IsValidFile', btTNP, 'Enabled'); //boton habilitado o no
@@ -83,6 +94,7 @@ begin
       FViewModel.OnProcesamientoFinalizado.Add(OnProcesoFinalizado);
       //4) evento de progreso
       FViewModel.OnProgresoProcesamiento.Add(OnProgresoProceso);
+      *)
     end
     else raise Exception.Create('No casan las interfaces');
   end;
@@ -118,7 +130,7 @@ begin
   DoCrearNuevaVista
 end;
 
-procedure TfrmCSV.DoMetodoNoParalelo;
+procedure TfrmCSV.DoMetodoNoParalelo(Sender: TObject);
 begin
   Guard.CheckNotNull(FViewModel, 'ViewModel no asignado');
   if not FViewModel.ProcesarFicheroCSV then
@@ -126,7 +138,7 @@ begin
   else mmInfo.Lines.Add('Ok')
 end;
 
-procedure TfrmCSV.DoMetodoParalelo;
+procedure TfrmCSV.DoMetodoParalelo(Sender: TObject);
 begin
   Guard.CheckNotNull(FViewModel, 'ViewModel no asignado');
   if not FViewModel.ProcesarFicheroCSV_Parallel then

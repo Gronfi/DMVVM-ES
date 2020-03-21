@@ -34,6 +34,7 @@ requires
 contains
   MVVM.Services.Platform.FMX in 'Src\MVVM.Services.Platform.FMX.pas',
   MVVM.Controls.Platform.FMX in 'Src\MVVM.Controls.Platform.FMX.pas',
-  MVVM.Views.Platform.FMX in 'Src\MVVM.Views.Platform.FMX.pas';
+  MVVM.Views.Platform.FMX in 'Src\MVVM.Views.Platform.FMX.pas',
+  MVVM.Commands.Platform.FMX in 'Src\MVVM.Commands.Platform.FMX.pas';
 
 end.

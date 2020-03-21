@@ -3,6 +3,7 @@ unit MVVM.Interfaces;
 interface
 
 uses
+  System.RTTI,
   System.Classes,
   System.SysUtils,
   System.Generics.Collections,
@@ -287,37 +288,118 @@ type
 
   IBinding = interface
     ['{13B534D5-094F-4DF3-AE62-C2BD8B703215}']
-    function GetBindingStrategy: IBindingStrategy;
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
+
+    procedure DoEnabled;
+    procedure DoDisabled;
+
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+  end;
+
+  TBindingBase = class abstract(TComponent, IBinding)
+  const
+    ENABLED_STATE                   = 0;
+    DISABLED_ACTIONS_APPLY_ON_VALUE = 1;
+  protected
+    FEnabled: Integer;
+    FSynchronizer: IReadWriteSync;
 
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
 
-    procedure CheckNotificationSupport(AObject: TObject; ATracking: Boolean);
+    procedure DoEnabled; virtual;
+    procedure DoDisabled; virtual;
 
-    procedure HandlePropertyChanged(const ASender: TObject;
-      const APropertyName: String);
-    procedure HandleLeafPropertyChanged(const ASender: TObject;
-      const APropertyName: String);
+  public
+    constructor Create; reintroduce;
+    destructor Destroy; override;
+
+    property Enabled: Boolean read GetEnabled write SetEnabled;
+  end;
+
+  IBindingDefault = interface(IBinding)
+    ['{8E5E2B20-86CF-48D5-99C2-6E9416AD1BE9}']
+    function GetBindingStrategy: IBindingStrategy;
+
+    function CheckPropertyChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+    function CheckPropertyTrackingChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+    function CheckFreeChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+
+    procedure HandlePropertyChanged(const ASender: TObject; const APropertyName: String);
+    procedure HandleLeafPropertyChanged(const ASender: TObject; const APropertyName: String);
+    procedure HandleFreeEvent(const ASender, AInstance: TObject);
 
     procedure SetFreeNotification(const AInstance: TObject);
     procedure RemoveFreeNotification(const AInstance: TObject);
-    procedure HandleFreeEvent(const ASender, AInstance: TObject);
 
     procedure SetManager(const AInstance: TObject);
+
+    property BindingStrategy: IBindingStrategy read GetBindingStrategy;
+  end;
+
+  TBindingDefault = class abstract(TBindingBase, IBindingDefault)
+  protected
+    FBindingStrategy : IBindingStrategy;
+    FTrackedInstances: ISet<Pointer>;
+
+    function GetBindingStrategy: IBindingStrategy;
+
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    constructor Create(ABindingStrategy: IBindingStrategy); overload;
+    destructor Destroy; override;
+
+    function CheckPropertyChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+    function CheckPropertyTrackingChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+    function CheckFreeChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean = True): Boolean;
+
+    procedure HandlePropertyChanged(const ASender: TObject; const APropertyName: String); virtual;
+    procedure HandleLeafPropertyChanged(const ASender: TObject; const APropertyName: String); virtual;
+    procedure HandleFreeEvent(const ASender, AInstance: TObject); virtual;
+
+    procedure SetFreeNotification(const AInstance: TObject); virtual;
+    procedure RemoveFreeNotification(const AInstance: TObject); virtual;
+
+    procedure SetManager(const AInstance: TObject); virtual;
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
+  IBindingCommand = interface(IBinding)
+    ['{0E689BEC-3ECA-4D02-B90F-3651D114DC4F}']
+    procedure Execute;
+    function CanExecute: Boolean;
+  end;
+
+  TBindingCommandBase<T> = class abstract(TBindingBase, IBindingCommand)
+  protected
+    FCommand: T;
+    FCanExecute: TCanExecuteMethod;
+    procedure SetCommand(const AValue: T);
+    function GetCommand: T;
+    property Command:T read GetCommand write SetCommand;
+  public
+    function CanExecute: Boolean; virtual;
+    procedure Execute; virtual; abstract;
+    constructor Create(const ACommand: T); overload;
+    constructor Create(const ACommand:T; const ACanExecute: TCanExecuteMethod = nil); overload;
+  end;
+
+(*
   TBindingBase = class abstract(TComponent, IBinding)
   protected
-    FEnabled: Boolean;
+    FEnabled: Integer;
     FSynchronizer: IReadWriteSync;
     FBindingStrategy: IBindingStrategy;
     FTrackedInstances: ISet<Pointer>;
 
-    function GetEnabled: Boolean; virtual;
-    procedure SetEnabled(const AValue: Boolean); virtual;
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
+
+    procedure DoEnabled; virtual;
+    procedure DoDisabled; virtual;
 
     procedure Notification(AComponent: TComponent;
       Operation: TOperation); override;
@@ -344,6 +426,7 @@ type
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
+  *)
 
 {$ENDREGION}
   { Abstract base template class that defines the mapping between properties of
@@ -355,7 +438,7 @@ type
     be assigned to the TListBoxItem.Text property.
 
     You can pass the template to the TgoDataBinder.BindCollection method. }
-{$REGION 'TDataTemplate'}
+ {$REGION 'TDataTemplate'}
 
   TDataTemplate = class abstract
   public
@@ -501,8 +584,13 @@ type
     procedure BindDataSet(const ADataSet: TDataSet;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass);
-    procedure BindAction(const AAction: IBindableAction;
+
+    procedure BindAction(AAction: IBindableAction); overload;
+    procedure BindAction(
       const AExecute: TExecuteMethod;
+      const ACanExecute: TCanExecuteMethod = nil); overload;
+    procedure BindAction(
+      const AExecute: TExecuteAnonymous;
       const ACanExecute: TCanExecuteMethod = nil); overload;
   end;
 
@@ -547,8 +635,13 @@ type
     procedure BindDataSet(const ADataSet: TDataSet;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass); virtual; abstract;
-    procedure BindAction(const AAction: IBindableAction;
+
+    procedure BindAction(AAction: IBindableAction); overload; virtual; abstract;
+    procedure BindAction(
       const AExecute: TExecuteMethod;
+      const ACanExecute: TCanExecuteMethod = nil); overload; virtual; abstract;
+    procedure BindAction(
+      const AExecute: TExecuteAnonymous;
       const ACanExecute: TCanExecuteMethod = nil); overload; virtual; abstract;
   end;
 
@@ -673,21 +766,109 @@ end;
 
 { TBindingBase }
 
-procedure TBindingBase.CheckNotificationSupport(AObject: TObject;
-  ATracking: Boolean);
-begin
-
-end;
-
-constructor TBindingBase.Create(ABindingStrategy: IBindingStrategy);
+constructor TBindingBase.Create;
 begin
   inherited Create(nil);
-  FBindingStrategy := ABindingStrategy;
+  FEnabled := ENABLED_STATE;
   FSynchronizer := TMREWSync.Create;
-  FTrackedInstances := TCollections.CreateSet<Pointer>;
 end;
 
 destructor TBindingBase.Destroy;
+begin
+  FSynchronizer := nil;
+  inherited;
+end;
+
+procedure TBindingBase.DoEnabled;
+begin
+  //
+end;
+
+procedure TBindingBase.DoDisabled;
+begin
+  //
+end;
+
+function TBindingBase.GetEnabled: Boolean;
+begin
+  FSynchronizer.BeginRead;
+  try
+    Result := (FEnabled = ENABLED_STATE)
+  finally
+    FSynchronizer.EndRead
+  end;
+end;
+
+procedure TBindingBase.SetEnabled(const AValue: Boolean);
+begin
+  FSynchronizer.BeginWrite;
+    try
+    case AValue of
+      True:
+        begin
+          if (FEnabled > ENABLED_STATE) then
+          begin
+            Dec(FEnabled);
+            if (FEnabled = ENABLED_STATE) then
+              DoEnabled;
+          end;
+        end;
+      False:
+        begin
+          Inc(FEnabled);
+          if (FEnabled = DISABLED_ACTIONS_APPLY_ON_VALUE) then //only once
+          begin
+            DoDisabled;
+          end;
+        end;
+    end;
+  finally
+    FSynchronizer.EndWrite;
+  end;
+end;
+
+{ TBindingDefault }
+function TBindingDefault.CheckFreeChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean): Boolean;
+begin
+  Result := True;
+  if not Supports(AObject, INotifyFree) then
+  begin
+    Result := False;
+    if ARaiseExceptionIfFalse then
+      raise Exception.Create('<INotifyFree> Interface not supported by object of class ' + AObject.QualifiedClassName);
+  end;
+end;
+
+function TBindingDefault.CheckPropertyChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean): Boolean;
+begin
+  Result := True;
+  if not Supports(AObject, INotifyChangedProperty) then
+  begin
+    Result := False;
+    if ARaiseExceptionIfFalse then
+      raise Exception.Create('<INotifyChangedProperty> Interface not supported by object of class ' + AObject.QualifiedClassName);
+  end;
+end;
+
+function TBindingDefault.CheckPropertyTrackingChangedNotificationSupport(AObject: TObject; const ARaiseExceptionIfFalse: Boolean): Boolean;
+begin
+  Result := True;
+  if not Supports(AObject, INotifyPropertyTrackingChanged) then
+  begin
+    Result := False;
+    if ARaiseExceptionIfFalse then
+      raise Exception.Create('<IPropertyChangedTrackingEvent> Interface not supported by object of class ' + AObject.QualifiedClassName);
+  end;
+end;
+
+constructor TBindingDefault.Create(ABindingStrategy: IBindingStrategy);
+begin
+  inherited Create;
+  FTrackedInstances := TCollections.CreateSet<Pointer>;
+  FBindingStrategy  := ABindingStrategy;
+end;
+
+destructor TBindingDefault.Destroy;
 var
   P: Pointer;
   Instance: TObject;
@@ -701,23 +882,17 @@ begin
     end;
     FTrackedInstances := nil;
   end;
-  FBindingStrategy := nil;
-  FSynchronizer := nil;
+  FBindingStrategy  := nil;
   FTrackedInstances := nil;
   inherited;
 end;
 
-function TBindingBase.GetBindingStrategy: IBindingStrategy;
+function TBindingDefault.GetBindingStrategy: IBindingStrategy;
 begin
   Result := FBindingStrategy
 end;
 
-function TBindingBase.GetEnabled: Boolean;
-begin
-  Result := FEnabled
-end;
-
-procedure TBindingBase.HandleFreeEvent(const ASender, AInstance: TObject);
+procedure TBindingDefault.HandleFreeEvent(const ASender, AInstance: TObject);
 begin
   FSynchronizer.BeginWrite;
   try
@@ -727,38 +902,32 @@ begin
   end;
 end;
 
-procedure TBindingBase.HandleLeafPropertyChanged(const ASender: TObject;
+procedure TBindingDefault.HandleLeafPropertyChanged(const ASender: TObject;
   const APropertyName: String);
 begin
-  //
+//
 end;
 
-procedure TBindingBase.HandlePropertyChanged(const ASender: TObject;
+procedure TBindingDefault.HandlePropertyChanged(const ASender: TObject;
   const APropertyName: String);
 begin
-  //
+//
 end;
 
-procedure TBindingBase.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TBindingDefault.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
   if (Operation = opRemove) then
     HandleFreeEvent(AComponent, AComponent);
 end;
 
-procedure TBindingBase.RemoveFreeNotification(const AInstance: TObject);
+procedure TBindingDefault.RemoveFreeNotification(const AInstance: TObject);
 begin
   if (AInstance is TComponent) then
     TComponent(AInstance).RemoveFreeNotification(Self);
 end;
 
-procedure TBindingBase.SetEnabled(const AValue: Boolean);
-begin
-  FEnabled := AValue;
-end;
-
-procedure TBindingBase.SetFreeNotification(const AInstance: TObject);
+procedure TBindingDefault.SetFreeNotification(const AInstance: TObject);
 var
   [weak] LNotifyFree: INotifyFree;
 begin
@@ -784,7 +953,7 @@ begin
   end;
 end;
 
-procedure TBindingBase.SetManager(const AInstance: TObject);
+procedure TBindingDefault.SetManager(const AInstance: TObject);
 var
   [weak] LNotifyProperty        : INotifyChangedProperty;
   [weak] LNotifyPropertyTracking: INotifyPropertyTrackingChanged;
@@ -821,6 +990,42 @@ begin
     end;
     LManager.BindingStrategy := FBindingStrategy;
   end;
+end;
+
+{ TBindingCommandBase<T> }
+
+constructor TBindingCommandBase<T>.Create(const ACommand: T);
+begin
+  inherited Create;
+  FCommand    := ACommand;
+  FCanExecute := nil;
+end;
+
+function TBindingCommandBase<T>.CanExecute: Boolean;
+begin
+  Result := Enabled;
+  if Result then
+  begin
+    if Assigned(FCanExecute) then
+      Result := FCanExecute;
+  end;
+end;
+
+constructor TBindingCommandBase<T>.Create(const ACommand: T; const ACanExecute: TCanExecuteMethod);
+begin
+  inherited Create;
+  FCommand    := ACommand;
+  FCanExecute := ACanExecute;
+end;
+
+function TBindingCommandBase<T>.GetCommand: T;
+begin
+  Result := FCommand
+end;
+
+procedure TBindingCommandBase<T>.SetCommand(const AValue: T);
+begin
+  FCommand := AValue;
 end;
 
 { TStrategyEventedObject }

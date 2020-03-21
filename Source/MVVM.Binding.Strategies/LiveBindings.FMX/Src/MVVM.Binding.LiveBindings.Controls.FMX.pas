@@ -19,6 +19,7 @@ uses
   Spring.Collections,
   System.Generics.Collections,
 
+  MVVM.Bindings.LiveBindings.EnumerableAdapter,
   Data.Bind.Components,
   Data.Bind.ObjectScope,
   Data.Bind.DBScope;

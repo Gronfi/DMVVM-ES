@@ -20,7 +20,7 @@ type
 {$REGION 'TBindingManager'}
   TBindingManager = class
   private
-    class var FDiccionarioEstrategiasBinding
+    class var FDictionaryBindingStrategies
       : IDictionary<String, TClass_BindingStrategyBase>;
   private
   var
@@ -55,17 +55,23 @@ type
     procedure BindDataSet(const ADataSet: TDataSet;
       const ATarget: ICollectionViewProvider;
       const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
-    procedure BindAction(const AAction: IBindableAction;
+
+    procedure BindAction(AAction: IBindableAction; const ABindingStrategy: String = ''); overload;
+    procedure BindAction(
       const AExecute: TExecuteMethod;
       const ACanExecute: TCanExecuteMethod = nil;
-      const ABindingStrategy: String = ''); overload; inline;
+      const ABindingStrategy: String = ''); overload;
+    procedure BindAction(
+      const AExecute: TExecuteAnonymous;
+      const ACanExecute: TCanExecuteMethod = nil;
+      const ABindingStrategy: String = ''); overload;
 
     procedure Notify(const AObject: TObject; const APropertyName: String);
       overload; virtual;
     procedure Notify(const AObject: TObject;
       const APropertiesNames: TArray<String>); overload; virtual;
 
-    class procedure RegisterBindingStrategy(const AEstrategia: String;
+    class procedure RegisterBindingStrategy(const ABindingStrategy: String;
       ABindingStrategyClass: TClass_BindingStrategyBase);
   end;
 {$ENDREGION}
@@ -125,14 +131,30 @@ begin
     ATargetPropertyPath, AFlags, AExtraParams);
 end;
 
-procedure TBindingManager.BindAction(const AAction: IBindableAction;
-  const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod;
-  const ABindingStrategy: String);
+procedure TBindingManager.BindAction(AAction: IBindableAction; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
-  LEstrategia.BindAction(AAction, AExecute, ACanExecute);
+  LEstrategia.BindAction(AAction);
+end;
+
+procedure TBindingManager.BindAction(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod;
+                                     const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia.BindAction(AExecute, ACanExecute);
+end;
+
+procedure TBindingManager.BindAction(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod;
+                                     const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia.BindAction(AExecute, ACanExecute);
 end;
 
 procedure TBindingManager.BindCollection<T>(const ACollection
@@ -165,11 +187,11 @@ begin
   else
     LMetodo := ABindingStrategy;
   // Integridad
-  Guard.CheckTrue(FDiccionarioEstrategiasBinding.ContainsKey(LMetodo),
+  Guard.CheckTrue(FDictionaryBindingStrategies.ContainsKey(LMetodo),
     'Estrategia de binding no registrada: ' + LMetodo);
   if not FDiccionarioEstrategias.TryGetValue(LMetodo, Result) then
   begin
-    Result := FDiccionarioEstrategiasBinding[LMetodo].Create;
+    Result := FDictionaryBindingStrategies[LMetodo].Create;
     FDiccionarioEstrategias.AddOrSetValue(LMetodo, Result);
   end;
 end;
@@ -189,7 +211,7 @@ end;
 
 class constructor TBindingManager.CreateC;
 begin
-  FDiccionarioEstrategiasBinding :=
+  FDictionaryBindingStrategies :=
     TCollections.CreateDictionary<String, TClass_BindingStrategyBase>;
 end;
 
@@ -201,7 +223,7 @@ end;
 
 class destructor TBindingManager.DestroyC;
 begin
-  FDiccionarioEstrategiasBinding := nil;
+  FDictionaryBindingStrategies := nil;
 end;
 
 procedure TBindingManager.Notify(const AObject: TObject;
@@ -222,10 +244,10 @@ begin
     FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertyName);
 end;
 
-class procedure TBindingManager.RegisterBindingStrategy(const AEstrategia
+class procedure TBindingManager.RegisterBindingStrategy(const ABindingStrategy
   : String; ABindingStrategyClass: TClass_BindingStrategyBase);
 begin
-  FDiccionarioEstrategiasBinding.AddOrSetValue(AEstrategia,
+  FDictionaryBindingStrategies.AddOrSetValue(ABindingStrategy,
     ABindingStrategyClass);
 end;
 

@@ -29,7 +29,7 @@ package CSV.View.FMX;
 
 requires
   CSV.Core,
-  fmx;
+  MVVM.Platform.FMX;
 
 contains
   CSV.View in 'Src\CSV.View.pas' {frmCSV};
