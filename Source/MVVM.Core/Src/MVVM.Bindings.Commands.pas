@@ -1,14 +1,15 @@
-unit MVVM.Commands.Platform.FMX;
+unit MVVM.Bindings.Commands;
 
 interface
 
 uses
-  MVVM.Interfaces,
-  MVVM.Controls.Platform.FMX;
+  System.Actions,
+
+  MVVM.Interfaces;
 
 type
 
-  TBindingCommandAction = class(TBindingCommandBase<TAction>)
+  TBindingCommandAction = class(TBindingCommandBase<TContainedAction>)
   protected
     procedure DoEnabled; override;
     procedure DoDisabled; override;

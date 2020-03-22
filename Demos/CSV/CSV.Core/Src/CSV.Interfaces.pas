@@ -47,6 +47,8 @@ type
     procedure ProcesarFicheroCSV;
     procedure ProcesarFicheroCSV_Parallel;
 
+    procedure CreateNewView;
+
     property IsValidFile: Boolean read GetIsValidFile;
     property FileName: String read GetFileName write SetFileName;
     property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
@@ -55,8 +57,17 @@ type
     property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
+const
+  ICSVFile_View_NAME = 'ICSVFile_View';
+
+type
+
   ICSVFile_View = Interface(IView<ICSVFile_ViewModel>)
   ['{A4D5834F-FF1C-4044-BA22-9BCE213241D1}']
+  end;
+
+  ICSVFile_ViewForm = Interface(IViewForm<ICSVFile_ViewModel>)
+  ['{96836BC6-C410-4610-84CD-4926D32F79E5}']
   end;
 
 implementation

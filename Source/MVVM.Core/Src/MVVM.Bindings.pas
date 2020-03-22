@@ -25,13 +25,12 @@ type
   private
   var
     FObject: TObject;
-    FDiccionarioEstrategias: IDictionary<String, IBindingStrategy>;
+    FDictionaryStrategies: IDictionary<String, IBindingStrategy>;
   protected
     class constructor CreateC;
     class destructor DestroyC;
 
-    function ChequeoIntegridadSeleccionBinding(const ABindingStrategy: String)
-      : IBindingStrategy;
+    function GetSelectedBindingOrDefault(const ABindingStrategy: String = ''): IBindingStrategy;
   public
     constructor Create(AObject: TObject); overload; virtual;
     constructor Create; overload; virtual;
@@ -60,11 +59,10 @@ type
 
     procedure Notify(const AObject: TObject; const APropertyName: String);
       overload; virtual;
-    procedure Notify(const AObject: TObject;
-      const APropertiesNames: TArray<String>); overload; virtual;
+    procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
     class procedure RegisterBindingStrategy(const ABindingStrategy: String;
-      ABindingStrategyClass: TClass_BindingStrategyBase);
+      ABindingStrategyClass: TClass_BindingStrategyBase); static;
   end;
 {$ENDREGION}
 {$REGION 'TMessage_Object_Destroyed'}
@@ -105,7 +103,7 @@ procedure TBindingManager.Bind(const ASource: TObject;
 var
   LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.Bind(ASource, ASourcePropertyPath, ATarget, ATargetPropertyPath,
     ADirection, AFlags, AValueConverterClass, AExtraParams);
 end;
@@ -118,7 +116,7 @@ procedure TBindingManager.Bind(const ASources: TSourcePairArray;
 var
   LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.Bind(ASources, ASourceExpresion, ATarget, ATargetAlias,
     ATargetPropertyPath, AFlags, AExtraParams);
 end;
@@ -127,7 +125,7 @@ procedure TBindingManager.BindAction(AAction: IBindableAction; const ABindingStr
 var
   LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.BindAction(AAction);
 end;
 
@@ -137,7 +135,7 @@ procedure TBindingManager.BindCollection<T>(const ACollection
 var
   LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.BindCollection(TypeInfo(T), TEnumerable<TObject>(ACollection), ATarget, ATemplate);
 end;
 
@@ -147,26 +145,26 @@ procedure TBindingManager.BindDataSet(const ADataSet: TDataSet;
 var
   LEstrategia: IBindingStrategy;
 begin
-  LEstrategia := ChequeoIntegridadSeleccionBinding(ABindingStrategy);
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.BindDataSet(ADataSet, ATarget, ATemplate);
 end;
 
-function TBindingManager.ChequeoIntegridadSeleccionBinding
+function TBindingManager.GetSelectedBindingOrDefault
   (const ABindingStrategy: String): IBindingStrategy;
 var
   LMetodo: String;
 begin
   if ABindingStrategy.IsEmpty then
-    LMetodo := MVVMCore.DefaultBindingStrategy
+    LMetodo := MVVMCore.DefaultBindingStrategyName
   else
     LMetodo := ABindingStrategy;
   // Integridad
   Guard.CheckTrue(FDictionaryBindingStrategies.ContainsKey(LMetodo),
-    'Estrategia de binding no registrada: ' + LMetodo);
-  if not FDiccionarioEstrategias.TryGetValue(LMetodo, Result) then
+    'Binding Strategy not registered: ' + LMetodo);
+  if not FDictionaryStrategies.TryGetValue(LMetodo, Result) then
   begin
     Result := FDictionaryBindingStrategies[LMetodo].Create;
-    FDiccionarioEstrategias.AddOrSetValue(LMetodo, Result);
+    FDictionaryStrategies.AddOrSetValue(LMetodo, Result);
   end;
 end;
 
@@ -179,7 +177,7 @@ end;
 constructor TBindingManager.Create;
 begin
   inherited Create;
-  FDiccionarioEstrategias :=
+  FDictionaryStrategies :=
     TCollections.CreateDictionary<String, IBindingStrategy>;
 end;
 
@@ -191,7 +189,7 @@ end;
 
 destructor TBindingManager.Destroy;
 begin
-  FDiccionarioEstrategias := nil;
+  FDictionaryStrategies := nil;
   inherited;
 end;
 
@@ -205,8 +203,8 @@ procedure TBindingManager.Notify(const AObject: TObject;
 var
   LEstrategia: String;
 begin
-  for LEstrategia in FDiccionarioEstrategias.Keys do
-    FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertiesNames);
+  for LEstrategia in FDictionaryStrategies.Keys do
+    FDictionaryStrategies[LEstrategia].Notify(AObject, APropertiesNames);
 end;
 
 procedure TBindingManager.Notify(const AObject: TObject;
@@ -214,8 +212,8 @@ procedure TBindingManager.Notify(const AObject: TObject;
 var
   LEstrategia: String;
 begin
-  for LEstrategia in FDiccionarioEstrategias.Keys do
-    FDiccionarioEstrategias[LEstrategia].Notify(AObject, APropertyName);
+  for LEstrategia in FDictionaryStrategies.Keys do
+    FDictionaryStrategies[LEstrategia].Notify(AObject, APropertyName);
 end;
 
 class procedure TBindingManager.RegisterBindingStrategy(const ABindingStrategy

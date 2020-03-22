@@ -44,8 +44,10 @@ type
 
     function GetAsObject: TObject;
 
-    function ProcesarFicheroCSV: Boolean;
-    function ProcesarFicheroCSV_Parallel: Boolean;
+    procedure ProcesarFicheroCSV;
+    procedure ProcesarFicheroCSV_Parallel;
+
+    procedure CreateNewView;
 
     function GetIsValidFile: Boolean;
 
@@ -66,6 +68,7 @@ uses
   System.Threading,
   System.Diagnostics,
 
+  MVVM.ViewFactory,
   MVVM.Utils,
   MVVM.Core;
 
@@ -79,6 +82,14 @@ begin
 
   FOnProcesamientoFinalizado := Utils.CreateEvent<TFinProcesamiento>;
   FOnProgresoProcesamiento   := Utils.CreateEvent<TProgresoProcesamiento>;
+end;
+
+procedure TCSVFile_ViewModel.CreateNewView;
+var
+  LVista: IViewForm<ICSVFile_ViewModel>;
+begin
+  LVista := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self) as IViewForm<ICSVFile_ViewModel>;
+  LVista.Execute;
 end;
 
 destructor TCSVFile_ViewModel.Destroy;
@@ -128,26 +139,25 @@ end;
 
 procedure TCSVFile_ViewModel.Notify(const APropertyName: string);
 begin
-  Notify(APropertyName);
+  Manager.BindingStrategy.Notify(Self, APropertyName);
 end;
 
-function TCSVFile_ViewModel.ProcesarFicheroCSV: Boolean;
+procedure TCSVFile_ViewModel.ProcesarFicheroCSV;
 var
   LTiming: TStopwatch;
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  Result := False;
   if MVVMCore.PlatformServices.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
     LTiming.Start;
-    Result := FModelo.ProcesarFicheroCSV;
+    FModelo.ProcesarFicheroCSV;
     FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (normal) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
   end;
 end;
 
-function TCSVFile_ViewModel.ProcesarFicheroCSV_Parallel: Boolean;
+procedure TCSVFile_ViewModel.ProcesarFicheroCSV_Parallel;
 var
   LTiming  : TStopwatch;
   LFromFile: TStrings;
@@ -155,12 +165,11 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  Result := False;
   if MVVMCore.PlatformServices.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
     LTiming.Start;
-    Result := FModelo.ProcesarFicheroCSV_Parallel;
+    FModelo.ProcesarFicheroCSV_Parallel;
     FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (Paralelo) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
   end;
 end;

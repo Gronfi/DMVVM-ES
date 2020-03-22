@@ -146,6 +146,7 @@ object frmCSV: TfrmCSV
     end
     object DoSelectFile: TAction
       Text = '...'
+      OnExecute = DoSelectFileExecute
     end
     object DoParalelo: TAction
       Text = 'DoParalelo'

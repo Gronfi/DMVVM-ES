@@ -386,10 +386,9 @@ type
     FCommand: T;
     procedure SetCommand(const AValue: T);
     function GetCommand: T;
-    property Command:T read GetCommand write SetCommand;
   public
-    constructor Create(const ACommand: T); overload;
-    constructor Create(const ACommand:T; const ACanExecute: TCanExecuteMethod = nil); overload;
+    constructor Create(ACommand:T; ACanExecute: TCanExecuteMethod = nil); overload;
+    property Command:T read GetCommand write SetCommand;
   end;
 
   TBindingCommandClass = class of TBindingCommandBase;
@@ -1009,14 +1008,7 @@ end;
 
 { TBindingCommandBase<T> }
 
-constructor TBindingCommandBase<T>.Create(const ACommand: T);
-begin
-  inherited Create;
-  FCommand    := ACommand;
-  FCanExecute := nil;
-end;
-
-constructor TBindingCommandBase<T>.Create(const ACommand: T; const ACanExecute: TCanExecuteMethod);
+constructor TBindingCommandBase<T>.Create(ACommand: T; ACanExecute: TCanExecuteMethod);
 begin
   inherited Create;
   FCommand    := ACommand;

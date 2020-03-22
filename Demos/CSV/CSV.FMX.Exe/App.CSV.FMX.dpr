@@ -4,7 +4,9 @@ uses
   System.StartUpCopy,
   FMX.Forms,
 
-  MVVM.Servicios.Platform.FMX,
+  MVVM.Core,
+  MVVM.Services.Platform.FMX,
+  MVVM.Bindings.LiveBindings,
   MVVM.Bindings in 'Source\MVVM.Bindings.pas',
   MVVM.Interfaces in 'Source\MVVM.Interfaces.pas',
   CSV.Interfaces in 'CSV.Interfaces.pas',
@@ -19,6 +21,8 @@ begin
   Application.Initialize;
   InitializePlatform;
 
+  MVVMCore.DefaultBindingStrategy := 'LIVEBINDINGS';
+
   Modelo      := TCSVFile_Model.Create;
 
   VistaModelo := TCSVFile_ViewModel.Create;
@@ -26,7 +30,7 @@ begin
 
   Vista := TfrmCSV.Create(Application);
   Application.MainForm := TfrmCSV(Vista);
-  Vista.AddViewModel(VistaModelo);
+  Vista.InitView(VistaModelo);
   TfrmCSV(Vista).Show;
 
   Application.Run;

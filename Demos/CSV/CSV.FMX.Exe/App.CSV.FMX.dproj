@@ -70,7 +70,7 @@
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>App_CSV_FMX</SanitizedProjectName>
         <UsePackages>true</UsePackages>
-        <DCC_UsePackage>CSV.View.FMX;MVVM.Platform.FMX;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>CSV.View.FMX;MVVM.Platform.FMX;MVVM.Binding.LiveBindings.FMX;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DcpOutput>..\..\..\Bin\$(Platform)\$(Config)\DCP</DCC_DcpOutput>

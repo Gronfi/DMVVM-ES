@@ -17,15 +17,13 @@ type
   class var
     FPlatformServicesClass: TPlatformServicesClass;
     FContainer: TContainer;
-    FDefaultBindingStrategy: String;
+    FDefaultBindingStrategyName: String;
     FSynchronizer: IReadWriteSync;
     class constructor CreateC;
     class destructor DestroyC;
 
-    class function GetDefaultBindingStrategy: String; static;
-    class procedure SetDefaultBindingStrategy(const AStrategyName
-      : String); static;
-
+    class function GetDefaultBindingStrategyName: String; static;
+    class procedure SetDefaultBindingStrategyName(const AStrategyName: String); static;
   public
     class procedure RegisterPlatformServices(AServicioClass
       : TPlatformServicesClass); static;
@@ -37,8 +35,8 @@ type
     class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>;
       AExecutionMode: EDelegatedExecutionMode); overload; static;
 
-    class property DefaultBindingStrategy: String read GetDefaultBindingStrategy
-      write SetDefaultBindingStrategy;
+    class property DefaultBindingStrategyName: String read GetDefaultBindingStrategyName
+      write SetDefaultBindingStrategyName;
   end;
 
 implementation
@@ -60,11 +58,11 @@ begin
   FSynchronizer := TMREWSync.Create;
 end;
 
-class function MVVMCore.GetDefaultBindingStrategy: String;
+class function MVVMCore.GetDefaultBindingStrategyName: String;
 begin
   FSynchronizer.BeginRead;
   try
-    Result := FDefaultBindingStrategy;
+    Result := FDefaultBindingStrategyName;
   finally
     FSynchronizer.EndRead;
   end;
@@ -121,11 +119,11 @@ begin
   FPlatformServicesClass := AServicioClass;
 end;
 
-class procedure MVVMCore.SetDefaultBindingStrategy(const AStrategyName: String);
+class procedure MVVMCore.SetDefaultBindingStrategyName(const AStrategyName: String);
 begin
   FSynchronizer.BeginWrite;
   try
-    FDefaultBindingStrategy := AStrategyName;
+    FDefaultBindingStrategyName := AStrategyName;
   finally
     FSynchronizer.EndWrite;
   end;

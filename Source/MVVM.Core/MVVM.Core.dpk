@@ -41,6 +41,7 @@ contains
   MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
   MVVM.Utils in 'Src\MVVM.Utils.pas',
   MVVM.Observable in 'Src\MVVM.Observable.pas',
-  MVVM.ViewFactory in 'Src\MVVM.ViewFactory.pas';
+  MVVM.ViewFactory in 'Src\MVVM.ViewFactory.pas',
+  MVVM.Bindings.Commands in 'Src\MVVM.Bindings.Commands.pas';
 
 end.

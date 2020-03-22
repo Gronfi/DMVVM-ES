@@ -35,9 +35,6 @@ type
     DoParalelo: TAction;
     DoNoParalelo: TAction;
     procedure btPathClick(Sender: TObject);
-    procedure btTNPClick(Sender: TObject);
-    procedure btTPClick(Sender: TObject);
-    procedure DoCrearVistaExecute(Sender: TObject);
     procedure DoSelectFileExecute(Sender: TObject);
     procedure lePathChangeTracking(Sender: TObject);
   private
@@ -49,9 +46,6 @@ type
     procedure OnProgresoProceso(const ADato: Integer);
 
     procedure DoSeleccionarFichero;
-    procedure DoCrearNuevaVista;
-    procedure DoMetodoNoParalelo(Sender: TObject);
-    procedure DoMetodoParalelo(Sender: TObject);
   public
     { Public declarations }
     procedure AddViewModel(AViewModel: IViewModel<ICSVFile_Model>);
@@ -64,6 +58,9 @@ var
 implementation
 
 uses
+  MVVM.ViewFactory,
+
+  CSV.ViewModel,
   Spring;
 
 {$R *.fmx}
@@ -80,8 +77,12 @@ begin
       //Bindings a capela
 
       //DoCrearVista.Bind(FViewModel.);
-      DoParalelo.Bind(FViewModel.ProcesarFicheroCSV_Parallel, FViewModel.GetIsValidFile);
-      DoNoParalelo.Bind(FViewModel.ProcesarFicheroCSV, FViewModel.GetIsValidFile);
+      //DoParalelo.Bind(FViewModel.ProcesarFicheroCSV_Parallel, FViewModel.GetIsValidFile);
+      DoParalelo.Bind(TCSVFile_ViewModel(FViewModel).ProcesarFicheroCSV_Parallel, TCSVFile_ViewModel(FViewModel).GetIsValidFile);
+      //DoNoParalelo.Bind(FViewModel.ProcesarFicheroCSV, FViewModel.GetIsValidFile);
+      DoParalelo.Bind(TCSVFile_ViewModel(FViewModel).ProcesarFicheroCSV, TCSVFile_ViewModel(FViewModel).GetIsValidFile);
+
+      DoCrearVista.Bind(TCSVFile_ViewModel(FViewModel).CreateNewView);
       //Binder.
       (*
       //1) boton ejecución no paralela
@@ -103,47 +104,6 @@ end;
 procedure TfrmCSV.btPathClick(Sender: TObject);
 begin
   DoSeleccionarFichero
-end;
-
-procedure TfrmCSV.btTNPClick(Sender: TObject);
-begin
-  DoMetodoNoParalelo;
-end;
-
-procedure TfrmCSV.btTPClick(Sender: TObject);
-begin
-  DoMetodoParalelo;
-end;
-
-procedure TfrmCSV.DoCrearNuevaVista;
-var
-  LVista: TfrmCSV;
-begin
-  Guard.CheckNotNull(FViewModel, 'ViewModel no asignado');
-  LVista := TfrmCSV.Create(Self);
-  LVista.AddViewModel(FViewModel);
-  LVista.Show;
-end;
-
-procedure TfrmCSV.DoCrearVistaExecute(Sender: TObject);
-begin
-  DoCrearNuevaVista
-end;
-
-procedure TfrmCSV.DoMetodoNoParalelo(Sender: TObject);
-begin
-  Guard.CheckNotNull(FViewModel, 'ViewModel no asignado');
-  if not FViewModel.ProcesarFicheroCSV then
-    mmInfo.Lines.Add('Hay problemas')
-  else mmInfo.Lines.Add('Ok')
-end;
-
-procedure TfrmCSV.DoMetodoParalelo(Sender: TObject);
-begin
-  Guard.CheckNotNull(FViewModel, 'ViewModel no asignado');
-  if not FViewModel.ProcesarFicheroCSV_Parallel then
-    mmInfo.Lines.Add('Hay problemas')
-  else mmInfo.Lines.Add('Ok')
 end;
 
 procedure TfrmCSV.DoSeleccionarFichero;
@@ -187,5 +147,8 @@ procedure TfrmCSV.RemoveViewModel(AViewModel: IViewModel<ICSVFile_Model>);
 begin
   FViewModel := nil;
 end;
+
+initialization
+  TViewFactory.Register(TfrmCSV, ICSVFile_View_NAME);
 
 end.

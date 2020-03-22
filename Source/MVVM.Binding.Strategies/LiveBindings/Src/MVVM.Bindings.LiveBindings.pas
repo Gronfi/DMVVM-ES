@@ -13,9 +13,11 @@ uses
   System.Bindings.EvalProtocol, System.Bindings.Outputs,
   System.RTTI,
   Data.DB,
+  System.Actions,
 
   Spring.Collections,
 
+  MVVM.Bindings.Commands,
   MVVM.Interfaces,
   MVVM.Types,
   MVVM.Bindings;
@@ -57,6 +59,11 @@ type
   protected
     function GetEnabled: Boolean; override;
     procedure SetEnabled(const AValue: Boolean); override;
+
+    procedure DoEnableAll;
+    procedure DoDisableAll;
+
+    function ExistBindingCommandActionFor(AObject: TContainedAction; out ACommand: TBindingCommandAction): Boolean;
 
     function InternalBindCollection(AServiceType: PTypeInfo;
       AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
@@ -242,10 +249,15 @@ end;
 
 procedure TStrategy_LiveBindings.BindAction(AAction: IBindableAction);
 var
-  LCommandClass: TBindingCommandClass;
+  LCommand: TBindingCommandAction;
+  LObject : TContainedAction;
 begin
   Guard.CheckNotNull(AAction, '<BindAction> (Param=AAction) cannot be null');
-
+  LObject := AAction as TContainedAction;
+  //if already Exists the binded object we reuse the command
+  if not ExistBindingCommandActionFor(LObject, LCommand) then
+    LCommand := TBindingCommandAction.Create(LObject);
+  FBindings.Add(LCommand);
 end;
 
 procedure TStrategy_LiveBindings.BindCollection(AServiceType: PTypeInfo;
@@ -355,9 +367,64 @@ begin
   FObjectDataSetLinkers := nil;
 end;
 
+procedure TStrategy_LiveBindings.DoDisableAll;
+var
+  I: TBindingBase;
+begin
+  AdquireWrite;
+  try
+    for I in FBindings do
+    begin
+      I.Enabled := False;
+    end;
+  finally
+    ReleaseWrite;
+  end;
+end;
+
+procedure TStrategy_LiveBindings.DoEnableAll;
+var
+  I: TBindingBase;
+begin
+  AdquireWrite;
+  try
+    for I in FBindings do
+    begin
+      I.Enabled := True;
+    end;
+  finally
+    ReleaseWrite;
+  end;
+end;
+
+function TStrategy_LiveBindings.ExistBindingCommandActionFor(AObject: TContainedAction; out ACommand: TBindingCommandAction): Boolean;
+var
+  I: TBindingBase;
+  LData: TBindingCommandAction;
+begin
+  Result := False;
+  AdquireRead;
+  try
+    for I in FBindings do
+    begin
+      LData := I as TBindingCommandAction;
+      if LData.Command = AObject then
+        Exit(True);
+    end;
+  finally
+    ReleaseRead;
+  end;
+
+end;
+
 function TStrategy_LiveBindings.GetEnabled: Boolean;
 begin
-  FS
+  Result := FEnabled
+end;
+
+function TStrategy_LiveBindings.GetPlatformBindActionCommandType: TBindingCommandClass;
+begin
+
 end;
 
 function TStrategy_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo;
@@ -414,8 +481,20 @@ end;
 
 procedure TStrategy_LiveBindings.SetEnabled(const AValue: Boolean);
 begin
-  inherited;
-
+  if FEnabled <> AValue then
+  begin
+    FEnabled := AValue;
+    case FEnabled of
+      True:
+        begin
+          DoEnableAll;
+        end;
+      False:
+        begin
+          DoDisableAll;
+        end;
+    end;
+  end;
 end;
 
 { TStrategy_LiveBindings.TInternalBindindExpression }
