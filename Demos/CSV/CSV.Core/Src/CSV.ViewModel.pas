@@ -10,50 +10,55 @@ uses
   Spring.Collections,
 
   CSV.Interfaces,
+
+  MVVM.Observable,
   MVVM.Interfaces,
   MVVM.Bindings;
 
 type
-  TCSVFile_ViewModel = class(TInterfacedObject, ICSVFile_ViewModel)
+  TCSVFile_ViewModel = class(TObservable, ICSVFile_ViewModel)
   private
-    FBinder                   : TBindingHelper;
     FModelo                   : ICSVFile_Model;
     FOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
     FOnProgresoProcesamiento  : IEvent<TProgresoProcesamiento>;
   protected
+    function GetModel: ICSVFile_Model;
+
     function GetFileName: String;
     procedure SetFileName(const AFileName: String);
 
     function GetProgresoProcesamiento: Integer;
-    procedure SetProgresoProcesamiento(const AValue: Integer);
+
+    procedure OnModelNotifyChanged(const ASender: TObject; const APropertyName: String);
 
     function GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
     function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
-
-    function GetIsValidFile: Boolean;
-    procedure SetIsValidFile(const AValue: Boolean);
 
     procedure Notify(const APropertyName: string = '');
   public
     constructor Create;
     destructor Destroy; override;
 
+    procedure SetupViewModel;
     procedure SetModel(AModel: ICSVFile_Model);
 
-    function ProcesarFicheroCSV: Boolean;
-    function ProcesarFicheroCSV_Parallel: Boolean;
+    function GetAsObject: TObject;
 
-    procedure Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string); overload;
-    procedure Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string); overload;
-    procedure BindReverse(const ABindObject: TObject; const AProperty: string; const ABindToProperty: string); overload;
-    procedure BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression: string; const ADstAlias, ADstFormatedExpression: string); overload;
+    procedure ProcesarFicheroCSV;
+    procedure ProcesarFicheroCSV_Parallel;
+
+    procedure CreateNewView;
+
+    function GetIsValidFile: Boolean;
 
     property FileName: String read GetFileName write SetFileName;
-    property IsValidFile: Boolean read GetIsValidFile write SetIsValidFile;
-    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento write SetProgresoProcesamiento;
+    property IsValidFile: Boolean read GetIsValidFile;
+    property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
 
     property OnDatosProcesamientoFinalizado: IEvent<TFinProcesamiento> read GetOnProcesamientoFinalizado;
     property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
+
+    property Model: ICSVFile_Model read GetModel;
   end;
 
 implementation
@@ -63,47 +68,49 @@ uses
   System.Threading,
   System.Diagnostics,
 
+  MVVM.ViewFactory,
+  MVVM.Utils,
   MVVM.Core;
 
 { TCSVFile_ViewModel }
-
-procedure TCSVFile_ViewModel.Bind(const AProperty: string; const ABindToObject: TObject; const ABindToProperty: string);
-begin
-  FBinder.Bind(AProperty, ABindToObject, ABindToProperty);
-end;
-
-procedure TCSVFile_ViewModel.Bind(const ASrcAlias, ASrcFormatedExpression: string; const ABindToObject: TObject; const ADstAlias, ADstFormatedExpression: string);
-begin
-  FBinder.Bind(ASrcAlias, ASrcFormatedExpression, ABindToObject, ADstAlias, ADstFormatedExpression);
-end;
-
-procedure TCSVFile_ViewModel.BindReverse(const ABindObject: TObject; const ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression: string);
-begin
-  FBinder.BindReverse(ABindObject, ASrcAlias, ASrcFormatedExpression, ADstAlias, ADstFormatedExpression);
-end;
-
-procedure TCSVFile_ViewModel.BindReverse(const ABindObject: TObject; const AProperty, ABindToProperty: string);
-begin
-  FBinder.BindReverse(ABindObject, AProperty, ABindToProperty);
-end;
 
 constructor TCSVFile_ViewModel.Create;
 var
   I: Integer;
 begin
   inherited;
-  FBinder := TBindingHelper.Create(Self);
 
-  FOnProcesamientoFinalizado := TBindingHelper.CreateEvent<TFinProcesamiento>;
-  FOnProgresoProcesamiento   := TBindingHelper.CreateEvent<TProgresoProcesamiento>;
+  FOnProcesamientoFinalizado := Utils.CreateEvent<TFinProcesamiento>;
+  FOnProgresoProcesamiento   := Utils.CreateEvent<TProgresoProcesamiento>;
+end;
+
+procedure TCSVFile_ViewModel.CreateNewView;
+var
+  [weak] LView : IView<ICSVFile_ViewModel>;
+  [weak] LVista: IViewForm<ICSVFile_ViewModel>;
+begin
+  try
+    LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self);
+    if Supports(LView, IView<ICSVFile_ViewModel>, LVista)  then
+      LVista.Execute;
+  except
+    on E:Exception do
+    begin
+      MVVMCore.PlatformServices.MessageDlg(E.Message, 'Data')
+    end;
+  end;
 end;
 
 destructor TCSVFile_ViewModel.Destroy;
 begin
   FOnProcesamientoFinalizado := nil;
   FOnProgresoProcesamiento   := nil;
-  FBinder.Free;
   inherited;
+end;
+
+function TCSVFile_ViewModel.GetAsObject: TObject;
+begin
+  Result := Self
 end;
 
 function TCSVFile_ViewModel.GetFileName: String;
@@ -116,6 +123,11 @@ function TCSVFile_ViewModel.GetIsValidFile: Boolean;
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Result := FModelo.IsPathOk;
+end;
+
+function TCSVFile_ViewModel.GetModel: ICSVFile_Model;
+begin
+  Result := FModelo
 end;
 
 function TCSVFile_ViewModel.GetOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
@@ -136,26 +148,25 @@ end;
 
 procedure TCSVFile_ViewModel.Notify(const APropertyName: string);
 begin
-  FBinder.Notify(APropertyName);
+  Manager.BindingStrategy.Notify(Self, APropertyName);
 end;
 
-function TCSVFile_ViewModel.ProcesarFicheroCSV: Boolean;
+procedure TCSVFile_ViewModel.ProcesarFicheroCSV;
 var
   LTiming: TStopwatch;
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  Result := False;
-  if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
+  if MVVMCore.PlatformServices.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
     LTiming.Start;
-    Result := FModelo.ProcesarFicheroCSV;
+    FModelo.ProcesarFicheroCSV;
     FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (normal) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
   end;
 end;
 
-function TCSVFile_ViewModel.ProcesarFicheroCSV_Parallel: Boolean;
+procedure TCSVFile_ViewModel.ProcesarFicheroCSV_Parallel;
 var
   LTiming  : TStopwatch;
   LFromFile: TStrings;
@@ -163,12 +174,11 @@ var
 begin
   Guard.CheckNotNull(FModelo, 'Modelo no asignado');
   Guard.CheckTrue(FModelo.IsPathOk, 'El fichero no existe: ' + FModelo.FileName);
-  Result := False;
-  if MVVMCore.ServicioDialogo.MessageDlg('Estas seguro?', 'Test') then
+  if MVVMCore.PlatformServices.MessageDlg('Estas seguro?', 'Test') then
   begin
     LTiming := TStopwatch.Create;
     LTiming.Start;
-    Result := FModelo.ProcesarFicheroCSV_Parallel;
+    FModelo.ProcesarFicheroCSV_Parallel;
     FOnProcesamientoFinalizado.Invoke('Fichero ' + FModelo.FileName + ' procesado (Paralelo) en ' + LTiming.ElapsedMilliseconds.ToString + ' msg');
   end;
 end;
@@ -184,27 +194,44 @@ begin
   end;
 end;
 
-procedure TCSVFile_ViewModel.SetIsValidFile(const AValue: Boolean);
-begin
-  Notify('IsValidFile');
-end;
-
 procedure TCSVFile_ViewModel.SetModel(AModel: ICSVFile_Model);
 begin
   if FModelo <> AModel then
   begin
     FModelo := AModel;
-    //Bindings
-    FModelo.Bind('IsPathOK', Self, 'IsValidFile');
-    FModelo.Bind('ProgresoProcesamiento', Self, 'ProgresoProcesamiento');
-    //
+    SetupViewModel;
     Notify;
   end;
 end;
 
-procedure TCSVFile_ViewModel.SetProgresoProcesamiento(const AValue: Integer);
+procedure TCSVFile_ViewModel.OnModelNotifyChanged(const ASender: TObject; const APropertyName: String);
 begin
-  FOnProgresoProcesamiento.Invoke(AValue);
+  case Utils.StringToCaseSelect(APropertyName, ['ProgresoProcesamiento', 'FileName', 'IsPathOK']) of
+    0:
+      begin
+        FOnProgresoProcesamiento.Invoke(FModelo.ProgresoProcesamiento);
+      end;
+    1:
+      begin
+        Notify('FileName');
+        Notify('IsValidFile');
+      end;
+    2:
+      begin
+        Notify('IsValidFile');
+      end;
+  end;
+end;
+
+procedure TCSVFile_ViewModel.SetupViewModel;
+var
+  LObservable: INotifyChangedProperty;
+begin
+  //Bindings
+  if Supports(FModelo, INotifyChangedProperty, LObservable) then
+  begin
+    LObservable.Manager.OnPropertyChangedEvent.Add(OnModelNotifyChanged);
+  end;
 end;
 
 end.

@@ -38,11 +38,14 @@ type
     procedure HandleOnChange(Sender: TObject);
   protected
     procedure Loaded; override;
+
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -55,11 +58,13 @@ type
     FManager: IStrategyEventedObject;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     procedure DoChanged; override;
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -72,11 +77,13 @@ type
     FManager: IStrategyEventedObject;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     procedure DoSwitch; override;
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -89,11 +96,13 @@ type
     FManager: IStrategyEventedObject;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     procedure AfterChangedProc(Sender: TObject); override;
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -103,19 +112,37 @@ type
   TAction = class(FMX.ActnList.TAction, IBindableAction)
 {$REGION 'Internal Declarations'}
   private
+    FBinding: IBinding;
     FExecute: TExecuteMethod;
     FCanExecute: TCanExecuteMethod;
+    FAnomExecute: TExecuteAnonymous;
+    FRttiExecute: TExecuteRttiMethod;
+  protected
+    procedure DoExecuteAnonymous;
+    procedure DoExecuteRtti;
+
+    function GetBinding: IBinding;
+    procedure SetBinding(ABinding: IBinding);
 {$ENDREGION 'Internal Declarations'}
   public
     { IBindableAction }
     procedure Bind(const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil;
-      const AEstrategiaBinding: String = ''); overload;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const AEstrategiaBinding: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteAnonymous;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteRttiMethod;
+                   const ACanExecute: TCanExecuteMethod = nil;
+                   const ABindingStrategy: String = ''); overload;
   public
     constructor Create(AOwner: TComponent); override;
     function Update: Boolean; override;
     function Execute: Boolean; override;
+
+    property Binding: IBinding read GetBinding write SetBinding;
   end;
+
 {$ENDREGION 'FMX.ActnList'}
 {$REGION 'FMX.Edit'}
 
@@ -130,12 +157,15 @@ type
     FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
+
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
     function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
     property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
@@ -155,12 +185,15 @@ type
     FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
+
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
     function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
     property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
@@ -180,12 +213,15 @@ type
     FManager: IStrategyEventedObject;
   protected
     function DefineModelClass: TDataModelClass; override;
+
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
     function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
     property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
@@ -204,13 +240,16 @@ type
     FManager: IStrategyEventedObject;
   private
     procedure HandleOnChange(Sender: TObject);
+
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
   protected
     procedure Loaded; override;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -226,10 +265,12 @@ type
     procedure DoColorChange(Sender: TObject); override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -245,10 +286,12 @@ type
     procedure DoChange; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -264,10 +307,12 @@ type
     procedure DoChange; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -283,10 +328,12 @@ type
     procedure DoChanged; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -302,10 +349,12 @@ type
     procedure DoChanged; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -321,10 +370,12 @@ type
     procedure DoChanged; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -344,10 +395,12 @@ type
       const ADate: TDateTime); override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -365,10 +418,12 @@ type
       const ADate: TDateTime); override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -386,10 +441,12 @@ type
     function DefineModelClass: TDataModelClass; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -407,10 +464,12 @@ type
     function DefineModelClass: TDataModelClass; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -441,6 +500,8 @@ type
     function GetCollectionView: ICollectionView;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
@@ -454,7 +515,7 @@ type
       The associated object is the object in the TListBoxItem.Data property. }
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
 
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -484,6 +545,8 @@ type
     function GetCollectionView: ICollectionView;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
@@ -496,7 +559,7 @@ type
       This is an unsafe reference, so you must make sure that the associated
       objects are available for the lifetime of the list view. }
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -514,10 +577,12 @@ type
     procedure DoChanged; override;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 {$ENDREGION 'Internal Declarations'}
   public
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -545,6 +610,8 @@ type
     function GetCollectionView: ICollectionView;
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
   protected
 {$ENDREGION 'Internal Declarations'}
@@ -557,7 +624,7 @@ type
       no item selected or there is no object associated with the selected item.
       The associated object is the object in the TListItem.Data property. }
     property SelectedNode: TObject read GetSelectedNode write SetSelectedNode;
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
   end;
@@ -585,6 +652,8 @@ type
     procedure Change(Sender: TObject);
   protected
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
     function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 
@@ -594,7 +663,7 @@ type
     { Destructor }
     destructor Destroy; override;
     property SelectedItem: TObject read GetSelectedItem write SetSelectedItem;
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
     property OnPropertyChangedEvent: IChangedPropertyEvent
       read GetOnPropertyChangedEvent;
     property OnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent
@@ -725,13 +794,26 @@ type
     constructor Create(const AComboBox: TComboBox);
   end;
 
-  { TAction }
+{ TAction }
 
 procedure TAction.Bind(const AExecute: TExecuteMethod;
   const ACanExecute: TCanExecuteMethod; const AEstrategiaBinding: String);
 begin
-  // le da igual la estrategia de binding, hace siempre lo mismo
-  FExecute := AExecute;
+  FExecute    := AExecute;
+  FCanExecute := ACanExecute;
+end;
+
+procedure TAction.Bind(const AExecute: TExecuteRttiMethod;
+  const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
+begin
+  FExecute    := DoExecuteRtti;
+  FCanExecute := ACanExecute;
+end;
+
+procedure TAction.Bind(const AExecute: TExecuteAnonymous;
+  const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
+begin
+  FExecute    := DoExecuteAnonymous;
   FCanExecute := ACanExecute;
 end;
 
@@ -739,6 +821,18 @@ constructor TAction.Create(AOwner: TComponent);
 begin
   inherited;
   DisableIfNoHandler := False;
+end;
+
+procedure TAction.DoExecuteAnonymous;
+begin
+  if Assigned(FAnomExecute) then
+    FAnomExecute();
+end;
+
+procedure TAction.DoExecuteRtti;
+begin
+  if Assigned(FRttiExecute) then
+    FRttiExecute.Invoke(Self.Owner, []);
 end;
 
 function TAction.Execute: Boolean;
@@ -749,6 +843,16 @@ begin
     if Assigned(FExecute) then
       FExecute();
   end;
+end;
+
+function TAction.GetBinding: IBinding;
+begin
+  Result := FBinding;
+end;
+
+procedure TAction.SetBinding(ABinding: IBinding);
+begin
+  FBinding := ABinding;
 end;
 
 function TAction.Update: Boolean;
@@ -792,6 +896,11 @@ begin
   OnChange := HandleOnChange;
 end;
 
+procedure TCheckBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TTrackBar }
 
 procedure TTrackBar.DoChanged;
@@ -816,6 +925,11 @@ function TTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TTrackBar.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TSwitch }
@@ -844,6 +958,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure TSwitch.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TArcDial }
 
 procedure TArcDial.AfterChangedProc(Sender: TObject);
@@ -870,6 +989,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure TArcDial.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TEdit }
 
 function TEdit.DefineModelClass: TDataModelClass;
@@ -894,6 +1018,11 @@ function TEdit.GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedTrackingEvent;
+end;
+
+procedure TEdit.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TBindableEditModel }
@@ -962,6 +1091,11 @@ begin
   Result := FManager.OnPropertyChangedTrackingEvent;
 end;
 
+procedure TMemo.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TBindableMemoModel }
 
 procedure TBindableMemoModel.DoChange;
@@ -1027,6 +1161,11 @@ function TComboEdit.GetOnPropertyChangedTrackingEvent
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedTrackingEvent;
+end;
+
+procedure TComboEdit.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TBindableComboEditModel }
@@ -1103,6 +1242,11 @@ begin
   OnChange := HandleOnChange;
 end;
 
+procedure TColorPanel.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TComboColorBox }
 
 procedure TComboColorBox.DoColorChange(Sender: TObject);
@@ -1127,6 +1271,11 @@ function TComboColorBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TComboColorBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TColorListBox }
@@ -1155,6 +1304,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure TColorListBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TColorComboBox }
 
 procedure TColorComboBox.DoChange;
@@ -1179,6 +1333,11 @@ function TColorComboBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TColorComboBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { THueTrackBar }
@@ -1207,6 +1366,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure THueTrackBar.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TAlphaTrackBar }
 
 procedure TAlphaTrackBar.DoChanged;
@@ -1233,6 +1397,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure TAlphaTrackBar.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TBWTrackBar }
 
 procedure TBWTrackBar.DoChanged;
@@ -1257,6 +1426,11 @@ function TBWTrackBar.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TBWTrackBar.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TTimeEdit }
@@ -1299,6 +1473,11 @@ begin
   end;
 end;
 
+procedure TTimeEdit.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TDateEdit }
 
 procedure TDateEdit.DoDateTimeChanged;
@@ -1339,6 +1518,11 @@ begin
   end;
 end;
 
+procedure TDateEdit.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TSpinBox }
 
 function TSpinBox.DefineModelClass: TDataModelClass;
@@ -1357,6 +1541,11 @@ function TSpinBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TSpinBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TBindableSpinBoxModel }
@@ -1398,6 +1587,11 @@ function TNumberBox.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   Guard.CheckNotNull(FManager, 'Manager is null');
   Result := FManager.OnPropertyChangedEvent;
+end;
+
+procedure TNumberBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TBindableNumberBoxModel }
@@ -1503,6 +1697,11 @@ begin
     Result := Sel.Data
   else
     Result := nil;
+end;
+
+procedure TListBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 procedure TListBox.SetSelectedItem(const Value: TObject);
@@ -1688,6 +1887,11 @@ begin
     Result := nil;
 end;
 
+procedure TListView.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 procedure TListView.SetSelectedItem(const Value: TObject);
 begin
   ItemIndex := FindListViewItem(Value);
@@ -1828,6 +2032,11 @@ begin
   Result := FManager.OnPropertyChangedEvent;
 end;
 
+procedure TImage.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 { TTreeView }
 
 procedure TTreeView.Change(Sender: TObject);
@@ -1923,6 +2132,11 @@ begin
   OnChange := Change;
 end;
 
+procedure TTreeView.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
+end;
+
 procedure TTreeView.SetSelectedNode(const Value: TObject);
 begin
   Selected := FindTreeNode(Value);
@@ -1989,6 +2203,11 @@ begin
   inherited;
   FChanged_ := OnChange;
   OnChange := Change;
+end;
+
+procedure TComboBox.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 procedure TComboBox.SetSelectedItem(const Value: TObject);

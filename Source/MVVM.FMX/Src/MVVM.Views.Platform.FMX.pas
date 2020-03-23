@@ -69,8 +69,7 @@ type
 
     function GetAsObject: TObject;
 
-    property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm
-      write FGrayOutPreviousForm;
+    property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm write FGrayOutPreviousForm;
 
     property Binder: TBindingManager read FBinder;
   end;
@@ -90,7 +89,7 @@ begin
   FPrevForm := Screen.ActiveForm;
 {$ENDIF}
   inherited;
-  FBinder := TBindingManager.Create;
+  FBinder              := TBindingManager.Create;
   FGrayOutPreviousForm := True;
 end;
 
@@ -146,7 +145,7 @@ begin
     FOverlay := TRectangle.Create(FPrevForm);
     FOverlay.SetBounds(0, 0, 9999, 9999);
     FOverlay.Stroke.Kind := TBrushKind.None;
-    FOverlay.Fill.Color := $50000000;
+    FOverlay.Fill.Color  := $50000000;
     FPrevForm.AddObject(FOverlay);
   end;
 {$ENDIF}

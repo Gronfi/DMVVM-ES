@@ -140,6 +140,7 @@ procedure TViewModelAlbums.ShowAlbumView(const AAlbum: TAlbum;
 var
   ViewModel: IViewModelAlbum;
   View: IView<IViewModelAlbum>;
+  LViewForm: IViewForm<IViewModelAlbum>;
 begin
   Assert(Assigned(AAlbum));
   Assert(Assigned(AResultProc));
@@ -147,11 +148,14 @@ begin
 
   { The view becomes owner of the view model. }
   View := TViewFactory.CreateView('Album', nil, ViewModel);
-  (View as IViewForm<IViewModelAlbum>).ExecuteModal(
-    procedure (AModalResult: TModalResult)
-    begin
-      AResultProc(AModalResult);
-    end);
+  if Supports(View, IViewForm<IViewModelAlbum>, LViewForm) then
+  begin
+    LViewForm.ExecuteModal(
+      procedure (AModalResult: TModalResult)
+      begin
+        AResultProc(AModalResult);
+      end);
+  end;
 end;
 
 end.

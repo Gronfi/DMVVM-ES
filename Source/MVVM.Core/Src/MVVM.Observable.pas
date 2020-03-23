@@ -13,8 +13,7 @@ uses
   MVVM.Interfaces;
 
 type
-  TObservable = class abstract(TInterfacedObject, INotifyChangedProperty,
-    INotifyFree)
+  TObservable = class abstract(TInterfacedObject, INotifyChangedProperty, INotifyFree)
   protected
     FManager: IStrategyEventedObject;
 {$REGION 'Internal Declarations'}
@@ -26,6 +25,7 @@ type
     procedure PropertyChanged(const APropertyName: String); virtual;
 
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
 {$ENDREGION 'Internal Declarations'}
   public
     constructor Create(AManager: IStrategyEventedObject); overload;
@@ -33,14 +33,12 @@ type
     destructor Destroy; override;
 
     property OnFreeEvent: IFreeEvent read GetOnFreeEvent;
-    property OnPropertyChangedEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedEvent: IChangedPropertyEvent read GetOnPropertyChangedEvent;
 
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
   end;
 
-  TObservableCollection<T: class> = class(TEnumerable<T>,
-    INotifyChangedProperty, INotifyCollectionChanged)
+  TObservableCollection<T: class> = class(TEnumerable<T>, INotifyChangedProperty, INotifyCollectionChanged)
 {$REGION 'Internal Declarations'}
   private
     FManager: IStrategyEventedObject;
@@ -55,15 +53,14 @@ type
     procedure SetItem(const AIndex: Integer; const Value: T); inline;
   private
     function GetManager: IStrategyEventedObject;
+    procedure SetManager(AManager: IStrategyEventedObject);
+
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
     function GetOnCollectionChangedEvent: IChangedCollectionEvent;
 
-    procedure DoItemPropertyChanged(const ASender: TObject;
-      const APropertyName: String);
+    procedure DoItemPropertyChanged(const ASender: TObject; const APropertyName: String);
     procedure DoPropertyChanged(const APropertyName: String);
-    procedure DoCollectionChanged(const AAction: TCollectionChangedAction;
-      const AItem: TObject = nil; const AItemIndex: Integer = -1;
-      const APropertyName: String = '');
+    procedure DoCollectionChanged(const AAction: TCollectionChangedAction; const AItem: TObject = nil; const AItemIndex: Integer = -1; const APropertyName: String = '');
   protected
     { IInterface }
     function QueryInterface(const IID: TGUID; out Obj): HResult; stdcall;
@@ -108,8 +105,7 @@ type
       Parameters:
       AItem: The item to find.
       ADirection: Whether to search forwards or backwards. }
-    function IndexOfItem(const AItem: T; const ADirection: TDirection)
-      : Integer; inline;
+    function IndexOfItem(const AItem: T; const ADirection: TDirection): Integer; inline;
     { Performs a binary search for a given item. This requires that the
       collection is sorted. This is an O(log n) operation that uses the default
       comparer to check for equality.
@@ -119,8 +115,7 @@ type
       to the index of the first entry larger than AItem.
       Returns:
       Whether the collection contains the item. }
-    function BinarySearch(const AItem: T; out AIndex: Integer): Boolean;
-      overload; inline;
+    function BinarySearch(const AItem: T; out AIndex: Integer): Boolean; overload; inline;
     { Performs a binary search for a given item. This requires that the
       collection is sorted. This is an O(log n) operation that uses the given
       comparer to check for equality.
@@ -131,8 +126,7 @@ type
       AComparer: the comparer to use to check for equality.
       Returns:
       Whether the collection contains the item. }
-    function BinarySearch(const AItem: T; out AIndex: Integer;
-      const AComparer: IComparer<T>): Boolean; overload; inline;
+    function BinarySearch(const AItem: T; out AIndex: Integer; const AComparer: IComparer<T>): Boolean; overload; inline;
     { Returns the first item in the collection. }
     function First: T; inline;
     { Returns the last item in the collection. }
@@ -167,8 +161,7 @@ type
       be inserted before AIndex. Set to 0 to insert at the beginning to the
       collection. Set to Count to add to the end of the collection.
       AItems: the items to insert. }
-    procedure InsertRange(const AIndex: Integer;
-      const AItems: array of T); overload;
+    procedure InsertRange(const AIndex: Integer; const AItems: array of T); overload;
     { Inserts the items from another collection into the collection.
       Parameters:
       AIndex: the index in the collection to insert the items. The items will
@@ -176,8 +169,7 @@ type
       collection. Set to Count to add to the end of the collection.
       ACollection: the collection containing the items to insert. Can be any
       class that descends from TEnumerable<T>. }
-    procedure InsertRange(const AIndex: Integer;
-      const ACollection: TEnumerable<T>); overload;
+    procedure InsertRange(const AIndex: Integer; const ACollection: TEnumerable<T>); overload;
     { Deletes an item from the collection.
       Parameters:
       AIndex: the index of the item to delete }
@@ -214,18 +206,15 @@ type
     { The number of items in the collection }
     property Count: Integer read GetCount;
     { The items in the collection }
-    property Items[const AIndex: Integer]: T read GetItem
-      write SetItem; default;
+    property Items[const AIndex: Integer]: T read GetItem write SetItem; default;
     { The number of reserved items in the collection. Is >= Count to improve
       performance by reducing memory reallocations. }
     property Capacity: Integer read GetCapacity;
 
-    property OnPropertyChangedEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedEvent;
-    property OncollectionChangedEvent: IChangedCollectionEvent
-      read GetOnCollectionChangedEvent;
+    property OnPropertyChangedEvent: IChangedPropertyEvent read GetOnPropertyChangedEvent;
+    property OncollectionChangedEvent: IChangedCollectionEvent read GetOnCollectionChangedEvent;
 
-    property Manager: IStrategyEventedObject read GetManager;
+    property Manager: IStrategyEventedObject read GetManager write SetManager;
 
   end;
 
@@ -253,49 +242,59 @@ end;
 
 function TObservable.GetManager: IStrategyEventedObject;
 begin
-  Result := FManager;
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result     := FManager;
 end;
 
 function TObservable.GetOnFreeEvent: IFreeEvent;
 begin
-  Result := FManager.OnFreeEvent;
+  Result := Manager.OnFreeEvent;
 end;
 
 function TObservable.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  Result := FManager.OnPropertyChangedEvent;
+  Result := Manager.OnPropertyChangedEvent;
 end;
 
 procedure TObservable.NotifyFree;
 begin
-  if FManager.IsAssignedFreeEvent then
-    FManager.OnFreeEvent.Invoke(Self, Self);
+  if Manager.IsAssignedFreeEvent then
+    Manager.OnFreeEvent.Invoke(Self, Self);
 end;
 
 procedure TObservable.PropertyChanged(const APropertyName: String);
 begin
-  if FManager.IsAssignedPropertyChangedEvent then
-    FManager.OnPropertyChangedEvent.Invoke(Self, APropertyName);
-  FManager.BindingStrategy.Notify(Self, APropertyName);
+  if Manager.IsAssignedPropertyChangedEvent then
+    Manager.OnPropertyChangedEvent.Invoke(Self, APropertyName);
+  if Assigned(Manager.BindingStrategy) then
+    Manager.BindingStrategy.Notify(Self, APropertyName);
+end;
+
+procedure TObservable.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager;
 end;
 
 { TObservableCollection<T> }
 
 function TObservableCollection<T>.Add(const AItem: T): Integer;
 var
-  NPC: INotifyChangedProperty;
+  [weak]
+  LPropertyChanged: INotifyChangedProperty;
 begin
   Result := FList.Add(AItem);
-   if Supports(AItem, INotifyChangedProperty, NPC) then
-     NPC.OnPropertyChangedEvent.Add(DoItemPropertyChanged);
-   DoCollectionChanged(TCollectionChangedAction.Add, AItem, Result);
-   DoPropertyChanged('Count');
+  if Supports(AItem, INotifyChangedProperty, LPropertyChanged) then
+    LPropertyChanged.OnPropertyChangedEvent.Add(DoItemPropertyChanged);
+  DoCollectionChanged(TCollectionChangedAction.Add, AItem, Result);
+  DoPropertyChanged('Count');
 end;
 
 procedure TObservableCollection<T>.AddRange(const ACollection: TEnumerable<T>);
 var
   Index: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   Index := FList.Count;
@@ -318,6 +317,7 @@ procedure TObservableCollection<T>.AddRange(const AItems: array of T);
 var
   I, Index: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   Index := FList.Count;
@@ -337,14 +337,12 @@ begin
     DoPropertyChanged('Count');
 end;
 
-function TObservableCollection<T>.BinarySearch(const AItem: T;
-  out AIndex: Integer; const AComparer: IComparer<T>): Boolean;
+function TObservableCollection<T>.BinarySearch(const AItem: T; out AIndex: Integer; const AComparer: IComparer<T>): Boolean;
 begin
   Result := FList.BinarySearch(AItem, AIndex, AComparer);
 end;
 
-function TObservableCollection<T>.BinarySearch(const AItem: T;
-  out AIndex: Integer): Boolean;
+function TObservableCollection<T>.BinarySearch(const AItem: T; out AIndex: Integer): Boolean;
 begin
   Result := FList.BinarySearch(AItem, AIndex);
 end;
@@ -353,6 +351,7 @@ procedure TObservableCollection<T>.Clear;
 var
   I: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   if (FList.Count > 0) then
@@ -380,13 +379,14 @@ end;
 constructor TObservableCollection<T>.Create(const AOwnsObjects: Boolean);
 begin
   inherited Create;
-  FList := TObjectList<T>.Create;
+  FList             := TObjectList<T>.Create;
   FList.OwnsObjects := AOwnsObjects;
 end;
 
 procedure TObservableCollection<T>.Delete(const AIndex: Integer);
 var
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   Item := FList[AIndex];
@@ -410,6 +410,7 @@ procedure TObservableCollection<T>.DeleteRange(const AIndex, ACount: Integer);
 var
   I: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   for I := AIndex to AIndex + ACount - 1 do
@@ -436,16 +437,14 @@ begin
   inherited;
 end;
 
-procedure TObservableCollection<T>.DoCollectionChanged(const AAction
-  : TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer;
-  const APropertyName: String);
+procedure TObservableCollection<T>.DoCollectionChanged(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
 var
   Args: TCollectionChangedEventArgs;
 begin
-  if Assigned(FManager.OnCollectionChangedEvent) then
+  if Manager.IsAssignedCollectionChangedEvent then
   begin
     Args := TCollectionChangedEventArgs.Create(AAction, AItem, AItemIndex, APropertyName);
-    FManager.OnCollectionChangedEvent.Invoke(Self, Args);
+    Manager.OncollectionChangedEvent.Invoke(Self, Args);
   end;
 end;
 
@@ -454,19 +453,17 @@ begin
   Result := FList.GetEnumerator;
 end;
 
-procedure TObservableCollection<T>.DoItemPropertyChanged(const ASender: TObject;
-  const APropertyName: String);
+procedure TObservableCollection<T>.DoItemPropertyChanged(const ASender: TObject; const APropertyName: String);
 begin
-  DoCollectionChanged(TCollectionChangedAction.ItemChange, ASender, -1,
-    APropertyName);
+  DoCollectionChanged(TCollectionChangedAction.ItemChange, ASender, -1, APropertyName);
 end;
 
-procedure TObservableCollection<T>.DoPropertyChanged
-  (const APropertyName: String);
+procedure TObservableCollection<T>.DoPropertyChanged(const APropertyName: String);
 begin
-  if Assigned(FManager.OnPropertyChangedEvent) then
-    FManager.OnPropertyChangedEvent.Invoke(Self, APropertyName);
-  FManager.BindingStrategy.Notify(Self, APropertyName);
+  if Manager.IsAssignedPropertyChangedEvent then
+    Manager.OnPropertyChangedEvent.Invoke(Self, APropertyName);
+  if Assigned(Manager.BindingStrategy) then
+    Manager.BindingStrategy.Notify(Self, APropertyName);
 end;
 
 function TObservableCollection<T>.First: T;
@@ -491,17 +488,19 @@ end;
 
 function TObservableCollection<T>.GetManager: IStrategyEventedObject;
 begin
-  Result := FManager;
+  if (FManager = nil) then
+    FManager := TStrategyEventedObject.Create(Self);
+  Result     := FManager;
 end;
 
 function TObservableCollection<T>.GetOnCollectionChangedEvent: IChangedCollectionEvent;
 begin
-  Result := FManager.OnCollectionChangedEvent;
+  Result := Manager.OncollectionChangedEvent;
 end;
 
 function TObservableCollection<T>.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
-  Result := FManager.OnPropertyChangedEvent;
+  Result := Manager.OnPropertyChangedEvent;
 end;
 
 function TObservableCollection<T>.IndexOf(const AItem: T): Integer;
@@ -509,15 +508,14 @@ begin
   Result := FList.IndexOf(AItem);
 end;
 
-function TObservableCollection<T>.IndexOfItem(const AItem: T;
-  const ADirection: TDirection): Integer;
+function TObservableCollection<T>.IndexOfItem(const AItem: T; const ADirection: TDirection): Integer;
 begin
   Result := FList.IndexOfItem(AItem, ADirection);
 end;
 
-procedure TObservableCollection<T>.Insert(const AIndex: Integer;
-  const AItem: T);
+procedure TObservableCollection<T>.Insert(const AIndex: Integer; const AItem: T);
 var
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   FList.Insert(AIndex, AItem);
@@ -527,11 +525,11 @@ begin
   DoPropertyChanged('Count');
 end;
 
-procedure TObservableCollection<T>.InsertRange(const AIndex: Integer;
-  const ACollection: TEnumerable<T>);
+procedure TObservableCollection<T>.InsertRange(const AIndex: Integer; const ACollection: TEnumerable<T>);
 var
   Index: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   Index := AIndex;
@@ -550,11 +548,11 @@ begin
     DoPropertyChanged('Count');
 end;
 
-procedure TObservableCollection<T>.InsertRange(const AIndex: Integer;
-  const AItems: array of T);
+procedure TObservableCollection<T>.InsertRange(const AIndex: Integer; const AItems: array of T);
 var
   I, Index: Integer;
   Item: T;
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   Index := AIndex;
@@ -584,8 +582,7 @@ begin
   Result := FList.LastIndexOf(AItem);
 end;
 
-function TObservableCollection<T>.QueryInterface(const IID: TGUID;
-  out Obj): HResult;
+function TObservableCollection<T>.QueryInterface(const IID: TGUID; out Obj): HResult;
 begin
   if GetInterface(IID, Obj) then
     Result := S_OK
@@ -595,6 +592,7 @@ end;
 
 function TObservableCollection<T>.Remove(const AItem: T): Integer;
 var
+  [weak]
   NPC: INotifyChangedProperty;
 begin
   if Supports(AItem, INotifyChangedProperty, NPC) then
@@ -618,10 +616,14 @@ begin
   DoCollectionChanged(TCollectionChangedAction.Rearrange);
 end;
 
-procedure TObservableCollection<T>.SetItem(const AIndex: Integer;
-  const Value: T);
+procedure TObservableCollection<T>.SetItem(const AIndex: Integer; const Value: T);
 begin
   FList[AIndex] := Value;
+end;
+
+procedure TObservableCollection<T>.SetManager(AManager: IStrategyEventedObject);
+begin
+  FManager := AManager
 end;
 
 procedure TObservableCollection<T>.Sort(const AComparer: IComparer<T>);

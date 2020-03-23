@@ -9,9 +9,6 @@
         <Projects Include="MVVM.Binding.Strategies\LiveBindings\MVVM.Binding.LiveBindings.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="MVVM.VCL\MVVM.Platform.VCL.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="MVVM.FMX\MVVM.Platform.FMX.dproj">
             <Dependencies/>
         </Projects>
@@ -21,6 +18,18 @@
         <Projects Include="..\Demos\CSV\CSV.Core\CSV.Core.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\Demos\MyTunes\FMX\MyTunesFMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="MVVM.VCL\MVVM.Platform.VCL.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj">
             <Dependencies/>
         </Projects>
@@ -28,12 +37,6 @@
             <Dependencies/>
         </Projects>
         <Projects Include="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj">
@@ -46,9 +49,6 @@
             <Dependencies/>
         </Projects>
         <Projects Include="D:\Mis Documentos\Embarcadero\Studio\Projects\Project62.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="..\Demos\MyTunes\FMX\MyTunesFMX.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -77,15 +77,6 @@
     <Target Name="MVVM_Binding_LiveBindings:Make">
         <MSBuild Projects="MVVM.Binding.Strategies\LiveBindings\MVVM.Binding.LiveBindings.dproj" Targets="Make"/>
     </Target>
-    <Target Name="MVVM_Platform_VCL">
-        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj"/>
-    </Target>
-    <Target Name="MVVM_Platform_VCL:Clean">
-        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="MVVM_Platform_VCL:Make">
-        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj" Targets="Make"/>
-    </Target>
     <Target Name="MVVM_Platform_FMX">
         <MSBuild Projects="MVVM.FMX\MVVM.Platform.FMX.dproj"/>
     </Target>
@@ -113,6 +104,42 @@
     <Target Name="CSV_Core:Make">
         <MSBuild Projects="..\Demos\CSV\CSV.Core\CSV.Core.dproj" Targets="Make"/>
     </Target>
+    <Target Name="CSV_View_FMX">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Clean">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CSV_View_FMX:Make">
+        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="App_CSV_FMX">
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj"/>
+    </Target>
+    <Target Name="App_CSV_FMX:Clean">
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="App_CSV_FMX:Make">
+        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MyTunesFMX">
+        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj"/>
+    </Target>
+    <Target Name="MyTunesFMX:Clean">
+        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MyTunesFMX:Make">
+        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="MVVM_Platform_VCL">
+        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj"/>
+    </Target>
+    <Target Name="MVVM_Platform_VCL:Clean">
+        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MVVM_Platform_VCL:Make">
+        <MSBuild Projects="MVVM.VCL\MVVM.Platform.VCL.dproj" Targets="Make"/>
+    </Target>
     <Target Name="CSV_Core_DUnitX">
         <MSBuild Projects="..\Demos\CSV\CSV.Core.DUnitX\CSV.Core.DUnitX.dproj"/>
     </Target>
@@ -139,24 +166,6 @@
     </Target>
     <Target Name="App_CSV_VCL:Make">
         <MSBuild Projects="..\Demos\CSV\CSV.VCL.Exe\App.CSV.VCL.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="CSV_View_FMX">
-        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj"/>
-    </Target>
-    <Target Name="CSV_View_FMX:Clean">
-        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="CSV_View_FMX:Make">
-        <MSBuild Projects="..\Demos\CSV\CSV.View.FMX\CSV.View.FMX.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="App_CSV_FMX">
-        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj"/>
-    </Target>
-    <Target Name="App_CSV_FMX:Clean">
-        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="App_CSV_FMX:Make">
-        <MSBuild Projects="..\Demos\CSV\CSV.FMX.Exe\App.CSV.FMX.dproj" Targets="Make"/>
     </Target>
     <Target Name="DataSet_Core">
         <MSBuild Projects="..\Demos\DataSet\DataSet.Core\DataSet.Core.dproj"/>
@@ -194,23 +203,14 @@
     <Target Name="Project62:Make">
         <MSBuild Projects="D:\Mis Documentos\Embarcadero\Studio\Projects\Project62.dproj" Targets="Make"/>
     </Target>
-    <Target Name="MyTunesFMX">
-        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj"/>
-    </Target>
-    <Target Name="MyTunesFMX:Clean">
-        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="MyTunesFMX:Make">
-        <MSBuild Projects="..\Demos\MyTunes\FMX\MyTunesFMX.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="MVVM_Core;MVVM_Binding_LiveBindings;MVVM_Platform_VCL;MVVM_Platform_FMX;MVVM_Binding_LiveBindings_FMX;CSV_Core;CSV_Core_DUnitX;CSV_View_VCL;App_CSV_VCL;CSV_View_FMX;App_CSV_FMX;DataSet_Core;DataSet_View_FMX;App_DataSet_FMX;Project62;MyTunesFMX"/>
+        <CallTarget Targets="MVVM_Core;MVVM_Binding_LiveBindings;MVVM_Platform_FMX;MVVM_Binding_LiveBindings_FMX;CSV_Core;CSV_View_FMX;App_CSV_FMX;MyTunesFMX;MVVM_Platform_VCL;CSV_Core_DUnitX;CSV_View_VCL;App_CSV_VCL;DataSet_Core;DataSet_View_FMX;App_DataSet_FMX;Project62"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="MVVM_Core:Clean;MVVM_Binding_LiveBindings:Clean;MVVM_Platform_VCL:Clean;MVVM_Platform_FMX:Clean;MVVM_Binding_LiveBindings_FMX:Clean;CSV_Core:Clean;CSV_Core_DUnitX:Clean;CSV_View_VCL:Clean;App_CSV_VCL:Clean;CSV_View_FMX:Clean;App_CSV_FMX:Clean;DataSet_Core:Clean;DataSet_View_FMX:Clean;App_DataSet_FMX:Clean;Project62:Clean;MyTunesFMX:Clean"/>
+        <CallTarget Targets="MVVM_Core:Clean;MVVM_Binding_LiveBindings:Clean;MVVM_Platform_FMX:Clean;MVVM_Binding_LiveBindings_FMX:Clean;CSV_Core:Clean;CSV_View_FMX:Clean;App_CSV_FMX:Clean;MyTunesFMX:Clean;MVVM_Platform_VCL:Clean;CSV_Core_DUnitX:Clean;CSV_View_VCL:Clean;App_CSV_VCL:Clean;DataSet_Core:Clean;DataSet_View_FMX:Clean;App_DataSet_FMX:Clean;Project62:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="MVVM_Core:Make;MVVM_Binding_LiveBindings:Make;MVVM_Platform_VCL:Make;MVVM_Platform_FMX:Make;MVVM_Binding_LiveBindings_FMX:Make;CSV_Core:Make;CSV_Core_DUnitX:Make;CSV_View_VCL:Make;App_CSV_VCL:Make;CSV_View_FMX:Make;App_CSV_FMX:Make;DataSet_Core:Make;DataSet_View_FMX:Make;App_DataSet_FMX:Make;Project62:Make;MyTunesFMX:Make"/>
+        <CallTarget Targets="MVVM_Core:Make;MVVM_Binding_LiveBindings:Make;MVVM_Platform_FMX:Make;MVVM_Binding_LiveBindings_FMX:Make;CSV_Core:Make;CSV_View_FMX:Make;App_CSV_FMX:Make;MyTunesFMX:Make;MVVM_Platform_VCL:Make;CSV_Core_DUnitX:Make;CSV_View_VCL:Make;App_CSV_VCL:Make;DataSet_Core:Make;DataSet_View_FMX:Make;App_DataSet_FMX:Make;Project62:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

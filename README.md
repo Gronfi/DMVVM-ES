@@ -57,6 +57,7 @@ https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
 ## Ideas a tener en cuenta
 
 * Motor permite el registro de distintos tipos de estrategias/métodos de binding
+* Posibilidad de habilitar/deshabilitar todos los bindings?
 
 ***
 
@@ -83,6 +84,7 @@ Objetivos:
 	d. grijjy: parece el más completo y sencillo de entender para aplicarlo como referencia. Se echan en falta más ejemplos
 3. Integrar al core la posibilidad de distintas estrategias de binding, que se puedan registrar
 4. Integrar ideas del framework de grijjy (por suerte ellos en su blog dan permiso a utilizar su framework para elaborar otros)
+5. El prototipo 1 de momento tendrá una correspondencia de 1-1 entre view y modelview
 
 ### Prototipo 2
 

@@ -22,8 +22,7 @@ type
     procedure AddItemsToView;
     procedure UpdateItemsInView;
   private
-    procedure CollectionChanged(const ASender: TObject;
-      const AArg: TCollectionChangedEventArgs);
+    procedure CollectionChanged(const ASender: TObject; const AArg: TCollectionChangedEventArgs);
   protected
     { IgoCollectionView }
     function GetSource: TCollectionSource;
@@ -76,8 +75,7 @@ type
 
       For example, when used with a TListBox, it would find the TListBoxItem
       associated with AItem and change one of its properties. }
-    procedure UpdateItemInView(const AItem: TObject;
-      const APropertyName: String); virtual; abstract;
+    procedure UpdateItemInView(const AItem: TObject; const APropertyName: String); virtual; abstract;
 
     { Must be overridden to update all items in the view with new data.
       This method is called when the order of the items in the source collection
@@ -131,8 +129,7 @@ begin
   end;
 end;
 
-procedure TCollectionView.CollectionChanged(const ASender: TObject;
-  const AArg: TCollectionChangedEventArgs);
+procedure TCollectionView.CollectionChanged(const ASender: TObject; const AArg: TCollectionChangedEventArgs);
 begin
   if (FTemplate = nil) then
     Exit;
@@ -202,7 +199,7 @@ begin
   if (AValue <> FTemplate) then
   begin
     PrevTemplate := FTemplate;
-    FTemplate := AValue;
+    FTemplate    := AValue;
     if Assigned(FTemplate) and Assigned(FSource) then
     begin
       if Assigned(PrevTemplate) then

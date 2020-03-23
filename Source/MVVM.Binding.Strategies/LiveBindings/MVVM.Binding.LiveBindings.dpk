@@ -33,6 +33,7 @@ requires
   bindcomp;
 
 contains
-  MVVM.Bindings.LiveBindings in 'Src\MVVM.Bindings.LiveBindings.pas';
+  MVVM.Bindings.LiveBindings in 'Src\MVVM.Bindings.LiveBindings.pas',
+  MVVM.Bindings.LiveBindings.EnumerableAdapter in 'Src\MVVM.Bindings.LiveBindings.EnumerableAdapter.pas';
 
 end.
