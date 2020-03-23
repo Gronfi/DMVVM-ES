@@ -109,7 +109,7 @@ type
 {$ENDREGION 'FMX.StdCtrls'}
 {$REGION 'FMX.ActnList'}
 
-  TAction = class(FMX.ActnList.TAction, IBindableAction)
+  TAction = class(FMX.ActnList.TAction, IBindableAction, IBindable)
 {$REGION 'Internal Declarations'}
   private
     FBinding: IBinding;

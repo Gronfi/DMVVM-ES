@@ -69,14 +69,12 @@ uses
 
 procedure TfrmCSV.Button1Click(Sender: TObject);
 begin
-  //MVVMCore.DisableBinding(DoCrearVista); no detecta la interface ???
-  DoCrearVista.Binding.Enabled := False;
+  MVVMCore.DisableBinding(DoCrearVista);
 end;
 
 procedure TfrmCSV.Button2Click(Sender: TObject);
 begin
-  //MVVMCore.EnableBinding(DoCrearVista); no detecta la interface ???
-  DoCrearVista.Binding.Enabled := True;
+  MVVMCore.EnableBinding(DoCrearVista);
 end;
 
 { TForm1 }

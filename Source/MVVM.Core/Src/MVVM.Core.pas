@@ -47,7 +47,9 @@ implementation
 
 uses
   System.Classes,
-  System.Threading;
+  System.Threading,
+
+  MVVM.Utils;
 
 { MVVM }
 
@@ -160,7 +162,7 @@ end;
 
 class function MVVMCore.EnableBinding(AObject: TObject): Boolean;
 var
-  LBinding: IBindable;
+  [weak] LBinding: IBindable;
 begin
   if Supports(AObject, IBindable, LBinding) then
     LBinding.Binding.Enabled := True;
