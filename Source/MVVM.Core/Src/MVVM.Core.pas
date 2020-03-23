@@ -30,6 +30,9 @@ type
     class function PlatformServices: IPlatformServices; static;
     class function Container: TContainer; static;
 
+    class function EnableBinding(AObject: TObject): Boolean; static;
+    class function DisableBinding(AObject: TObject): Boolean; static;
+
     class procedure InitializationDone; static;
 
     class procedure DelegateExecution(AProc: TProc; AExecutionMode: EDelegatedExecutionMode); overload; static;
@@ -145,6 +148,22 @@ end;
 class destructor MVVMCore.DestroyC;
 begin
   FContainer.Free;
+end;
+
+class function MVVMCore.DisableBinding(AObject: TObject): Boolean;
+var
+  [weak] LBinding: IBindable;
+begin
+  if Supports(AObject, IBindable, LBinding) then
+    LBinding.Binding.Enabled := False;
+end;
+
+class function MVVMCore.EnableBinding(AObject: TObject): Boolean;
+var
+  LBinding: IBindable;
+begin
+  if Supports(AObject, IBindable, LBinding) then
+    LBinding.Binding.Enabled := True;
 end;
 
 class procedure MVVMCore.InitializationDone;

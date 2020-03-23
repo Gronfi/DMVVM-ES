@@ -89,10 +89,16 @@ var
   [weak] LView : IView<ICSVFile_ViewModel>;
   [weak] LVista: IViewForm<ICSVFile_ViewModel>;
 begin
-  //LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self) as IViewForm<ICSVFile_ViewModel>;
-  LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self);
-  if Supports(LView, IView<ICSVFile_ViewModel>, LVista)  then
-    LVista.Execute;
+  try
+    LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self);
+    if Supports(LView, IView<ICSVFile_ViewModel>, LVista)  then
+      LVista.Execute;
+  except
+    on E:Exception do
+    begin
+      MVVMCore.PlatformServices.MessageDlg(E.Message, 'Data')
+    end;
+  end;
 end;
 
 destructor TCSVFile_ViewModel.Destroy;

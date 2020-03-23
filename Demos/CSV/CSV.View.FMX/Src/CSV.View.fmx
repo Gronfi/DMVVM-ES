@@ -140,6 +140,26 @@ object frmCSV: TfrmCSV
       Size.PlatformDefault = False
     end
   end
+  object Button1: TButton
+    Position.X = 312.000000000000000000
+    Position.Y = 136.000000000000000000
+    Size.Width = 152.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 11
+    Text = 'Disable Crear nueva Vista'
+    OnClick = Button1Click
+  end
+  object Button2: TButton
+    Position.X = 312.000000000000000000
+    Position.Y = 168.000000000000000000
+    Size.Width = 152.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 12
+    Text = 'Enable Crear nueva Vista'
+    OnClick = Button2Click
+  end
   object ActionList1: TActionList
     Left = 360
     Top = 64

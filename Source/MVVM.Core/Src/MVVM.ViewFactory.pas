@@ -79,7 +79,7 @@ type
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     public
-      constructor Create(const AView: IView<TVM>); reintroduce;
+      constructor Create(AView: IView<TVM>); reintroduce;
       destructor Destroy; override;
 
       property ActualView: IView<TVM> read FActualView;
@@ -95,7 +95,44 @@ type
     procedure InitView(AViewModel: TVM);
 {$ENDREGION 'Internal Declarations'}
   public
-    constructor Create(const AActualView: IView<TVM>);
+    constructor Create(AActualView: IView<TVM>);
+    destructor Destroy; override;
+
+    function GetAsObject: TObject;
+
+    procedure SetupView;
+    property ViewModel: TVM read GetViewModel;
+  end;
+
+  TFormViewProxy<TVM: IViewModel> = class(TInterfacedObject, IView, IView<TVM>, IViewForm<TVM>)
+{$REGION 'Internal Declarations'}
+  private type
+    TViewFreeListener = class(TComponent)
+    strict private
+      FActualView: IViewForm<TVM>;
+      [unsafe]
+      FActualViewObject: TComponent;
+    protected
+      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    public
+      constructor Create(AView: IViewForm<TVM>); reintroduce;
+      destructor Destroy; override;
+
+      property ActualView: IViewForm<TVM> read FActualView;
+    end;
+  private
+    FViewFreeListener: TViewFreeListener;
+  protected
+    function GetViewModel: TVM;
+    { IViewForm }
+    procedure Execute;
+    procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
+  protected
+    { IView<TVM> }
+    procedure InitView(AViewModel: TVM);
+{$ENDREGION 'Internal Declarations'}
+  public
+    constructor Create(AActualView: IViewForm<TVM>);
     destructor Destroy; override;
 
     function GetAsObject: TObject;
@@ -111,7 +148,7 @@ uses
 
 { TViewProxy<TVM> }
 
-constructor TViewProxy<TVM>.Create(const AActualView: IView<TVM>);
+constructor TViewProxy<TVM>.Create(AActualView: IView<TVM>);
 begin
   Assert(Assigned(AActualView));
   inherited Create;
@@ -132,7 +169,7 @@ end;
 
 procedure TViewProxy<TVM>.ExecuteModal(const AResultProc: TProc<TModalResult>);
 var
-  LViewForm: IViewForm<TVM>;
+  [weak]LViewForm: IViewForm<TVM>;
 begin
   if Assigned(FViewFreeListener.ActualView) then
   begin
@@ -168,7 +205,7 @@ end;
 
 { TViewProxy<TVM>.TViewFreeListener }
 
-constructor TViewProxy<TVM>.TViewFreeListener.Create(const AView: IView<TVM>);
+constructor TViewProxy<TVM>.TViewFreeListener.Create(AView: IView<TVM>);
 var
   Instance: TObject;
 begin
@@ -221,7 +258,7 @@ begin
     ViewComp := ViewClass.Create(AOwner);
     if Supports(ViewComp, IViewForm<TVM>, LViewForm) then
     begin
-      Result := TViewProxy<TVM>.Create(LViewForm);
+      Result := TFormViewProxy<TVM>.Create(LViewForm);
     end
     else
     begin
@@ -234,6 +271,103 @@ begin
     raise;
   end;
 end;
+
+{ TFormViewProxy<TVM> }
+
+constructor TFormViewProxy<TVM>.Create(AActualView: IViewForm<TVM>);
+begin
+  Assert(Assigned(AActualView));
+  inherited Create;
+  { Executing a view may free it (for example, when the view is a form and its
+    CloseAction is set to caFree). When that happens, the IView interface
+    will contain an invalid reference, and you may get an access violation when
+    it goes out of scope. To avoid this, we use a view proxy. This proxy
+    subscribes to a free notification of the view, so it can set the IView
+    interface to nil BEFORE the view is destroyed. }
+  FViewFreeListener := TViewFreeListener.Create(AActualView);
+end;
+
+destructor TFormViewProxy<TVM>.Destroy;
+begin
+FViewFreeListener.Free;
+  inherited;
+end;
+
+procedure TFormViewProxy<TVM>.Execute;
+begin
+  FViewFreeListener.ActualView.Execute;
+end;
+
+procedure TFormViewProxy<TVM>.ExecuteModal(const AResultProc: TProc<TModalResult>);
+var
+  [weak]LViewForm: IViewForm<TVM>;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+  begin
+    if Supports(FViewFreeListener.ActualView, IViewForm<TVM>, LViewForm) then
+      LViewForm.ExecuteModal(AResultProc);
+  end;
+end;
+
+function TFormViewProxy<TVM>.GetAsObject: TObject;
+begin
+  Result := Self
+end;
+
+function TFormViewProxy<TVM>.GetViewModel: TVM;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    Result := FViewFreeListener.ActualView.ViewModel
+  else
+    Result := nil;
+end;
+
+procedure TFormViewProxy<TVM>.InitView(AViewModel: TVM);
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    FViewFreeListener.ActualView.InitView(AViewModel);
+end;
+
+procedure TFormViewProxy<TVM>.SetupView;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    FViewFreeListener.ActualView.SetupView;
+end;
+
+{ TFormViewProxy<TVM>.TViewFreeListener }
+
+constructor TFormViewProxy<TVM>.TViewFreeListener.Create(AView: IViewForm<TVM>);
+var
+  Instance: TObject;
+begin
+  inherited Create(nil);
+  FActualView := AView;
+  Instance    := TObject(AView);
+  if (Instance is TComponent) then
+  begin
+    FActualViewObject := TComponent(Instance);
+    FActualViewObject.FreeNotification(Self);
+  end;
+end;
+
+destructor TFormViewProxy<TVM>.TViewFreeListener.Destroy;
+begin
+  if (FActualViewObject <> nil) then
+    FActualViewObject.RemoveFreeNotification(Self);
+  inherited;
+end;
+
+procedure TFormViewProxy<TVM>.TViewFreeListener.Notification(
+  AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (AComponent = FActualViewObject) and (Operation = opRemove) then
+  begin
+    FActualView       := nil;
+    FActualViewObject := nil;
+  end;
+end;
+
 
 class destructor TViewFactory.Destroy;
 begin

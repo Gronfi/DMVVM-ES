@@ -218,6 +218,7 @@ begin
   // if already Exists the binded object we reuse the command
   if not ExistBindingCommandActionFor(LObject, LCommand) then
     LCommand := TBindingCommandAction.Create(LObject);
+  AAction.Binding := LCommand;
   FBindings.Add(LCommand);
 end;
 

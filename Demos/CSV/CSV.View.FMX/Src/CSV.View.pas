@@ -6,11 +6,11 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, System.Actions,
   FMX.ActnList, FMX.ScrollBox, FMX.Memo, FMX.StdCtrls, FMX.Edit,
-  FMX.Controls.Presentation,
+  FMX.Controls.Presentation, FMX.Layouts, FMX.Objects, FMX.Effects,
+
+  CSV.Interfaces,
 
   MVVM.Interfaces,
-  CSV.Interfaces, FMX.Effects, FMX.Layouts, FMX.Objects,
-
   MVVM.Controls.Platform.FMX,
   MVVM.Views.Platform.FMX;
 
@@ -34,8 +34,11 @@ type
     pgBarra: TProgressBar;
     DoParalelo: TAction;
     DoNoParalelo: TAction;
+    Button1: TButton;
+    Button2: TButton;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
     procedure DoSelectFileExecute(Sender: TObject);
-    procedure lePathChangeTracking(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -57,11 +60,24 @@ implementation
 uses
   MVVM.ViewFactory,
   MVVM.Types,
+  MVVM.Core,
 
   CSV.ViewModel,
   Spring;
 
 {$R *.fmx}
+
+procedure TfrmCSV.Button1Click(Sender: TObject);
+begin
+  //MVVMCore.DisableBinding(DoCrearVista); no detecta la interface ???
+  DoCrearVista.Binding.Enabled := False;
+end;
+
+procedure TfrmCSV.Button2Click(Sender: TObject);
+begin
+  //MVVMCore.EnableBinding(DoCrearVista); no detecta la interface ???
+  DoCrearVista.Binding.Enabled := True;
+end;
 
 { TForm1 }
 
@@ -80,12 +96,6 @@ end;
 procedure TfrmCSV.DoSelectFileExecute(Sender: TObject);
 begin
   DoSeleccionarFichero
-end;
-
-procedure TfrmCSV.lePathChangeTracking(Sender: TObject);
-begin
-  //Guard.CheckNotNull(ViewModel, 'ViewModel no asignado');
-  //ViewModel.FileName := lePath.Text;
 end;
 
 procedure TfrmCSV.OnProcesoFinalizado(const ADato: String);

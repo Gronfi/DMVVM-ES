@@ -112,6 +112,7 @@ type
   TAction = class(FMX.ActnList.TAction, IBindableAction)
 {$REGION 'Internal Declarations'}
   private
+    FBinding: IBinding;
     FExecute: TExecuteMethod;
     FCanExecute: TCanExecuteMethod;
     FAnomExecute: TExecuteAnonymous;
@@ -119,6 +120,9 @@ type
   protected
     procedure DoExecuteAnonymous;
     procedure DoExecuteRtti;
+
+    function GetBinding: IBinding;
+    procedure SetBinding(ABinding: IBinding);
 {$ENDREGION 'Internal Declarations'}
   public
     { IBindableAction }
@@ -135,6 +139,8 @@ type
     constructor Create(AOwner: TComponent); override;
     function Update: Boolean; override;
     function Execute: Boolean; override;
+
+    property Binding: IBinding read GetBinding write SetBinding;
   end;
 
 {$ENDREGION 'FMX.ActnList'}
@@ -837,6 +843,16 @@ begin
     if Assigned(FExecute) then
       FExecute();
   end;
+end;
+
+function TAction.GetBinding: IBinding;
+begin
+  Result := FBinding;
+end;
+
+procedure TAction.SetBinding(ABinding: IBinding);
+begin
+  FBinding := ABinding;
 end;
 
 function TAction.Update: Boolean;

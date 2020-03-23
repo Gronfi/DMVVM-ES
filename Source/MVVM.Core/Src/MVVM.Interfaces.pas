@@ -531,7 +531,15 @@ type
     // procedure Bind(const ACollection: TEnumerable<TObject>; const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
   end;
 
-  IBindableAction = interface
+  IBindable = interface
+    ['{74F1EA86-FCFC-49AD-AB53-DCEBF476CB3B}']
+    function GetBinding: IBinding;
+    procedure SetBinding(ABinding: IBinding);
+
+    property Binding: IBinding read GetBinding write SetBinding;
+  end;
+
+  IBindableAction = interface(IBindable)
     ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
     procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
     procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
