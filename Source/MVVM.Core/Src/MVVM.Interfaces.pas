@@ -24,25 +24,19 @@ type
     function LoadBitmap(const AFileName: String): TObject; overload;
     function LoadBitmap(const AStream: TStream): TObject; overload;
     function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload;
-    function LoadBitmap(const AMemory: Pointer; const ASize: Integer)
-      : TObject; overload;
+    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload;
   end;
 {$ENDREGION}
 {$REGION 'TPlatformServicesBase'}
 
   TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
-    function MessageDlg(const ATitulo: string; const ATexto: String): Boolean;
-      virtual; abstract;
+    function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
     function IsMainThreadUI: Boolean; virtual; abstract;
-    function LoadBitmap(const AFileName: String): TObject; overload;
-      virtual; abstract;
-    function LoadBitmap(const AStream: TStream): TObject; overload;
-      virtual; abstract;
-    function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload;
-      virtual; abstract;
-    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject;
-      overload; virtual; abstract;
+    function LoadBitmap(const AFileName: String): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AStream: TStream): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload; virtual; abstract;
+    function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; virtual; abstract;
   end;
 {$ENDREGION}
 
@@ -78,8 +72,7 @@ type
     procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
 
     function GetTypeRestriction: EMessageTypeRestriction;
-    procedure SetTypeRestriction(const ATypeRestriction
-      : EMessageTypeRestriction);
+    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
 
     function GetListenerFilter: TListenerFilter;
     procedure SetListenerFilter(const AFilter: TListenerFilter);
@@ -93,13 +86,9 @@ type
 
     procedure NewMessage(AMessage: IMessage);
 
-    property FilterCondition: TListenerFilter read GetListenerFilter
-      write SetListenerFilter;
-    property IsCodeToExecuteInUIMainThread: Boolean
-      read GetIsCodeToExecuteInUIMainThread
-      write SetIsCodeToExecuteInUIMainThread;
-    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction
-      write SetTypeRestriction;
+    property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
+    property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
+    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
   end;
 {$ENDREGION}
   (*
@@ -161,8 +150,7 @@ type
 
 {$REGION 'INotifyFree'}
 
-  TNotifyFreeObjectEvent = procedure(const ASender, AInstance: TObject)
-    of Object;
+  TNotifyFreeObjectEvent = procedure(const ASender, AInstance: TObject) of Object;
 
   IFreeEvent = IEvent<TNotifyFreeObjectEvent>;
 
@@ -183,8 +171,7 @@ type
     ['{9201E57B-98C2-4724-9D03-84E7BF15CDAE}']
     function GetOnPropertyChangedEvent: IChangedPropertyEvent;
 
-    property OnPropertyChangedEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedEvent;
+    property OnPropertyChangedEvent: IChangedPropertyEvent read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION}
 {$REGION 'INotifyPropertyChangeTracking'}
@@ -195,8 +182,7 @@ type
     ['{70345AF0-199C-4E75-A7BE-5C4929E82620}']
     function GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 
-    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedTrackingEvent;
+    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION}
 
@@ -211,12 +197,11 @@ type
     ['{1DF02979-CEAF-4783-BEE9-2500700E6604}']
     function GetOnCollectionChangedEvent: IChangedCollectionEvent;
 
-    property OnCollectionChangedEvent: IChangedCollectionEvent
-      read GetOnCollectionChangedEvent;
+    property OnCollectionChangedEvent: IChangedCollectionEvent read GetOnCollectionChangedEvent;
   end;
 {$ENDREGION}
-
 {$REGION 'IStrategyEventedObject'}
+
   IStrategyEventedObject = interface(IStrategyBased)
     ['{CB3FA6A8-371A-481A-AD49-790692843777}']
     function GetOnFreeEvent: IFreeEvent;
@@ -229,13 +214,14 @@ type
     function IsAssignedPropertyChangedTrackingEvent: Boolean;
     function IsAssignedCollectionChangedEvent: Boolean;
 
+    procedure NotifyPropertyChanged(const ASender: TObject; const APropertyName: String);
+    procedure NotifyPropertyTrackingChanged(const ASender: TObject; const APropertyName: String);
+    procedure NotifyFreeEvent(const ASender, AInstance: TObject);
+
     property OnFreeEvent: IFreeEvent read GetOnFreeEvent;
-    property OnPropertyChangedEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedEvent;
-    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedTrackingEvent;
-    property OnCollectionChangedEvent: IChangedCollectionEvent
-      read GetOnCollectionChangedEvent;
+    property OnPropertyChangedEvent: IChangedPropertyEvent read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent read GetOnPropertyChangedTrackingEvent;
+    property OnCollectionChangedEvent: IChangedCollectionEvent read GetOnCollectionChangedEvent;
   end;
 {$ENDREGION}
 {$REGION 'TStrategyEventedObject'}
@@ -268,22 +254,21 @@ type
     function IsAssignedCollectionChangedEvent: Boolean;
   public
     constructor Create(AObject: TObject); overload;
-    constructor Create(ABindingStrategy: IBindingStrategy;
-      AObject: TObject); overload;
+    constructor Create(ABindingStrategy: IBindingStrategy; AObject: TObject); overload;
     destructor Destroy; override;
 
+    procedure NotifyPropertyChanged(const ASender: TObject; const APropertyName: String);
+    procedure NotifyPropertyTrackingChanged(const ASender: TObject; const APropertyName: String);
+    procedure NotifyFreeEvent(const ASender, AInstance: TObject);
+
     property OnFreeEvent: IFreeEvent read GetOnFreeEvent;
-    property OnPropertyChangedEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedEvent;
-    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent
-      read GetOnPropertyChangedTrackingEvent;
-    property OnCollectionChangedEvent: IChangedCollectionEvent
-      read GetOnCollectionChangedEvent;
+    property OnPropertyChangedEvent: IChangedPropertyEvent read GetOnPropertyChangedEvent;
+    property OnPropertyChangedTrackingEvent: IChangedPropertyEvent read GetOnPropertyChangedTrackingEvent;
+    property OnCollectionChangedEvent: IChangedCollectionEvent read GetOnCollectionChangedEvent;
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION}
-
 {$REGION 'IBINDING'}
 
   IBinding = interface
@@ -340,7 +325,7 @@ type
 
   TBindingDefault = class abstract(TBindingBase, IBindingDefault)
   protected
-    FBindingStrategy : IBindingStrategy;
+    FBindingStrategy: IBindingStrategy;
     FTrackedInstances: ISet<Pointer>;
 
     function GetBindingStrategy: IBindingStrategy;
@@ -387,15 +372,15 @@ type
     procedure SetCommand(const AValue: T);
     function GetCommand: T;
   public
-    constructor Create(ACommand:T; ACanExecute: TCanExecuteMethod = nil); overload;
-    property Command:T read GetCommand write SetCommand;
+    constructor Create(ACommand: T; ACanExecute: TCanExecuteMethod = nil); overload;
+    property Command: T read GetCommand write SetCommand;
   end;
 
   TBindingCommandClass = class of TBindingCommandBase;
 
-(*
-  TBindingBase = class abstract(TComponent, IBinding)
-  protected
+  (*
+    TBindingBase = class abstract(TComponent, IBinding)
+    protected
     FEnabled: Integer;
     FSynchronizer: IReadWriteSync;
     FBindingStrategy: IBindingStrategy;
@@ -408,20 +393,20 @@ type
     procedure DoDisabled; virtual;
 
     procedure Notification(AComponent: TComponent;
-      Operation: TOperation); override;
-  public
+    Operation: TOperation); override;
+    public
     constructor Create(ABindingStrategy: IBindingStrategy); overload;
     destructor Destroy; override;
 
     procedure CheckNotificationSupport(AObject: TObject; ATracking: Boolean);
-      virtual; // DAVID? sobra?
+    virtual; // DAVID? sobra?
 
     function GetBindingStrategy: IBindingStrategy;
 
     procedure HandlePropertyChanged(const ASender: TObject;
-      const APropertyName: String); virtual;
+    const APropertyName: String); virtual;
     procedure HandleLeafPropertyChanged(const ASender: TObject;
-      const APropertyName: String); virtual;
+    const APropertyName: String); virtual;
 
     procedure SetFreeNotification(const AInstance: TObject); virtual;
     procedure RemoveFreeNotification(const AInstance: TObject); virtual;
@@ -431,7 +416,7 @@ type
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
     property Enabled: Boolean read GetEnabled write SetEnabled;
-  end;
+    end;
   *)
 
 {$ENDREGION}
@@ -444,7 +429,7 @@ type
     be assigned to the TListBoxItem.Text property.
 
     You can pass the template to the TgoDataBinder.BindCollection method. }
- {$REGION 'TDataTemplate'}
+{$REGION 'TDataTemplate'}
 
   TDataTemplate = class abstract
   public
@@ -494,8 +479,7 @@ type
     class function GetImageIndex(const AItem: TObject): Integer; virtual;
     class function GetStyle(const AItem: TObject): string; virtual;
     class function GetParent(const AItem: TObject): TObject; virtual; abstract;
-    class function GetChildren(const AItem: TObject): TList<TObject>;
-      virtual; abstract;
+    class function GetChildren(const AItem: TObject): TList<TObject>; virtual; abstract;
   end;
 {$ENDREGION}
 
@@ -549,15 +533,9 @@ type
 
   IBindableAction = interface
     ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
-    procedure Bind(const AExecute: TExecuteMethod;
-      const ACanExecute: TCanExecuteMethod = nil;
-      const ABindingStrategy: String = ''); overload;
-    procedure Bind(const AExecute: TExecuteAnonymous;
-                   const ACanExecute: TCanExecuteMethod = nil;
-                   const ABindingStrategy: String = ''); overload;
-    procedure Bind(const AExecute: TExecuteRttiMethod;
-                   const ACanExecute: TCanExecuteMethod = nil;
-                   const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
+    procedure Bind(const AExecute: TExecuteRttiMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
   end;
 
   IBindingStrategy = interface
@@ -572,10 +550,8 @@ type
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
 
-    procedure Notify(const ASource: TObject;
-      const APropertyName: String = ''); overload;
-    procedure Notify(const ASource: TObject;
-      const APropertiesNames: TArray<String>); overload;
+    procedure Notify(const ASource: TObject; const APropertyName: String = ''); overload;
+    procedure Notify(const ASource: TObject; const APropertiesNames: TArray<String>); overload;
 
     procedure AddBinding(ABinding: TBindingBase);
     function BindsCount: Integer;
@@ -583,28 +559,14 @@ type
 
     function GetPlatformBindActionCommandType: TBindingCommandClass;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
-      const ATarget: TObject; const ATargetPropertyPath: String;
-      const ADirection: EBindDirection = EBindDirection.OneWay;
-      const AFlags: EBindFlags = [];
-      const AValueConverterClass: TBindingValueConverterClass = nil;
-      const AExtraParams: TBindExtraParams = []); overload;
-    procedure Bind(const ASources: TSourcePairArray;
-      const ASourceExpresion: String; const ATarget: TObject;
-      const ATargetAlias: String; const ATargetPropertyPath: String;
-      const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []
-      ); overload;
-    procedure BindCollection(AServiceType: PTypeInfo;
-      const ACollection: TEnumerable<TObject>;
-      const ATarget: ICollectionViewProvider;
-      const ATemplate: TDataTemplateClass);
-    procedure BindDataSet(const ADataSet: TDataSet;
-      const ATarget: ICollectionViewProvider;
-      const ATemplate: TDataTemplateClass);
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload;
+    procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload;
+    procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+    procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
 
     procedure BindAction(AAction: IBindableAction); overload;
 
-    property Enabled : Boolean read GetEnabled write SetEnabled;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
@@ -624,10 +586,8 @@ type
     function GetEnabled: Boolean; virtual; abstract;
     procedure SetEnabled(const AValue: Boolean); virtual; abstract;
 
-    procedure Notify(const AObject: TObject; const APropertyName: String = '');
-      overload; virtual; abstract;
-    procedure Notify(const AObject: TObject;
-      const APropertiesNames: TArray<String>); overload; virtual;
+    procedure Notify(const AObject: TObject; const APropertyName: String = ''); overload; virtual; abstract;
+    procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
     procedure AddBinding(ABinding: TBindingBase); virtual; abstract;
     procedure ClearBindings; virtual; abstract;
@@ -635,28 +595,15 @@ type
 
     function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String;
-      const ATarget: TObject; const ATargetPropertyPath: String;
-      const ADirection: EBindDirection = EBindDirection.OneWay;
-      const AFlags: EBindFlags = [];
-      const AValueConverterClass: TBindingValueConverterClass = nil;
-      const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
-    procedure Bind(const ASources: TSourcePairArray;
-      const ASourceExpresion: String; const ATarget: TObject;
-      const ATargetAlias: String; const ATargetPropertyPath: String;
-      const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []);
-      overload; virtual; abstract;
-    procedure BindCollection(AServiceType: PTypeInfo;
-      const ACollection: TEnumerable<TObject>;
-      const ATarget: ICollectionViewProvider;
-      const ATemplate: TDataTemplateClass); virtual; abstract;
-    procedure BindDataSet(const ADataSet: TDataSet;
-      const ATarget: ICollectionViewProvider;
-      const ATemplate: TDataTemplateClass); virtual; abstract;
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; virtual;
+      abstract;
+    procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
+    procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); virtual; abstract;
+    procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); virtual; abstract;
 
     procedure BindAction(AAction: IBindableAction); overload; virtual; abstract;
 
-    property Enabled : Boolean read GetEnabled write SetEnabled;
+    property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
   TClass_BindingStrategyBase = class of TBindingStrategyBase;
@@ -699,7 +646,7 @@ type
   end;
 
   IViewForm<T: IViewModel> = interface(IView<T>)
-  ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
+    ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
     procedure Execute;
     procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
   end;
@@ -707,6 +654,7 @@ type
 implementation
 
 uses
+  MVVM.Core,
   MVVM.Utils;
 
 { TDataTemplate }
@@ -755,8 +703,7 @@ begin
   inherited;
 end;
 
-procedure TBindingStrategyBase.Notify(const AObject: TObject;
-  const APropertiesNames: TArray<String>);
+procedure TBindingStrategyBase.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
 var
   LValue: String;
 begin
@@ -783,7 +730,7 @@ end;
 constructor TBindingBase.Create;
 begin
   inherited Create(nil);
-  FEnabled := ENABLED_STATE;
+  FEnabled      := ENABLED_STATE;
   FSynchronizer := TMREWSync.Create;
 end;
 
@@ -816,7 +763,7 @@ end;
 procedure TBindingBase.SetEnabled(const AValue: Boolean);
 begin
   FSynchronizer.BeginWrite;
-    try
+  try
     case AValue of
       True:
         begin
@@ -830,7 +777,7 @@ begin
       False:
         begin
           Inc(FEnabled);
-          if (FEnabled = DISABLED_ACTIONS_APPLY_ON_VALUE) then //only once
+          if (FEnabled = DISABLED_ACTIONS_APPLY_ON_VALUE) then // only once
           begin
             DoDisabled;
           end;
@@ -916,16 +863,14 @@ begin
   end;
 end;
 
-procedure TBindingDefault.HandleLeafPropertyChanged(const ASender: TObject;
-  const APropertyName: String);
+procedure TBindingDefault.HandleLeafPropertyChanged(const ASender: TObject; const APropertyName: String);
 begin
-//
+  //
 end;
 
-procedure TBindingDefault.HandlePropertyChanged(const ASender: TObject;
-  const APropertyName: String);
+procedure TBindingDefault.HandlePropertyChanged(const ASender: TObject; const APropertyName: String);
 begin
-//
+  //
 end;
 
 procedure TBindingDefault.Notification(AComponent: TComponent; Operation: TOperation);
@@ -943,7 +888,8 @@ end;
 
 procedure TBindingDefault.SetFreeNotification(const AInstance: TObject);
 var
-  [weak] LNotifyFree: INotifyFree;
+  [weak]
+  LNotifyFree: INotifyFree;
 begin
   if (AInstance is TComponent) then
   begin
@@ -969,10 +915,13 @@ end;
 
 procedure TBindingDefault.SetManager(const AInstance: TObject);
 var
-  [weak] LNotifyProperty        : INotifyChangedProperty;
-  [weak] LNotifyPropertyTracking: INotifyPropertyTrackingChanged;
-  [weak] LNotifyCollection      : INotifyCollectionChanged;
-  LManager                      : IStrategyEventedObject;
+  [weak]
+  LNotifyProperty: INotifyChangedProperty;
+  [weak]
+  LNotifyPropertyTracking: INotifyPropertyTrackingChanged;
+  [weak]
+  LNotifyCollection: INotifyCollectionChanged;
+  LManager: IStrategyEventedObject;
 begin
   if Supports(AInstance, INotifyChangedProperty, LNotifyProperty) then
   begin
@@ -1051,16 +1000,16 @@ constructor TStrategyEventedObject.Create(AObject: TObject);
 begin
   Guard.CheckNotNull(AObject, '(Param=AObject) is null');
   inherited Create;
-  FObject := AObject;
+  FObject          := AObject;
+  FBindingStrategy := MVVMCore.DefaultBindingStrategy;
 end;
 
-constructor TStrategyEventedObject.Create(ABindingStrategy: IBindingStrategy;
-  AObject: TObject);
+constructor TStrategyEventedObject.Create(ABindingStrategy: IBindingStrategy; AObject: TObject);
 begin
   Guard.CheckNotNull(ABindingStrategy, '(Param=ABindingStrategy) is null');
   Guard.CheckNotNull(AObject, '(Param=AObject) is null');
   inherited Create;
-  FObject := AObject;
+  FObject          := AObject;
   FBindingStrategy := ABindingStrategy;
 end;
 
@@ -1095,8 +1044,7 @@ begin
   Result := FOnFreeEvent;
 end;
 
-function TStrategyEventedObject.GetOnPropertyChangedEvent
-  : IChangedPropertyEvent;
+function TStrategyEventedObject.GetOnPropertyChangedEvent: IChangedPropertyEvent;
 begin
   if (FOnPropertyChangedEvent = nil) then
   begin
@@ -1106,14 +1054,12 @@ begin
   Result := FOnPropertyChangedEvent;
 end;
 
-function TStrategyEventedObject.GetOnPropertyChangedTrackingEvent
-  : IPropertyChangedTrackingEvent;
+function TStrategyEventedObject.GetOnPropertyChangedTrackingEvent: IPropertyChangedTrackingEvent;
 begin
   if (FOnPropertyChangedTrackingEvent = nil) then
   begin
     CheckObjectHasPropertyChangedTrackingInterface;
-    FOnPropertyChangedTrackingEvent :=
-      Utils.CreateEvent<TNotifySomethingChangedEvent>;
+    FOnPropertyChangedTrackingEvent := Utils.CreateEvent<TNotifySomethingChangedEvent>;
   end;
   Result := FOnPropertyChangedTrackingEvent;
 end;
@@ -1136,6 +1082,24 @@ end;
 function TStrategyEventedObject.IsAssignedPropertyChangedTrackingEvent: Boolean;
 begin
   Result := Assigned(FOnPropertyChangedTrackingEvent)
+end;
+
+procedure TStrategyEventedObject.NotifyFreeEvent(const ASender, AInstance: TObject);
+begin
+  if IsAssignedFreeEvent then
+    FOnFreeEvent.Invoke(ASender, AInstance);
+end;
+
+procedure TStrategyEventedObject.NotifyPropertyChanged(const ASender: TObject; const APropertyName: String);
+begin
+  if IsAssignedPropertyChangedEvent then
+    FOnPropertyChangedEvent.Invoke(ASender, APropertyName);
+end;
+
+procedure TStrategyEventedObject.NotifyPropertyTrackingChanged(const ASender: TObject; const APropertyName: String);
+begin
+  if IsAssignedPropertyChangedTrackingEvent then
+    FOnPropertyChangedTrackingEvent.Invoke(ASender, APropertyName);
 end;
 
 procedure TStrategyEventedObject.SetBindingStrategy(ABindingStrategy: IBindingStrategy);

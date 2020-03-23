@@ -22,22 +22,22 @@ type
 
     View models can create a view by calling TViewFactory.CreateView. }
   TViewFactory = class // abstract
-  {$REGION 'Internal Declarations'}
-  private class var
-    FRegisteredViews: TDictionary<String, TComponentClass>;
+{$REGION 'Internal Declarations'}
+  private
+    class var FRegisteredViews: TDictionary<String, TComponentClass>;
   public
     class destructor Destroy;
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
     { Registers a view class with the factory.
 
       Parameters:
-        AViewClass: the class of the view (such as a form) to register.
-          AViewClass MUST implement the IView interface.
-        AViewName: the name to register the view under.
+      AViewClass: the class of the view (such as a form) to register.
+      AViewClass MUST implement the IView interface.
+      AViewName: the name to register the view under.
 
       Raises:
-        EInvalidOperation if AViewClass does not implement IView.
+      EInvalidOperation if AViewClass does not implement IView.
 
       This method should be called once for each view type, usually in the
       Initialization section of the unit of that view. }
@@ -46,35 +46,36 @@ type
     { Creates a view using a previously registered view class.
 
       Parameters:
-        TVM: type parameter with the type of view model used by the view.
-        AViewName: the name of the view. This must be one of the names
-          previously registered using the Register method. The name determines
-          the type of view that is created.
-        AOwner: the owner for the view. This is passed as the standard AOwner
-          parameter of the view class.
-        AViewModel: the view model for the the view. This method will call
-          IView.Initialize to associate the view model with the view.
-        AOwnsViewModel: (optional) whether the view becomes owner of the view
-          model. If True (the default), then the view model will automatically
-          be freed when the view is freed.
+      TVM: type parameter with the type of view model used by the view.
+      AViewName: the name of the view. This must be one of the names
+      previously registered using the Register method. The name determines
+      the type of view that is created.
+      AOwner: the owner for the view. This is passed as the standard AOwner
+      parameter of the view class.
+      AViewModel: the view model for the the view. This method will call
+      IView.Initialize to associate the view model with the view.
+      AOwnsViewModel: (optional) whether the view becomes owner of the view
+      model. If True (the default), then the view model will automatically
+      be freed when the view is freed.
 
       Returns:
-        A newly created view that represents AViewName.
+      A newly created view that represents AViewName.
 
       Raises:
-        EListError if there is no view registered with the given AViewName. }
+      EListError if there is no view registered with the given AViewName. }
     class function CreateView<TVM: IViewModel>(const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>; static;
   end;
 
 type
   { Internal class used to manage lifetimes of views. }
   TViewProxy<TVM: IViewModel> = class(TInterfacedObject, IView, IView<TVM>)
-  {$REGION 'Internal Declarations'}
+{$REGION 'Internal Declarations'}
   private type
     TViewFreeListener = class(TComponent)
     strict private
       FActualView: IView<TVM>;
-      [unsafe] FActualViewObject: TComponent;
+      [unsafe]
+      FActualViewObject: TComponent;
     protected
       procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     public
@@ -92,7 +93,7 @@ type
   protected
     { IView<TVM> }
     procedure InitView(AViewModel: TVM);
-  {$ENDREGION 'Internal Declarations'}
+{$ENDREGION 'Internal Declarations'}
   public
     constructor Create(const AActualView: IView<TVM>);
     destructor Destroy; override;
@@ -149,7 +150,8 @@ function TViewProxy<TVM>.GetViewModel: TVM;
 begin
   if Assigned(FViewFreeListener.ActualView) then
     Result := FViewFreeListener.ActualView.ViewModel
-  else Result := nil;
+  else
+    Result := nil;
 end;
 
 procedure TViewProxy<TVM>.InitView(AViewModel: TVM);
@@ -172,7 +174,7 @@ var
 begin
   inherited Create(nil);
   FActualView := AView;
-  Instance := TObject(AView);
+  Instance    := TObject(AView);
   if (Instance is TComponent) then
   begin
     FActualViewObject := TComponent(Instance);
@@ -187,13 +189,12 @@ begin
   inherited;
 end;
 
-procedure TViewProxy<TVM>.TViewFreeListener.Notification(AComponent: TComponent;
-  Operation: TOperation);
+procedure TViewProxy<TVM>.TViewFreeListener.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
   if (AComponent = FActualViewObject) and (Operation = opRemove) then
   begin
-    FActualView := nil;
+    FActualView       := nil;
     FActualViewObject := nil;
   end;
 end;
@@ -204,8 +205,10 @@ class function TViewFactory.CreateView<TVM>(const AViewName: String; const AOwne
 var
   ViewClass: TComponentClass;
   ViewComp: TComponent;
-  View: IView<TVM>;
-  LVIewForm: IViewForm<TVM>;
+  [weak]
+  LView: IView<TVM>;
+  [weak]
+  LViewForm: IViewForm<TVM>;
 begin
   try
     ViewClass := nil;
@@ -220,10 +223,11 @@ begin
     begin
       Result := TViewProxy<TVM>.Create(LViewForm);
     end
-    else begin
-           View := ViewComp as IView<TVM>;
-           Result := TViewProxy<TVM>.Create(View);
-         end;
+    else
+    begin
+      LView  := ViewComp as IView<TVM>;
+      Result := TViewProxy<TVM>.Create(LView);
+    end;
     Result.InitView(AViewModel);
   except
     AViewModel := nil;
@@ -239,12 +243,10 @@ end;
 class procedure TViewFactory.Register(const AViewClass: TComponentClass; const AViewName: String);
 begin
   if (not Supports(AViewClass, IView)) then
-    raise EInvalidOperation.CreateFmt('View class %s must implement the IView interface',
-      [AViewClass.ClassName]);
+    raise EInvalidOperation.CreateFmt('View class %s must implement the IView interface', [AViewClass.ClassName]);
 
   if (FRegisteredViews = nil) then
-    FRegisteredViews := TDictionary<String, TComponentClass>.Create(
-      TIStringComparer.Ordinal);
+    FRegisteredViews := TDictionary<String, TComponentClass>.Create(TIStringComparer.Ordinal);
 
   FRegisteredViews.AddOrSetValue(AViewName, AViewClass);
 end;

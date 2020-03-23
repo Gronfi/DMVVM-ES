@@ -86,10 +86,13 @@ end;
 
 procedure TCSVFile_ViewModel.CreateNewView;
 var
-  LVista: IViewForm<ICSVFile_ViewModel>;
+  [weak] LView : IView<ICSVFile_ViewModel>;
+  [weak] LVista: IViewForm<ICSVFile_ViewModel>;
 begin
-  LVista := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self) as IViewForm<ICSVFile_ViewModel>;
-  LVista.Execute;
+  //LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self) as IViewForm<ICSVFile_ViewModel>;
+  LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self);
+  if Supports(LView, IView<ICSVFile_ViewModel>, LVista)  then
+    LVista.Execute;
 end;
 
 destructor TCSVFile_ViewModel.Destroy;
@@ -190,6 +193,7 @@ begin
   if FModelo <> AModel then
   begin
     FModelo := AModel;
+    SetupViewModel;
     Notify;
   end;
 end;

@@ -18,7 +18,7 @@ type
   public
     procedure Edit(AForce: Boolean); override;
     procedure Reload; virtual; // Reload enumerator
-    procedure Cancel; reintroduce;  // Cancel pending edits
+    procedure Cancel; reintroduce; // Cancel pending edits
   end;
 
   TEnumerableBindSourceAdapter<T: class> = class(TBaseEnumerableBindSourceAdapter)
@@ -34,7 +34,7 @@ type
     procedure Reload; override;
     procedure SetEnumerable(const AValue: TEnumerable<T>);
     function GetEnumerable: TEnumerable<T>;
-    function Current : T;
+    function Current: T;
   end;
 
 implementation
@@ -46,7 +46,7 @@ var
   LType: TRttiType;
   LGetMemberObject: IGetMemberObject;
 begin
-  LType := GetObjectType;
+  LType            := GetObjectType;
   LGetMemberObject := TBindSourceAdapterGetMemberObject.Create(Self);
   AddFieldsToList(LType, Self, Self.Fields, LGetMemberObject);
   AddPropertiesToList(LType, Self, Self.Fields, LGetMemberObject);
@@ -77,13 +77,13 @@ end;
 procedure TBaseEnumerableBindSourceAdapter.Edit(AForce: Boolean);
 begin
   if GetCount = 0 then
-    Exit;               // Prevent auto insert
+    Exit; // Prevent auto insert
   inherited;
 end;
 
 function TBaseEnumerableBindSourceAdapter.GetCanModify: Boolean;
 begin
-  Result := (GetCount > 0) and  (loptAllowModify in Options);
+  Result := (GetCount > 0) and (loptAllowModify in Options);
 
 end;
 
@@ -125,7 +125,7 @@ end;
 function TEnumerableBindSourceAdapter<T>.GetCurrent: TObject;
 begin
   if (ItemIndex >= 0) and (ItemIndex + ItemIndexOffset < GetCount) then
-    Result := FArray[ItemIndex +  ItemIndexOffset]
+    Result := FArray[ItemIndex + ItemIndexOffset]
   else
     Result := nil;
 end;
@@ -135,7 +135,7 @@ var
   LType: TRttiType;
   LCtxt: TRttiContext;
 begin
-  LType := LCtxt.GetType(TypeInfo(T));
+  LType  := LCtxt.GetType(TypeInfo(T));
   Result := LType;
 end;
 
@@ -149,15 +149,15 @@ begin
   Cancel;
   // Toggle Active to update controls
   LActive := Active;
-  Active := False;
+  Active  := False;
   if FEnumerable <> nil then
     FArray := FEnumerable.ToArray
   else
     FArray := nil;
   // Make sure itemindex is in range
   if ItemIndex > GetCount then
-    ItemIndex := GetCount-1;
-  Active := LActive;
+    ItemIndex := GetCount - 1;
+  Active      := LActive;
 end;
 
 end.

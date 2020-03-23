@@ -90,7 +90,6 @@
         <DCCReference Include="Src\MVVM.Types.pas"/>
         <DCCReference Include="Src\MVVM.Bindings.Collections.pas"/>
         <DCCReference Include="Src\MVVM.Classes.pas"/>
-        <DCCReference Include="Src\MVVM.Messages.Engine.pas"/>
         <DCCReference Include="Src\MVVM.Utils.pas"/>
         <DCCReference Include="Src\MVVM.Observable.pas"/>
         <DCCReference Include="Src\MVVM.ViewFactory.pas"/>

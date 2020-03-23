@@ -27,14 +27,14 @@ uses
 initialization
 
 {$REGION 'TListBox'}
-TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
-  procedure (AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
+  TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
+  procedure(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
   var
-    LLink  : TBindListLink;
+    LLink: TBindListLink;
     LSource: TAdapterBindSource;
-    I      : Integer;
+    I: Integer;
   begin
-    //Remove possible previous link
+    // Remove possible previous link
     for I := 0 to AComponent.ComponentCount - 1 do
     begin
       if (AComponent.Components[I] is TBindListLink) then
@@ -43,22 +43,22 @@ TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
         Break;
       end;
     end;
-    LLink                  := TBindListLink.Create(AComponent);
+    LLink := TBindListLink.Create(AComponent);
     LLink.ControlComponent := AComponent;
-    LSource                := TAdapterBindSource.Create(LLink);
-    LSource.Adapter        := TListBindSourceAdapter.Create(AComponent, ACollection as TList<TObject>, GetTypeData(PTypeInfo(AServiceType))^.ClassType, True);
-    LLink.SourceComponent  := LSource;
+    LSource := TAdapterBindSource.Create(LLink);
+    LSource.Adapter := TListBindSourceAdapter.Create(AComponent, ACollection as TList<TObject>, GetTypeData(PTypeInfo(AServiceType))^.ClassType, True);
+    LLink.SourceComponent := LSource;
   end);
 
 TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
-  procedure (ADataSet: TDataSet; AComponent: TComponent)
+  procedure(ADataSet: TDataSet; AComponent: TComponent)
   var
-    LLink  : TBindListLink;
+    LLink: TBindListLink;
     LSource: TBindSourceDB;
-    LDS    : TDataSource;
-    I      : Integer;
+    LDS: TDataSource;
+    I: Integer;
   begin
-    //Remove possible previous link
+    // Remove possible previous link
     for I := 0 to AComponent.ComponentCount - 1 do
     begin
       if (AComponent.Components[I] is TBindListLink) then
@@ -67,25 +67,24 @@ TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
         Break;
       end;
     end;
-    LLink                  := TBindListLink.Create(AComponent);
+    LLink := TBindListLink.Create(AComponent);
     LLink.ControlComponent := AComponent;
-    LDS                    := TDataSource.Create(LLink);
-    LDS.DataSet            := ADataSet;
-    LSource                := TBindSourceDB.Create(LLink);
-    LSource.DataSource     := LDS;
-    LLink.SourceComponent  := LSource;
+    LDS := TDataSource.Create(LLink);
+    LDS.DataSet := ADataSet;
+    LSource := TBindSourceDB.Create(LLink);
+    LSource.DataSource := LDS;
+    LLink.SourceComponent := LSource;
   end);
 {$ENDREGION}
-
 {$REGION 'TListView'}
 TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListView,
-  procedure (AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
+  procedure(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
   var
-    LLink  : TBindListLink;
+    LLink: TBindListLink;
     LSource: TAdapterBindSource;
-    I      : Integer;
+    I: Integer;
   begin
-    //Remove possible previous link
+    // Remove possible previous link
     for I := 0 to AComponent.ComponentCount - 1 do
     begin
       if (AComponent.Components[I] is TBindListLink) then
@@ -94,22 +93,22 @@ TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListView,
         Break;
       end;
     end;
-    LLink                  := TBindListLink.Create(AComponent);
+    LLink := TBindListLink.Create(AComponent);
     LLink.ControlComponent := AComponent;
-    LSource                := TAdapterBindSource.Create(LLink);
-    LSource.Adapter        := TListBindSourceAdapter.Create(AComponent, ACollection as TList<TObject>, GetTypeData(PTypeInfo(AServiceType))^.ClassType, True);
-    LLink.SourceComponent  := LSource;
+    LSource := TAdapterBindSource.Create(LLink);
+    LSource.Adapter := TListBindSourceAdapter.Create(AComponent, ACollection as TList<TObject>, GetTypeData(PTypeInfo(AServiceType))^.ClassType, True);
+    LLink.SourceComponent := LSource;
   end);
 
 TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListView,
-  procedure (ADataSet: TDataSet; AComponent: TComponent)
+  procedure(ADataSet: TDataSet; AComponent: TComponent)
   var
-    LLink  : TBindListLink;
+    LLink: TBindListLink;
     LSource: TBindSourceDB;
-    LDS    : TDataSource;
-    I      : Integer;
+    LDS: TDataSource;
+    I: Integer;
   begin
-    //Remove possible previous link
+    // Remove possible previous link
     for I := 0 to AComponent.ComponentCount - 1 do
     begin
       if (AComponent.Components[I] is TBindListLink) then
@@ -118,13 +117,14 @@ TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListView,
         Break;
       end;
     end;
-    LLink                  := TBindListLink.Create(AComponent);
+    LLink := TBindListLink.Create(AComponent);
     LLink.ControlComponent := AComponent;
-    LDS                    := TDataSource.Create(LLink);
-    LDS.DataSet            := ADataSet;
-    LSource                := TBindSourceDB.Create(LLink);
-    LSource.DataSource     := LDS;
-    LLink.SourceComponent  := LSource;
+    LDS := TDataSource.Create(LLink);
+    LDS.DataSet := ADataSet;
+    LSource := TBindSourceDB.Create(LLink);
+    LSource.DataSource := LDS;
+    LLink.SourceComponent := LSource;
   end);
 {$ENDREGION}
+
 end.

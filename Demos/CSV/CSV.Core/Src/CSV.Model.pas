@@ -115,7 +115,7 @@ end;
 
 procedure TCSVFile_Model.Notify(const APropertyName: string);
 begin
-  Notify(APropertyName);
+  Manager.NotifyPropertyChanged(Self, APropertyName);
 end;
 
 function TCSVFile_Model.ProcesarFicheroCSV: Boolean;

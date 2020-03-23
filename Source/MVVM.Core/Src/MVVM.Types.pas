@@ -62,8 +62,7 @@ type
 
       Returns:
       ASource converted for the target binding. }
-    class function ConvertSourceToTarget(const ASource: TValue): TValue;
-      virtual; abstract;
+    class function ConvertSourceToTarget(const ASource: TValue): TValue; virtual; abstract;
 
     { Converts a property value from a data binding target to a property value
       for the data binding source.
@@ -78,8 +77,7 @@ type
       ATarget converted for the source binding.
 
       This method is optional. It returns ATarget by default. }
-    class function ConvertTargetToSource(const ATarget: TValue)
-      : TValue; virtual;
+    class function ConvertTargetToSource(const ATarget: TValue): TValue; virtual;
   end;
 
   RSourcePair = record
@@ -146,9 +144,7 @@ type
     FPropertyName: String;
 {$ENDREGION 'Internal Declarations'}
   public
-    constructor Create(const AAction: TCollectionChangedAction;
-      const AItem: TObject; const AItemIndex: Integer;
-      const APropertyName: String);
+    constructor Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
 
     { The action that caused the event. The availability of the other properties
       depends on this action. }
@@ -180,21 +176,18 @@ implementation
 
 { TBindingValueConverter }
 
-class function TBindingValueConverter.ConvertTargetToSource
-  (const ATarget: TValue): TValue;
+class function TBindingValueConverter.ConvertTargetToSource(const ATarget: TValue): TValue;
 begin
   Result := ATarget;
 end;
 
 { TCollectionChangedEventArgs }
 
-constructor TCollectionChangedEventArgs.Create(const AAction
-  : TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer;
-  const APropertyName: String);
+constructor TCollectionChangedEventArgs.Create(const AAction: TCollectionChangedAction; const AItem: TObject; const AItemIndex: Integer; const APropertyName: String);
 begin
-  FAction := AAction;
-  FItem := AItem;
-  FItemIndex := AItemIndex;
+  FAction       := AAction;
+  FItem         := AItem;
+  FItemIndex    := AItemIndex;
   FPropertyName := APropertyName;
 end;
 

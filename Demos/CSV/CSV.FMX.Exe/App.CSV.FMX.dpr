@@ -21,7 +21,8 @@ begin
   Application.Initialize;
   InitializePlatform;
 
-  MVVMCore.DefaultBindingStrategy := 'LIVEBINDINGS';
+  MVVMCore.InitializationDone;
+  MVVMCore.DefaultBindingStrategyName := 'LIVEBINDINGS';
 
   Modelo      := TCSVFile_Model.Create;
 

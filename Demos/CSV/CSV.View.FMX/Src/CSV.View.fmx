@@ -32,27 +32,30 @@ object frmCSV: TfrmCSV
     Size.PlatformDefault = False
     StyleLookup = 'searchtoolbutton'
     TabOrder = 4
-    OnClick = btPathClick
   end
   object btTNP: TButton
+    Action = DoNoParalelo
     Anchors = [akLeft, akRight, akBottom]
+    Enabled = True
+    ImageIndex = -1
     Position.X = 8.000000000000000000
     Position.Y = 347.000000000000000000
     Size.Width = 473.000000000000000000
     Size.Height = 41.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
-    Text = 'btTNP'
   end
   object btTP: TButton
+    Action = DoParalelo
     Anchors = [akLeft, akRight, akBottom]
+    Enabled = True
+    ImageIndex = -1
     Position.X = 8.000000000000000000
     Position.Y = 403.000000000000000000
     Size.Width = 473.000000000000000000
     Size.Height = 41.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
-    Text = 'btTP'
   end
   object Label1: TLabel
     Position.X = 8.000000000000000000
@@ -69,7 +72,6 @@ object frmCSV: TfrmCSV
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
       TextPrompt = 'Introduce el path'
-      OnChangeTracking = lePathChangeTracking
     end
   end
   object mmInfo: TMemo
