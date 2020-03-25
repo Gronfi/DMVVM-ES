@@ -7,64 +7,77 @@ object frmDataSetDesktop: TfrmDataSetDesktop
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object Grid1: TGrid
-    Align = Client
-    CanFocus = True
-    ClipChildren = True
+  object Layout1: TLayout
+    Align = Bottom
+    Position.Y = 392.000000000000000000
     Size.Width = 944.000000000000000000
-    Size.Height = 429.000000000000000000
+    Size.Height = 37.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 0
-    RowCount = 0
-    Viewport.Width = 940.000000000000000000
-    Viewport.Height = 404.000000000000000000
-  end
-  object Button1: TButton
-    Action = actRefresco
-    Enabled = True
-    ImageIndex = -1
-    Position.X = 848.000000000000000000
-    Position.Y = 32.000000000000000000
-    Size.Width = 80.000000000000000000
-    Size.Height = 57.000000000000000000
-    Size.PlatformDefault = False
-    StyleLookup = 'refreshtoolbutton'
-    TabOrder = 4
-  end
-  object Edit1: TEdit
-    Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 8
-    Position.X = 760.000000000000000000
-    Position.Y = 88.000000000000000000
-    Size.Width = 172.000000000000000000
-    Size.Height = 22.000000000000000000
-    Size.PlatformDefault = False
-    OnChange = Edit1Change
-  end
-  object BindingsList1: TBindingsList
-    Methods = <>
-    OutputConverters = <>
-    Left = 36
-    Top = 37
-    object LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource
-      Category = 'Quick Bindings'
-      DataSource = BindSourceDB1
-      GridControl = Grid1
-      Columns = <>
+    TabOrder = 7
+    object edtFileName: TEdit
+      Touch.InteractiveGestures = [LongTap, DoubleTap]
+      Align = Left
+      TabOrder = 0
+      ReadOnly = True
+      Position.X = 2.000000000000000000
+      Position.Y = 2.000000000000000000
+      Margins.Left = 2.000000000000000000
+      Margins.Top = 2.000000000000000000
+      Margins.Right = 2.000000000000000000
+      Margins.Bottom = 2.000000000000000000
+      Size.Width = 543.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      OnChange = edtFileNameChange
+    end
+    object Button1: TButton
+      Action = actRefresco
+      Align = Left
+      Enabled = True
+      ImageIndex = -1
+      Margins.Left = 2.000000000000000000
+      Margins.Top = 2.000000000000000000
+      Margins.Right = 2.000000000000000000
+      Margins.Bottom = 2.000000000000000000
+      Position.X = 549.000000000000000000
+      Position.Y = 2.000000000000000000
+      Size.Width = 80.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+    end
+    object lbStatus: TLabel
+      Align = Client
+      Margins.Left = 2.000000000000000000
+      Margins.Top = 2.000000000000000000
+      Margins.Right = 5.000000000000000000
+      Margins.Bottom = 2.000000000000000000
+      Size.Width = 306.000000000000000000
+      Size.Height = 33.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Trailing
+      TabOrder = 2
     end
   end
-  object BindSourceDB1: TBindSourceDB
-    ScopeMappings = <>
-    Left = 40
-    Top = 104
+  object ListBox1: TListBox
+    Align = Client
+    Size.Width = 944.000000000000000000
+    Size.Height = 392.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 12
+    DisableFocusEffect = True
+    DefaultItemStyles.ItemStyle = ''
+    DefaultItemStyles.GroupHeaderStyle = ''
+    DefaultItemStyles.GroupFooterStyle = ''
+    Viewport.Width = 940.000000000000000000
+    Viewport.Height = 388.000000000000000000
   end
   object ActionList1: TActionList
     Left = 616
-    Top = 40
+    Top = 72
     object actRefresco: TAction
-      Text = 'Refresco'
+      Text = 'Abrir tabla'
       OnExecute = actRefrescoExecute
     end
   end

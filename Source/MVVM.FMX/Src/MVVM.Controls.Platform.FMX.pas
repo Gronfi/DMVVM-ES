@@ -22,6 +22,7 @@ uses
   FMX.Objects,
   FMX.ActnList,
   FMX.TreeView,
+  FMX.Grid,
 
   MVVM.Interfaces,
   MVVM.Types;
@@ -670,6 +671,12 @@ type
       read GetOnPropertyChangedTrackingEvent;
   end;
 {$ENDREGION 'FMX.ComboBox'}
+
+{$REGION 'TGrid'}
+  TGrid = class(FMX.Grid.TGrid)
+
+  end;
+{$ENDREGION}
 
 implementation
 

@@ -225,7 +225,7 @@ end;
 
 procedure TCSVFile_ViewModel.SetupViewModel;
 var
-  LObservable: INotifyChangedProperty;
+  [weak] LObservable: INotifyChangedProperty;
 begin
   //Bindings
   if Supports(FModelo, INotifyChangedProperty, LObservable) then

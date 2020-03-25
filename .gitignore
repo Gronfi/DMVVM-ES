@@ -299,3 +299,8 @@
 /Demos/CSV/CSV.Core/Src/__history
 /Demos/CSV/CSV.View.FMX/Src/__history
 /Demos/CSV/CSV.View.FMX/__history
+/Demos/Test-DataSet-ComboBox/__history
+/Demos/Test-DataSet-ComboBox/*.local
+/Demos/Test-DataSet-ComboBox/*.res
+/Demos/CSV/CSV.FMX.Exe/__history
+/Source/*.tvsconfig

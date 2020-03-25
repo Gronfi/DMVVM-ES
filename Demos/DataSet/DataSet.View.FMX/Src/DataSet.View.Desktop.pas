@@ -6,41 +6,40 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, System.Rtti,
   FMX.Grid.Style, Data.Bind.GenData, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
-  Fmx.Bind.Grid, System.Bindings.Outputs, Fmx.Bind.Editors,
-  Data.Bind.Components, Data.Bind.Grid, Data.Bind.ObjectScope,
-  FMX.Controls.Presentation, FMX.ScrollBox, FMX.Grid,
+  System.Bindings.Outputs, Fmx.Bind.Editors,
+  Data.Bind.Components, Data.Bind.ObjectScope,
+  FMX.Controls.Presentation, FMX.ScrollBox,
+  Data.Bind.DBScope, Data.DB, Datasnap.DBClient,
+  FMX.StdCtrls, FMX.Objects, FMX.Edit, FMX.Layouts,
+  System.Actions, FMX.ActnList,
+  FMX.ListView.Types, FMX.ListView.Appearances,
+  FMX.ListView.Adapters.Base, FMX.ListView, FMX.ListBox,
+  Fmx.Bind.GenData,
+
+  DataSet.Interfaces,
 
   MVVM.Interfaces, MVVM.Bindings,
-  DataSet.Interfaces, Data.Bind.DBScope, Data.DB, Datasnap.DBClient,
-  FMX.StdCtrls, FMX.Objects, FMX.Edit,
-
-  System.Actions, FMX.ActnList,
-
-  MVVM.Controls.Platform.FMX;
+  MVVM.Controls.Platform.FMX,
+  MVVM.Views.Platform.FMX;
 
 type
-  TfrmDataSetDesktop = class(TForm, IDataSetFile_View)
-    Grid1: TGrid;
-    BindingsList1: TBindingsList;
-    BindSourceDB1: TBindSourceDB;
-    LinkGridToDataSourceBindSourceDB1: TLinkGridToDataSource;
+  TfrmDataSetDesktop = class(TFormView<IDataSetFile_ViewModel>, IDataSetFile_View)
     Button1: TButton;
-    Edit1: TEdit;
+    edtFileName: TEdit;
     ActionList1: TActionList;
     actRefresco: TAction;
+    Layout1: TLayout;
+    lbStatus: TLabel;
+    ListBox1: TListBox;
     procedure actRefrescoExecute(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
-    procedure Edit1Change(Sender: TObject);
+    procedure edtFileNameChange(Sender: TObject);
   private
     { Private declarations }
-    FViewModel: IDataSetFile_ViewModel;
-    FBinder   : TBindingHelper_V2;
+    procedure SetupView; override;
   public
     { Public declarations }
     procedure RefreshData;
-    procedure AddViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
-    procedure RemoveViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
   end;
 
 var
@@ -49,6 +48,8 @@ var
 implementation
 
 uses
+  DataSet.ViewModel,
+
   MVVM.Types,
   Data.Bind.DBLinks;
 
@@ -59,44 +60,12 @@ begin
   RefreshData;
 end;
 
-procedure TfrmDataSetDesktop.FormCreate(Sender: TObject);
-begin
-  FBinder := TBindingHelper_V2.Create(Self);
-end;
-
-procedure TfrmDataSetDesktop.AddViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
-var
-  LProc: TProc;
-  LFunc: TFunc<Boolean>;
-begin
-  if FViewModel <> AViewModel then
-  begin
-    if Supports(AViewModel, IDataSetFile_ViewModel, FViewModel)  then
-    begin
-      FViewModel := AViewModel as IDataSetFile_ViewModel;
-      //Bindings a capela
-      LProc := procedure
-               begin
-                 FViewModel.AbrirDataSet;
-               end;
-      LFunc := function: Boolean
-               begin
-                 Result := FViewModel.IsValidFile;
-               end;
-      actRefresco.Bind(LProc, LFunc);
-      FBinder.Bind(Edit1, 'Text', TObject(FViewModel), 'FileName', EBindDirection.TwoWay, [EBindFlag.DontApply]);
-      RefreshData;
-    end
-    else raise Exception.Create('No casan las interfaces');
-  end;
-end;
-
 procedure TfrmDataSetDesktop.Button1Click(Sender: TObject);
 begin
   RefreshData;
 end;
 
-procedure TfrmDataSetDesktop.Edit1Change(Sender: TObject);
+procedure TfrmDataSetDesktop.edtFileNameChange(Sender: TObject);
 begin
   //FBinder.Notify(Edit1, 'Text');
 end;
@@ -104,6 +73,7 @@ end;
 procedure TfrmDataSetDesktop.RefreshData;
 begin
   //Cerramos
+  (*
   if FViewModel.DataSet.Active then
     FViewModel.DataSet.Active := False;
   //Abrimoa
@@ -113,11 +83,18 @@ begin
     //hacemos binding a grid
     BindSourceDB1.DataSet := FViewModel.DataSet;
   end;
+  *)
 end;
 
-procedure TfrmDataSetDesktop.RemoveViewModel(AViewModel: IViewModel<IDataSetFile_Model>);
+procedure TfrmDataSetDesktop.SetupView;
 begin
-  FViewModel := nil;
+  // Refresh Data
+  actRefresco.Bind(TDataSet_ViewModel(ViewModel).AbrirDataSet, TDataSet_ViewModel(ViewModel).GetIsValidFile);
+  Binder.BindAction(actRefresco);
+  // Filename binding
+  Binder.Bind(TDataSet_ViewModel(ViewModel), 'FileName', edtFileName, 'Text', EBindDirection.OneWay);
+  // Dataset binding
+  Binder.BindDataSet(TDataSet_ViewModel(ViewModel).DataSet, ListBox1);
 end;
 
 end.

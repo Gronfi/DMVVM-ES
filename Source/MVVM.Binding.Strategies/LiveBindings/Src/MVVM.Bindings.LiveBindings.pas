@@ -77,7 +77,7 @@ type
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; override;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload; override;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); override;
-    procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); override;
+    procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil); override;
     procedure BindAction(AAction: IBindableAction); overload; override;
 
     class procedure RegisterClassObjectListCollectionBinder(const AClass: TClass; AProcedure: TProc < PTypeInfo, TComponent, TEnumerable < TObject >> ); static;
@@ -236,7 +236,7 @@ begin
   LView.Template := ATemplate;
   LView.Source   := TCollectionSource(ACollection);
 
-  if InternalBindCollection(AServiceType, LView.Component, ACollection) then
+  if not InternalBindCollection(AServiceType, LView.Component, ACollection) then
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
 end;
 
@@ -254,10 +254,8 @@ begin
 
   LView.Template := ATemplate;
 
-  if InternalBindDataSet(ADataSet, LView.Component) then
+  if not InternalBindDataSet(ADataSet, LView.Component) then
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
-  // LAdapterBindSource := TAdapterBindSource.Create(nil); //DAVID
-  // LAdapterBindSource.
 end;
 
 function TStrategy_LiveBindings.BindsCount: Integer;
