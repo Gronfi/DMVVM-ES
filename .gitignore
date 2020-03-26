@@ -304,3 +304,6 @@
 /Demos/Test-DataSet-ComboBox/*.res
 /Demos/CSV/CSV.FMX.Exe/__history
 /Source/*.tvsconfig
+/Demos/Test-DataSet-ListBox/*.res
+/Demos/Test-DataSet-ListBox/__history
+/Demos/Test-DataSet-ComboBox/*.identcache
