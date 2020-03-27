@@ -307,3 +307,11 @@
 /Demos/Test-DataSet-ListBox/*.res
 /Demos/Test-DataSet-ListBox/__history
 /Demos/Test-DataSet-ComboBox/*.identcache
+/Demos/Test-DataSet-ListBox/*.local
+/Demos/Test-DataSet-ListBox/*.identcache
+/Demos/Test-DataSet-ListView/*.local
+/Demos/Test-DataSet-ListView/*.identcache
+/Demos/Test-DataSet-ListView/__history
+/Demos/Test-DataSet-ListBox/*.vlb
+/Demos/Test-DataSet-ListView/*.res
+/Demos/Test-DataSet-ListView/*.vlb
