@@ -2,6 +2,26 @@
 
 ![logo del grupo](logo-grupo.png)
 
+<br/>
+<div>
+  <!-- Stability -->
+  <a href="https://nodejs.org/api/documentation.html#documentation_stability_index">
+    <img src="https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square"
+      alt="API stability" />
+  </a>
+  <!-- Standard -->
+  <a href="https://img.shields.io/badge">
+    <img src="https://img.shields.io/badge/Language-Delphi-brightgreen.svg"
+      alt="Delphi" />
+  </a>
+  <!-- Standard -->
+  <a href="https://img.shields.io/badge">
+    <img src="https://img.shields.io/badge/Date-2020-red.svg"
+      alt="2005" />
+  </a>
+</div>
+<br/>
+
 Ejercicios de práctica para tratar de comprender el patrón **MVVM** y quizás terminar con el desarrollo de un pequeño y útil **Framework MVVM** para Delphi.
 
 ## Otros frameworks utilizados
@@ -31,9 +51,13 @@ https://github.com/msnts/glue
 
 https://github.com/bogdanpolak/command-delphi
 
+Modificado
+https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
+
 ## Ideas a tener en cuenta
 
 * Motor permite el registro de distintos tipos de estrategias/métodos de binding
+* Posibilidad de habilitar/deshabilitar todos los bindings?
 
 ***
 
@@ -52,7 +76,7 @@ Objetivos:
 ### Prototipo 1 (en curso, aún los fuentes visibles son del prototipo.0)
 
 Objetivos:
-1. Añadir Motor de Mensajes al sistema: analizar si es mejor que el patrón observer para el modelo
+1. Añadir Motor de Mensajes al sistema: analizar si es mejor que el patrón observer para el modelo    <-- NO
 2. Análisis de bindings del motor de grijjy/dsharp/knockoff/Glue para ver qué ideas buenas pueden incorporarse
 	a. knockoff: no hay clases especializadas ni interfaces a utilizar en cualquiera de las 3 capas, se utilizan atributos para el binding. Complejo de realizar
 	b. glue: parece incompleto, sin ejemplos completos
@@ -60,6 +84,7 @@ Objetivos:
 	d. grijjy: parece el más completo y sencillo de entender para aplicarlo como referencia. Se echan en falta más ejemplos
 3. Integrar al core la posibilidad de distintas estrategias de binding, que se puedan registrar
 4. Integrar ideas del framework de grijjy (por suerte ellos en su blog dan permiso a utilizar su framework para elaborar otros)
+5. El prototipo 1 de momento tendrá una correspondencia de 1-1 entre view y modelview
 
 ### Prototipo 2
 

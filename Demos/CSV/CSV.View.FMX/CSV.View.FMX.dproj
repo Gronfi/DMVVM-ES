@@ -84,7 +84,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="CSV.Core.dcp"/>
-        <DCCReference Include="fmx.dcp"/>
+        <DCCReference Include="MVVM.Platform.FMX.dcp"/>
         <DCCReference Include="Src\CSV.View.pas">
             <Form>frmCSV</Form>
             <FormType>fmx</FormType>

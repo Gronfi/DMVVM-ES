@@ -29,7 +29,7 @@ package DataSet.View.FMX;
 
 requires
   DataSet.Core,
-  FMX,
+  MVVM.Platform.FMX,
   bindcomp,
   bindcompfmx;
 

@@ -4,7 +4,12 @@ uses
   System.StartUpCopy,
   FMX.Forms,
 
-  MVVM.Servicios.Platform.FMX,
+  MVVM.Core,
+  MVVM.Services.Platform.FMX,
+
+  MVVM.Bindings.LiveBindings, //especial
+  MVVM.Binding.LiveBindings.Controls.FMX,
+
   MVVM.Bindings in 'Source\MVVM.Bindings.pas',
   MVVM.Interfaces in 'Source\MVVM.Interfaces.pas',
   DataSet.Interfaces in 'DataSet.Interfaces.pas',
@@ -19,6 +24,9 @@ begin
   Application.Initialize;
   InitializePlatform;
 
+  MVVMCore.InitializationDone;
+  MVVMCore.DefaultBindingStrategyName := 'LIVEBINDINGS';
+
   Modelo          := TDataSet_Model.Create;
   Modelo.FileName := '..\..\..\Demos\Data\biolife.xml';
 
@@ -28,7 +36,7 @@ begin
   Vista := TfrmDataSetDesktop.Create(Application);
   Application.MainForm := TfrmDataSetDesktop(Vista);
 
-  Vista.AddViewModel(VistaModelo);
+  Vista.InitView(VistaModelo);
   TfrmDataSetDesktop(Vista).Show;
 
   Application.Run;
