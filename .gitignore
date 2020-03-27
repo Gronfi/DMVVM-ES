@@ -315,3 +315,7 @@
 /Demos/Test-DataSet-ListBox/*.vlb
 /Demos/Test-DataSet-ListView/*.res
 /Demos/Test-DataSet-ListView/*.vlb
+/Demos/CSV/CSV.FMX.NoPackage.Exe/__history
+/Demos/CSV/CSV.FMX.NoPackage.Exe/App.CSV.FMX.NoPackages.dproj.local
+/Demos/CSV/CSV.FMX.NoPackage.Exe/App.CSV.FMX.NoPackages.identcache
+/Demos/CSV/CSV.FMX.NoPackage.Exe/App.CSV.FMX.NoPackages.res
