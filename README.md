@@ -58,11 +58,19 @@ https://github.com/pmoitaly/BindAPI
 https://martinfowler.com/eaaDev/PresentationModel.html
 
 Modificado
+
 https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
+
 https://github.com/nanosystems-srl/MvvmStarterKit
+
 https://github.com/hwhohwh/MvvmStarterKit
 
 https://github.com/bogdanpolak/delphi-dataproxy
+
+View with multiple VM, possible?
+https://stackoverflow.com/questions/3259398/multiple-viewmodels-associated-with-a-single-view
+
+https://www.wintellect.com/model-view-viewmodel-mvvm-explained
 
 
 ## Ideas a tener en cuenta
