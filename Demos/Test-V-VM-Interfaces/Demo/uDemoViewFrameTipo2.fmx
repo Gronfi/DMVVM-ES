@@ -1,0 +1,30 @@
+object Frame2: TFrame2
+  Size.Width = 282.000000000000000000
+  Size.Height = 202.000000000000000000
+  Size.PlatformDefault = False
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 8.000000000000000000
+    Text = 'View Frame 2'
+    TabOrder = 0
+  end
+  object Button1: TButton
+    Position.X = 192.000000000000000000
+    Position.Y = 8.000000000000000000
+    TabOrder = 1
+    Text = 'Ver'
+    OnClick = Button1Click
+  end
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Position.X = 8.000000000000000000
+    Position.Y = 32.000000000000000000
+    Size.Width = 265.000000000000000000
+    Size.Height = 161.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Viewport.Width = 265.000000000000000000
+    Viewport.Height = 161.000000000000000000
+  end
+end

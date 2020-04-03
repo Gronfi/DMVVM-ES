@@ -1,0 +1,53 @@
+object frmMultiVista: TfrmMultiVista
+  Left = 0
+  Top = 0
+  Caption = 'Vista que contiene vistas'
+  ClientHeight = 623
+  ClientWidth = 1061
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Layout1: TLayout
+    Align = Left
+    Size.Width = 553.000000000000000000
+    Size.Height = 528.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+  end
+  object Layout3: TLayout
+    Align = Bottom
+    Position.Y = 528.000000000000000000
+    Size.Width = 1061.000000000000000000
+    Size.Height = 95.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    object Button1: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 0
+      Text = 'Ver'
+      OnClick = Button1Click
+    end
+    object Memo1: TMemo
+      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+      DataDetectorTypes = []
+      Position.X = 96.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 961.000000000000000000
+      Size.Height = 81.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Viewport.Width = 961.000000000000000000
+      Viewport.Height = 81.000000000000000000
+    end
+  end
+  object Layout2: TLayout
+    Align = Client
+    Size.Width = 508.000000000000000000
+    Size.Height = 528.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+  end
+end

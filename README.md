@@ -53,8 +53,17 @@ https://github.com/bogdanpolak/command-delphi
 
 https://github.com/mauriziodm/iORM
 
+https://github.com/pmoitaly/BindAPI
+
+https://martinfowler.com/eaaDev/PresentationModel.html
+
 Modificado
 https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
+https://github.com/nanosystems-srl/MvvmStarterKit
+https://github.com/hwhohwh/MvvmStarterKit
+
+https://github.com/bogdanpolak/delphi-dataproxy
+
 
 ## Ideas a tener en cuenta
 
