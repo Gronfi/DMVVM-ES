@@ -12,7 +12,6 @@ uses
   CSV.Interfaces,
 
   MVVM.Observable,
-  MVVM.Interfaces,
   MVVM.Bindings;
 
 type
@@ -68,6 +67,8 @@ uses
   System.Threading,
   System.Diagnostics,
 
+  MVVM.Interfaces,
+  MVVM.Interfaces.Architectural,
   MVVM.ViewFactory,
   MVVM.Utils,
   MVVM.Core;

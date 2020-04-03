@@ -57,7 +57,7 @@ https://github.com/pmoitaly/BindAPI
 
 https://martinfowler.com/eaaDev/PresentationModel.html
 
-Modificado
+Modificados de Grijjy
 
 https://github.com/DelphiPraxis/MvvmStarterKit/commits/master
 
@@ -71,6 +71,10 @@ View with multiple VM, possible?
 https://stackoverflow.com/questions/3259398/multiple-viewmodels-associated-with-a-single-view
 
 https://www.wintellect.com/model-view-viewmodel-mvvm-explained
+
+Otros
+
+https://medium.com/flawless-app-stories/how-to-use-a-model-view-viewmodel-architecture-for-ios-46963c67be1b
 
 
 ## Ideas a tener en cuenta

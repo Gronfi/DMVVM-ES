@@ -16,6 +16,8 @@ uses
   MVVM.Types;
 
 type
+// Platform Services Interfaces
+{$REGION 'PLATFORM'}
 {$REGION 'IPlatformServices'}
   IPlatformServices = interface
     ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
@@ -41,95 +43,23 @@ type
 {$ENDREGION}
 
   TPlatformServicesClass = class of TPlatformServicesBase;
+{$ENDREGION 'PLATFORM'}
 
+// Returns the object interface
 {$REGION 'IObject'}
-
   IObject = interface
     ['{61A3454D-3B58-4CDE-83AE-4C3E73732977}']
     function GetAsObject: TObject;
   end;
 {$ENDREGION}
-{$REGION 'IMessage'}
 
-  IMessage = interface(IObject)
-    ['{8C6AE8E2-B18D-41B4-AAED-88CF3B110F1D}']
-    function GetCreationDateTime: TDateTime;
-    procedure Queue;
-
-    property CreationDateTime: TDateTime read GetCreationDateTime;
-  end;
-{$ENDREGION}
-
-  TNotifyMessage = procedure(AMessage: IMessage) of Object;
-
-  TListenerFilter = reference to function(AMessage: IMessage): Boolean;
-
-{$REGION 'IMessageListener'}
-
-  IMessageListener = interface(IObject)
-    ['{ABC992B0-4CB4-470A-BDCE-EBE6651C84DD}']
-    function GetIsCodeToExecuteInUIMainThread: Boolean;
-    procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
-
-    function GetTypeRestriction: EMessageTypeRestriction;
-    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
-
-    function GetListenerFilter: TListenerFilter;
-    procedure SetListenerFilter(const AFilter: TListenerFilter);
-
-    function GetMensajeClass: TClass;
-
-    function GetConditionsMatch(AMessage: IMessage): Boolean;
-
-    procedure Register;
-    procedure UnRegister;
-
-    procedure NewMessage(AMessage: IMessage);
-
-    property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
-    property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
-    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
-  end;
-{$ENDREGION}
-  (*
-    {$REGION 'INotificationChanged'}
-    INotificationChanged = interface
-    ['{DC4EF24C-660A-46EE-8404-4ECF67CF7287}']
-    end;
-    {$ENDREGION}
-
-    {$REGION 'INotificationChanged<T:INotificationChanged>'}
-    IEventNotificationChanged<T:INotificationChanged> = interface(IEvent<T>)
-    end;
-    {$ENDREGION}
-
-    IEventNotificationChanged = IEventNotificationChanged<INotificationChanged>;
-  *)
-
+// Bindings
   IBindingStrategy = interface;
   ICollectionViewProvider = interface;
   IBindableAction = interface;
 
-  (*
-    IBindingBase = interface
-    ['{CD1A1D15-45F8-4E47-8CCA-98B2E85653A8}']
-    function GetBindingStrategy: IBindingStrategy;
-
-    function GetIsMultiCastEventBinding: Boolean;
-    procedure SetIsMultiCastEventBinding(const AValue: Boolean);
-
-    property BindingStrategy: IBindingStrategy read GetBindingStrategy;
-    property IsMultiCastEventBinding: Boolean read GetIsMultiCastEventBinding write SetIsMultiCastEventBinding;
-    end;
-
-    IBindingBase<T> = interface(IBindingBase)
-    ['{4AA82C2B-6E24-45DE-82C4-283CBFC337F6}']
-    function GetOnEvent: IEvent<T>;
-
-    property OnEvent: IEvent<T> read GetOnEvent;
-    end;
-  *)
-
+// Strategy Based Interface
+{$REGION 'IStrategyBased'}
   IStrategyBased = interface
     ['{3F645E49-CD84-430C-982F-2B2ADC128203}']
     function GetBindingStrategy: IBindingStrategy;
@@ -137,9 +67,11 @@ type
 
     property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
-
+{$ENDREGION}
   IStrategyEventedObject = interface;
 
+// Strategy and MultiCastEvents Based Interface
+{$REGION 'IStrategyEventedBased'}
   IStrategyEventedBased = interface
     ['{72613457-8EBA-47F0-B277-47F66FD4A427}']
     function GetManager: IStrategyEventedObject;
@@ -147,7 +79,8 @@ type
 
     property Manager: IStrategyEventedObject read GetManager write SetManager;
   end;
-
+{$ENDREGION}
+// Free notification interface
 {$REGION 'INotifyFree'}
 
   TNotifyFreeObjectEvent = procedure(const ASender, AInstance: TObject) of Object;
@@ -493,8 +426,7 @@ type
     Implementors should use the abstract TgoCollectionView class in the
     Grijjy.Mvvm.DataBinding.Collections unit as a base for their views. }
 
-{$REGION 'ICollectionView'}
-
+{$REGION 'ICollectionViewProvider'}
   ICollectionView = interface
     ['{FB28F410-1707-497B-BD1E-67C218E9EB42}']
 {$REGION 'Internal Declarations'}
@@ -523,14 +455,13 @@ type
     property Template: TDataTemplateClass read GetTemplate write SetTemplate;
     property Component: TComponent read GetComponent;
   end;
-{$ENDREGION}
 
   ICollectionViewProvider = interface
     ['{22F1E2A9-0078-4401-BA80-C8EFFEE091EA}']
     function GetCollectionView: ICollectionView;
-    // procedure Bind(const ACollection: TEnumerable<TObject>; const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
   end;
-
+{$ENDREGION}
+{$REGION 'IBindable'}
   IBindable = interface
     ['{74F1EA86-FCFC-49AD-AB53-DCEBF476CB3B}']
     function GetBinding: IBinding;
@@ -538,14 +469,16 @@ type
 
     property Binding: IBinding read GetBinding write SetBinding;
   end;
-
+{$ENDREGION}
+{$REGION 'IBindableAction'}
   IBindableAction = interface(IBindable)
     ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
     procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
     procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
     procedure Bind(const AExecute: TExecuteRttiMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
   end;
-
+{$ENDREGION}
+{$REGION 'IBindingStrategy'}
   IBindingStrategy = interface
     ['{84676E39-0351-4F3E-AB66-814E022014BD}']
     procedure Start;
@@ -576,7 +509,8 @@ type
 
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
-
+{$ENDREGION}
+{$REGION 'TBindingStrategyBase'}
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   protected
     FSynchronizer: IReadWriteSync;
@@ -615,49 +549,7 @@ type
   end;
 
   TClass_BindingStrategyBase = class of TBindingStrategyBase;
-
-  // IBinder = interface
-  // ['{AA80417A-B7B8-4867-A310-89BDAB7FEEDD}']
-  // //function GetDataBinder: IDataBinder;
-  //
-  // //property DataBinder: IDataBinder read GetDataBinder;  DAVID
-  // end;
-
-  IModel = interface(IObject)
-    ['{28C9B05B-A5F5-49E1-913E-2AB10F9FB8F3}']
-  end;
-
-  IViewModel = interface(IObject)
-    ['{37E13CBF-FDB2-4C6B-948A-7D5F7A6D0AC5}']
-    procedure SetupViewModel;
-  end;
-
-  IViewModel<T: IModel> = interface(IViewModel)
-    ['{2B47A54F-4C87-4C17-9D68-8848F4A0555A}']
-    function GetModel: T;
-    procedure SetModel(AModel: T);
-
-    property Model: T read GetModel;
-  end;
-
-  IView = interface(IObject)
-    ['{44055F6F-42A8-43DD-B393-1CC700B8C7F8}']
-    procedure SetupView;
-  end;
-
-  IView<T: IViewModel> = interface(IView)
-    ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
-    function GetViewModel: T;
-    procedure InitView(AViewModel: T);
-
-    property ViewModel: T read GetViewModel;
-  end;
-
-  IViewForm<T: IViewModel> = interface(IView<T>)
-    ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
-    procedure Execute;
-    procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
-  end;
+{$ENDREGION}
 
 implementation
 

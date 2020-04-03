@@ -15,6 +15,50 @@ uses
 
 type
 
+
+{$REGION 'IMessage'}
+
+  IMessage = interface(IObject)
+    ['{8C6AE8E2-B18D-41B4-AAED-88CF3B110F1D}']
+    function GetCreationDateTime: TDateTime;
+    procedure Queue;
+
+    property CreationDateTime: TDateTime read GetCreationDateTime;
+  end;
+{$ENDREGION}
+
+  TNotifyMessage = procedure(AMessage: IMessage) of Object;
+
+  TListenerFilter = reference to function(AMessage: IMessage): Boolean;
+
+{$REGION 'IMessageListener'}
+
+  IMessageListener = interface(IObject)
+    ['{ABC992B0-4CB4-470A-BDCE-EBE6651C84DD}']
+    function GetIsCodeToExecuteInUIMainThread: Boolean;
+    procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
+
+    function GetTypeRestriction: EMessageTypeRestriction;
+    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
+
+    function GetListenerFilter: TListenerFilter;
+    procedure SetListenerFilter(const AFilter: TListenerFilter);
+
+    function GetMensajeClass: TClass;
+
+    function GetConditionsMatch(AMessage: IMessage): Boolean;
+
+    procedure Register;
+    procedure UnRegister;
+
+    procedure NewMessage(AMessage: IMessage);
+
+    property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
+    property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
+    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
+  end;
+{$ENDREGION}
+
   { Forward Declarations }
   TMessage = class;
   TMessageClass = class of TMessage;

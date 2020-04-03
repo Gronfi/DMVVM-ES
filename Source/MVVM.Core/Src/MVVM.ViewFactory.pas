@@ -9,19 +9,15 @@ uses
   System.Generics.Collections,
 
   MVVM.Core,
-  MVVM.Interfaces;
+  MVVM.Interfaces.Architectural;
 
 type
   { A factory for creating views based on their names.
-    This allows for loose coupling between view models and views, since the
-    view model can create a view without knowing its actual type.
-
     All views (except the main form) should implement the IView interface and
     register the view class by calling TViewFactory.Register (usually in the
     Initialization section of the unit).
-
     View models can create a view by calling TViewFactory.CreateView. }
-  TViewFactory = class // abstract
+  TViewFactory = class
 {$REGION 'Internal Declarations'}
   private
     class var FRegisteredViews: TDictionary<String, TComponentClass>;

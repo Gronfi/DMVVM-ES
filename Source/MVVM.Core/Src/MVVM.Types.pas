@@ -14,6 +14,10 @@ uses
 // CBasicStrategies : array[EBasicStrategies] of String = ('RTTI', 'LIVEBINDINGS');
 
 type
+  //Attributes
+  EInstanceType = (itSingleton, itNewInstance);
+
+  //Bindings
   EBindDirection = (
     { Data flows in one direction, from the source (eg a view model) to a target
       (eg a control). }
