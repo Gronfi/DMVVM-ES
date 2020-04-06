@@ -143,7 +143,6 @@
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Collections.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Commands.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.pas"/>
-        <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Classes.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Core.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Interfaces.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Observable.pas"/>
@@ -156,6 +155,8 @@
         <DCCReference Include="..\..\..\Source\MVVM.Binding.Strategies\LiveBindings\Src\MVVM.Bindings.LiveBindings.EnumerableAdapter.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Binding.Strategies\LiveBindings\Src\MVVM.Bindings.LiveBindings.pas"/>
         <DCCReference Include="..\..\..\Source\MVVM.Binding.Strategies\LiveBindings.FMX\Src\MVVM.Binding.LiveBindings.Controls.FMX.pas"/>
+        <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Attributes.pas"/>
+        <DCCReference Include="..\..\..\Source\MVVM.Core\Src\MVVM.Interfaces.Architectural.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

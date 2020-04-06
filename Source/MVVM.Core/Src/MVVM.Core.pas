@@ -10,6 +10,8 @@ uses
 
   MVVM.Bindings,
   MVVM.Interfaces,
+  MVVM.Interfaces.Architectural,
+  MVVM.ViewFactory,
   MVVM.Types;
 
 type
@@ -19,12 +21,17 @@ type
     FPlatformServicesClass: TPlatformServicesClass;
     FContainer: TContainer;
     FDefaultBindingStrategyName: String;
+    FDefaultViewPlatform: string;
     FSynchronizer: IReadWriteSync;
     class constructor CreateC;
     class destructor DestroyC;
 
     class function GetDefaultBindingStrategyName: String; static;
     class procedure SetDefaultBindingStrategyName(const AStrategyName: String); static;
+    class function GetDefaultViewPlatform: String; static;
+    class procedure SetDefaultViewPlatform(const APlatform: String); static;
+
+    class procedure AutoRegister; static;
   public
     class procedure RegisterPlatformServices(AServicioClass: TPlatformServicesClass); static;
     class function PlatformServices: IPlatformServices; static;
@@ -35,12 +42,15 @@ type
 
     class procedure InitializationDone; static;
 
+    class function ViewsProvider: TViewFactoryClass; static;
+
     class procedure DelegateExecution(AProc: TProc; AExecutionMode: EDelegatedExecutionMode); overload; static;
     class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode); overload; static;
 
     class function DefaultBindingStrategy: IBindingStrategy; static;
 
     class property DefaultBindingStrategyName: String read GetDefaultBindingStrategyName write SetDefaultBindingStrategyName;
+    class property DefaultViewPlatform: String read GetDefaultViewPlatform write SetDefaultViewPlatform;
   end;
 
 implementation
@@ -48,10 +58,77 @@ implementation
 uses
   System.Classes,
   System.Threading,
+  System.RTTI,
 
+  MVVM.Attributes,
   MVVM.Utils;
 
 { MVVM }
+
+class procedure MVVMCore.AutoRegister;
+var
+  Ctx  : TRttiContext;
+  Typ  : TRttiType;
+  TypI : TRttiInterfaceType ;
+  LAttr: TCustomAttribute;
+  LVMA : View_For_ViewModel;
+  LVMI : ViewModel_Implements;
+  LInstanceType: TRttiInstanceType;
+  LInterfaces: TArray<TRttiInterfaceType>;
+  I : Integer;
+begin
+  Ctx := TRttiContext.Create;
+  try
+    for Typ in Ctx.GetTypes do
+    begin
+      // Loop for attributes
+      for LAttr in Typ.GetAttributes do
+      begin
+        //Utils.IdeDebugMsg('Atributo: ' + LAttr.QualifiedClassName);
+        case Utils.AttributeToCaseSelect(LAttr, [View_For_ViewModel, ViewModel_Implements]) of
+          0: // View_For_ViewModel
+            begin
+              LVMA := LAttr as View_For_ViewModel;
+              if not Typ.IsInstance then Continue;
+              LInstanceType := Typ.AsInstance;
+              TViewFactory.Register(LInstanceType, LVMA.ViewAlias, LVMA.Platform);
+            end;
+          1: //ViewModel_Implements
+            begin
+              LVMI := LAttr as ViewModel_Implements;
+              if Typ.IsInstance then
+              begin
+                LInstanceType := Typ.AsInstance;
+                LInterfaces   := LInstanceType.GetImplementedInterfaces;
+                if Length(LInterfaces) > 0 then
+                begin
+                  for I := Low(LInterfaces) to High(LInterfaces) do
+                  begin
+                    if LInterfaces[I].GUID = LVMI.VMInterface then
+                    begin
+                      case LVMI.InstanceType of
+                        EInstanceType.itSingleton:
+                          begin
+                            MVVMCore.Container.RegisterType(LInstanceType.Handle).Implements(LInterfaces[I].Handle).AsSingleton;
+                          end;
+                        EInstanceType.itNewInstance:
+                          begin
+                            MVVMCore.Container.RegisterType(LInstanceType.Handle).Implements(LInterfaces[I].Handle);
+                          end;
+                      end;
+                      Break;
+                    end;
+                  end;
+                end;
+              end;
+            end;
+        end;
+      end;
+    end;
+  finally
+    Ctx.Free;
+  end;
+end;
 
 class function MVVMCore.Container: TContainer;
 begin
@@ -62,6 +139,8 @@ class constructor MVVMCore.CreateC;
 begin
   FContainer    := TContainer.Create;
   FSynchronizer := TMREWSync.Create;
+  FDefaultBindingStrategyName := '';
+  FDefaultViewPlatform        := '';
 end;
 
 class function MVVMCore.GetDefaultBindingStrategyName: String;
@@ -69,6 +148,16 @@ begin
   FSynchronizer.BeginRead;
   try
     Result := FDefaultBindingStrategyName;
+  finally
+    FSynchronizer.EndRead;
+  end;
+end;
+
+class function MVVMCore.GetDefaultViewPlatform: String;
+begin
+  FSynchronizer.BeginRead;
+  try
+    Result := FDefaultViewPlatform;
   finally
     FSynchronizer.EndRead;
   end;
@@ -170,6 +259,7 @@ end;
 
 class procedure MVVMCore.InitializationDone;
 begin
+  AutoRegister;
   FContainer.Build;
 end;
 
@@ -188,10 +278,25 @@ begin
   end;
 end;
 
+class procedure MVVMCore.SetDefaultViewPlatform(const APlatform: String);
+begin
+  FSynchronizer.BeginWrite;
+  try
+    FDefaultViewPlatform := APlatform;
+  finally
+    FSynchronizer.EndWrite;
+  end;
+end;
+
 class function MVVMCore.PlatformServices: IPlatformServices;
 begin
   Spring.Guard.CheckNotNull(FPlatformServicesClass, 'No hay registrado ningun servicio para la plataforma');
   Result := FPlatformServicesClass.Create;
+end;
+
+class function MVVMCore.ViewsProvider: TViewFactoryClass;
+begin
+  Result := TViewFactory;
 end;
 
 end.

@@ -1,12 +1,12 @@
 unit MVVM.Services.Platform.FMX;
 
-{$HPPEMIT 'MVVM.Services.Platform.FMX'}
-
 interface
 
 uses
+  FMX.Platform,
   System.Classes,
   System.SysUtils,
+  System.UITypes,
 
   MVVM.Interfaces;
 
@@ -14,6 +14,8 @@ type
   TFMXPlatformServices = class(TPlatformServicesBase)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; override;
+    procedure ShowFormView(AComponent: TComponent); override;
+    procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>); override;
     function IsMainThreadUI: Boolean; override;
     function LoadBitmap(const AFileName: String): TObject; overload; override;
     function LoadBitmap(const AStream: TStream): TObject; overload; override;
@@ -29,7 +31,6 @@ uses
   FMX.Forms,
   FMX.Dialogs,
   FMX.Graphics,
-  System.UITypes,
 
   MVVM.Core;
 
@@ -86,6 +87,16 @@ end;
 function TFMXPlatformServices.MessageDlg(const ATitulo, ATexto: String): Boolean;
 begin
   Result := FMX.Dialogs.MessageDlg(ATitulo, TMsgDlgType.mtConfirmation, [TMsgDlgBtn.mbYes, TMsgDlgBtn.mbNo], 0) = mrYes
+end;
+
+procedure TFMXPlatformServices.ShowFormView(AComponent: TComponent);
+begin
+  TForm(AComponent).Show;
+end;
+
+procedure TFMXPlatformServices.ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>);
+begin
+  TForm(AComponent).ShowModal(AResultProc);
 end;
 
 procedure InitializePlatform;

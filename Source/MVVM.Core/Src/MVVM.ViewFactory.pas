@@ -3,64 +3,36 @@ unit MVVM.ViewFactory;
 interface
 
 uses
+  System.Rtti,
   System.UITypes,
   System.Classes,
   System.SysUtils,
   System.Generics.Collections,
 
-  MVVM.Core,
   MVVM.Interfaces.Architectural;
 
 type
   { A factory for creating views based on their names.
-    All views (except the main form) should implement the IView interface and
-    register the view class by calling TViewFactory.Register (usually in the
-    Initialization section of the unit).
     View models can create a view by calling TViewFactory.CreateView. }
   TViewFactory = class
 {$REGION 'Internal Declarations'}
   private
-    class var FRegisteredViews: TDictionary<String, TComponentClass>;
+    class var FRegisteredViews: TDictionary<String, TRttiInstanceType>;
   public
     class destructor Destroy;
 {$ENDREGION 'Internal Declarations'}
   public
-    { Registers a view class with the factory.
-
-      Parameters:
-      AViewClass: the class of the view (such as a form) to register.
-      AViewClass MUST implement the IView interface.
-      AViewName: the name to register the view under.
-
-      Raises:
-      EInvalidOperation if AViewClass does not implement IView.
-
-      This method should be called once for each view type, usually in the
-      Initialization section of the unit of that view. }
-    class procedure Register(const AViewClass: TComponentClass; const AViewName: String); static;
+    class procedure Register(const AViewClass: TRttiInstanceType; const AViewName: String; const APlatform: String = ''); static;
 
     { Creates a view using a previously registered view class.
-
-      Parameters:
-      TVM: type parameter with the type of view model used by the view.
-      AViewName: the name of the view. This must be one of the names
-      previously registered using the Register method. The name determines
-      the type of view that is created.
-      AOwner: the owner for the view. This is passed as the standard AOwner
-      parameter of the view class.
-      AViewModel: the view model for the the view. This method will call
-      IView.Initialize to associate the view model with the view.
-      AOwnsViewModel: (optional) whether the view becomes owner of the view
-      model. If True (the default), then the view model will automatically
-      be freed when the view is freed.
-
       Returns:
       A newly created view that represents AViewName.
-
       Raises:
       EListError if there is no view registered with the given AViewName. }
-    class function CreateView<TVM: IViewModel>(const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>; static;
+    class function CreateView<TVM: IViewModel>(const APlatform: string; const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>; static;
   end;
+
+  TViewFactoryClass = class of TViewFactory;
 
 type
   { Internal class used to manage lifetimes of views. }
@@ -140,7 +112,9 @@ type
 implementation
 
 uses
-  System.Generics.Defaults;
+  System.Generics.Defaults,
+
+  MVVM.Utils;
 
 { TViewProxy<TVM> }
 
@@ -234,24 +208,32 @@ end;
 
 { TViewFactory }
 
-class function TViewFactory.CreateView<TVM>(const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>;
+class function TViewFactory.CreateView<TVM>(const APlatform: string; const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>;
 var
-  ViewClass: TComponentClass;
+  ViewClass: TRttiInstanceType;
+  ViewClassComp: TComponentClass;
   ViewComp: TComponent;
   [weak]
   LView: IView<TVM>;
   [weak]
   LViewForm: IViewForm<TVM>;
+  LName : string;
+  LParams: array of TValue;
 begin
+  LName := APlatform + '.' + AViewName;
   try
     ViewClass := nil;
     if Assigned(FRegisteredViews) then
-      FRegisteredViews.TryGetValue(AViewName, ViewClass);
+      FRegisteredViews.TryGetValue(LName, ViewClass);
 
     if (ViewClass = nil) then
-      raise EListError.CreateFmt('Cannot create view. View "%s" is not registered.', [AViewName]);
+      raise EListError.CreateFmt('Cannot create view. View "%s" is not registered.', [LName]);
 
-    ViewComp := ViewClass.Create(AOwner);
+  SetLength(LParams, 1);
+  LParams[0] := AOwner;
+  ViewComp := Utils.CreateComponent_From_RttiInstance(ViewClass, LParams);
+    //ViewClassComp := ViewClass as TComponentClass;
+   // ViewComp := ViewClass.Create(AOwner);
     if Supports(ViewComp, IViewForm<TVM>, LViewForm) then
     begin
       Result := TFormViewProxy<TVM>.Create(LViewForm);
@@ -307,7 +289,10 @@ end;
 
 function TFormViewProxy<TVM>.GetAsObject: TObject;
 begin
-  Result := Self
+  if Assigned(FViewFreeListener.ActualView) then
+    Result := FViewFreeListener.ActualView.GetAsObject
+  else
+    Result := nil;
 end;
 
 function TFormViewProxy<TVM>.GetViewModel: TVM;
@@ -370,15 +355,23 @@ begin
   FreeAndNil(FRegisteredViews);
 end;
 
-class procedure TViewFactory.Register(const AViewClass: TComponentClass; const AViewName: String);
+class procedure TViewFactory.Register(const AViewClass: TRttiInstanceType; const AViewName: String; const APlatform: String);
+var
+  LAlias: string;
 begin
-  if (not Supports(AViewClass, IView)) then
-    raise EInvalidOperation.CreateFmt('View class %s must implement the IView interface', [AViewClass.ClassName]);
+  if (not Supports(AViewClass.MetaclassType, IView)) then
+    raise EInvalidOperation.CreateFmt('View class %s must implement the IView interface', [AViewClass.MetaclassType.QualifiedClassName]);
+  if not AViewClass.MetaclassType.InheritsFrom(TComponent) then
+    raise EInvalidOperation.CreateFmt('View class %s must inherit from TComponent', [AViewClass.MetaclassType.QualifiedClassName]);
+  if AViewName.IsEmpty then
+    raise EInvalidOperation.CreateFmt('View class %s must have a ViewName not empty', [AViewClass.MetaclassType.QualifiedClassName]);
 
   if (FRegisteredViews = nil) then
-    FRegisteredViews := TDictionary<String, TComponentClass>.Create(TIStringComparer.Ordinal);
+    FRegisteredViews := TDictionary<String, TRttiInstanceType>.Create(TIStringComparer.Ordinal);
 
-  FRegisteredViews.AddOrSetValue(AViewName, AViewClass);
+  LALias := Utils.iif<String>(APlatform.IsEmpty, AViewName, APlatform + '.' + AViewName);
+
+  FRegisteredViews.AddOrSetValue(LAlias, AViewClass);
 end;
 
 end.

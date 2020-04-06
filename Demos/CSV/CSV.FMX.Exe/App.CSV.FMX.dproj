@@ -109,7 +109,7 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Debugger_DebugSourcePath>D:\998.Test.Programacion\MVVM\Prototipo.0\ThirdParty\Spring4D\Base\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
+        <Debugger_DebugSourcePath>D:\998.Test.Programacion\MVVM\Prototipo.0\ThirdParty\Spring4D\Base\;D:\998.Test.Programacion\MVVM\Prototipo.0\Demos\CSV\CSV.Core\Src\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
@@ -133,14 +133,6 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="Source\MVVM.Bindings.pas"/>
-        <DCCReference Include="Source\MVVM.Interfaces.pas"/>
-        <DCCReference Include="CSV.Interfaces.pas"/>
-        <DCCReference Include="CSV.Model.pas"/>
-        <DCCReference Include="CSV.ViewModel.pas"/>
-        <DCCReference Include="CSV.View.pas">
-            <Form>frmCSV</Form>
-        </DCCReference>
         <DCCReference Include="..\CSV.Resources.Common\CSV.RecursosEjercicio.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

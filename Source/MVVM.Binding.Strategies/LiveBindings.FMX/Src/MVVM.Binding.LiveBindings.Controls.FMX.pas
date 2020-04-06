@@ -1,7 +1,5 @@
 unit MVVM.Binding.LiveBindings.Controls.FMX;
 
-{$HPPEMIT 'MVVM.Binding.LiveBindings.Controls.FMX'}
-
 interface
 
 uses

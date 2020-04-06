@@ -22,6 +22,8 @@ type
   IPlatformServices = interface
     ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
     function MessageDlg(const ATitle: string; const AText: String): Boolean;
+    procedure ShowFormView(AComponent: TComponent);
+    procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>);
     function IsMainThreadUI: Boolean;
     function LoadBitmap(const AFileName: String): TObject; overload;
     function LoadBitmap(const AStream: TStream): TObject; overload;
@@ -34,6 +36,8 @@ type
   TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
+    procedure ShowFormView(AComponent: TComponent); virtual; abstract;
+    procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>); virtual; abstract;
     function IsMainThreadUI: Boolean; virtual; abstract;
     function LoadBitmap(const AFileName: String): TObject; overload; virtual; abstract;
     function LoadBitmap(const AStream: TStream): TObject; overload; virtual; abstract;

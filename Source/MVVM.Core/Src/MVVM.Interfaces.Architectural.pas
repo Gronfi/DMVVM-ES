@@ -15,7 +15,7 @@ type
     ['{28C9B05B-A5F5-49E1-913E-2AB10F9FB8F3}']
   end;
 
-  IViewModel = interface
+  IViewModel = interface(IObject)
     ['{37E13CBF-FDB2-4C6B-948A-7D5F7A6D0AC5}']
     procedure SetupViewModel;
   end;
@@ -23,6 +23,8 @@ type
   TViewModel = class abstract(TObservable, IViewModel)
   public
     procedure SetupViewModel; virtual; abstract;
+
+    function GetAsObject: TObject;
   end;
 
   TViewModelClass = class of TViewModel;
@@ -41,11 +43,13 @@ type
     property ViewModel: T read GetViewModel;
   end;
 
+(*
   IView<T: IViewModel; K: TViewModel> = interface(IView<T>)
     ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
     function GetVM_AsObject: K;
     property ViewModel_AsObject: K read GetVM_AsObject;
   end;
+*)
 
   IViewForm<T: IViewModel> = interface(IView<T>)
     ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
@@ -55,5 +59,12 @@ type
 {$ENDREGION}
 
 implementation
+
+{ TViewModel }
+
+function TViewModel.GetAsObject: TObject;
+begin
+  Result := Self
+end;
 
 end.

@@ -20,6 +20,7 @@ type
   private
     FFileName: String;
     FProgreso: Integer;
+    FOnProgresoProcesamiento  : IEvent<TProgresoProcesamiento>;
 
     FTest1, FTest2, FTest3: IList<String>;
   protected
@@ -28,6 +29,7 @@ type
 
     function GetIsPathOK: Boolean;
     function GetProgresoProcesamiento: Integer;
+    function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
 
     function ProcesarRow(const ARowNo: Integer; const AData: String): Boolean;
     function ValidarDato(const ARowNo, AColumn: Integer; const AData: String): Boolean;
@@ -47,6 +49,7 @@ type
     property IsPathOk: Boolean read GetIsPathOK;
     property FileName: String read GetFileName write SetFileName;
     property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
+    property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
 implementation
@@ -55,7 +58,9 @@ uses
   System.IOUtils,
   System.SysUtils,
 
-  System.Threading;
+  System.Threading,
+
+  MVVM.Utils;
 
 { TCSVFile }
 
@@ -64,6 +69,8 @@ var
   I: Integer;
 begin
   inherited;
+
+  FOnProgresoProcesamiento := Utils.CreateEvent<TProgresoProcesamiento>;
 
   FTest1:= TCollections.CreateList<String>;
   FTest2:= TCollections.CreateList<String>;
@@ -94,6 +101,11 @@ end;
 function TCSVFile_Model.GetIsPathOK: Boolean;
 begin
   Result := TFile.Exists(FFileName);
+end;
+
+function TCSVFile_Model.GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
+begin
+  Result := FOnProgresoProcesamiento;
 end;
 
 function TCSVFile_Model.GetProgresoProcesamiento: Integer;
@@ -138,6 +150,7 @@ begin
       begin
         FProgreso := LPaso;
         Notify('ProgresoProcesamiento');
+        FOnProgresoProcesamiento.Invoke(FProgreso);
       end;
     end;
   finally

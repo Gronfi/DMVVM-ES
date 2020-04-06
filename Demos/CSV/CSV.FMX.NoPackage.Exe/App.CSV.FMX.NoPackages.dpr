@@ -11,7 +11,6 @@ uses
   MVVM.Bindings.Collections in '..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Collections.pas',
   MVVM.Bindings.Commands in '..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Commands.pas',
   MVVM.Bindings in '..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.pas',
-  MVVM.Classes in '..\..\..\Source\MVVM.Core\Src\MVVM.Classes.pas',
   MVVM.Core in '..\..\..\Source\MVVM.Core\Src\MVVM.Core.pas',
   MVVM.Interfaces in '..\..\..\Source\MVVM.Core\Src\MVVM.Interfaces.pas',
   MVVM.Observable in '..\..\..\Source\MVVM.Core\Src\MVVM.Observable.pas',
@@ -23,22 +22,17 @@ uses
   MVVM.Views.Platform.FMX in '..\..\..\Source\MVVM.FMX\Src\MVVM.Views.Platform.FMX.pas',
   MVVM.Bindings.LiveBindings.EnumerableAdapter in '..\..\..\Source\MVVM.Binding.Strategies\LiveBindings\Src\MVVM.Bindings.LiveBindings.EnumerableAdapter.pas',
   MVVM.Bindings.LiveBindings in '..\..\..\Source\MVVM.Binding.Strategies\LiveBindings\Src\MVVM.Bindings.LiveBindings.pas',
-  MVVM.Binding.LiveBindings.Controls.FMX in '..\..\..\Source\MVVM.Binding.Strategies\LiveBindings.FMX\Src\MVVM.Binding.LiveBindings.Controls.FMX.pas';
-
-//  MVVM.Bindings.Collections in '..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Collections.pas'
-//  MVVM.Bindings.Commands in '..\..\..\Source\MVVM.Core\Src\MVVM.Bindings.Commands.pas';
-
-//  CSV.Interfaces in 'CSV.Interfaces.pas',
-//  CSV.Model in 'CSV.Model.pas',
-//  CSV.ViewModel in 'CSV.ViewModel.pas',
-//  CSV.View in 'CSV.View.pas' {frmCSV},
-//  CSV.RecursosEjercicio in '..\CSV.Resources.Common\CSV.RecursosEjercicio.pas';
+  MVVM.Binding.LiveBindings.Controls.FMX in '..\..\..\Source\MVVM.Binding.Strategies\LiveBindings.FMX\Src\MVVM.Binding.LiveBindings.Controls.FMX.pas',
+  MVVM.Attributes in '..\..\..\Source\MVVM.Core\Src\MVVM.Attributes.pas',
+  MVVM.Interfaces.Architectural in '..\..\..\Source\MVVM.Core\Src\MVVM.Interfaces.Architectural.pas';
 {$R *.res}
 
 begin
   Application.Initialize;
-
   InitializePlatform;
+
+  MVVMCore.DefaultBindingStrategyName := 'LIVEBINDINGS';
+  MVVMCore.DefaultViewPlatform        := 'WINDOWS_DESKTOP';
 
   MVVMCore.InitializationDone;
   MVVMCore.DefaultBindingStrategyName := 'LIVEBINDINGS';
@@ -48,11 +42,10 @@ begin
   VistaModelo := TCSVFile_ViewModel.Create;
   VistaModelo.SetModel(Modelo);
 
-  Vista := TfrmCSV.Create(Application);
-  Application.MainForm := TfrmCSV(Vista);
-  Vista.InitView(VistaModelo);
-  TfrmCSV(Vista).Show;
+  Vista := MVVMCore.ViewsProvider.CreateView<ICSVFile_ViewModel>(MVVMCore.DefaultViewPlatform, ICSVFile_View_NAME, nil, VistaModelo);
+  Application.MainForm := TfrmCSV(Vista.GetAsObject);
 
-  Application.CreateForm(TfrmCSV, frmCSV);
+  Utils.ShowView<ICSVFile_ViewModel>(Vista);
+
   Application.Run;
 end.

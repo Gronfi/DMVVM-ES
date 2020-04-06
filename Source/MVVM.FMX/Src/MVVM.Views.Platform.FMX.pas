@@ -1,7 +1,4 @@
 unit MVVM.Views.Platform.FMX;
-
-{$HPPEMIT 'MVVM.Views.Platform.FMX'}
-
 interface
 
 uses
@@ -16,14 +13,14 @@ uses
   MVVM.Bindings;
 
 type
-  TFrameView<T: IViewModel; K: TViewModel> = class abstract(TFrame, IView, IView<T>, IView<T,K>)
+  TFrameView<T: IViewModel> = class abstract(TFrame, IView, IView<T>)
 {$REGION 'Internal Declarations'}
   private
     FBinder: TBindingManager;
     FViewModel: T;
   protected
     function GetViewModel: T;
-    function GetVM_AsObject: K;
+//    function GetVM_AsObject: K;
 {$ENDREGION 'Internal Declarations'}
   protected
     procedure SetupView; virtual;
@@ -36,12 +33,11 @@ type
     function GetAsObject: TObject;
 
     property ViewModel: T read GetViewModel;
-    property ViewModel_AsObject: K read GetVM_AsObject;
 
     property Binder: TBindingManager read FBinder;
   end;
 
-  TFormView<T: IViewModel; K: TViewModel> = class(TForm, IView, IView<T>, IViewForm<T>, IView<T,K>)
+  TFormView<T: IViewModel> = class abstract(TForm, IView, IView<T>, IViewForm<T>)
 {$REGION 'Internal Declarations'}
   private
 {$IFNDEF MOBILE}
@@ -54,7 +50,6 @@ type
   protected
     procedure DoClose(var CloseAction: TCloseAction); override;
     function GetViewModel: T;
-    function GetVM_AsObject: K;
 {$ENDREGION 'Internal Declarations'}
   protected
     procedure SetupView; virtual;
@@ -70,7 +65,6 @@ type
 
     property GrayOutPreviousForm: Boolean read FGrayOutPreviousForm write FGrayOutPreviousForm;
     property ViewModel: T read GetViewModel;
-    property ViewModel_AsObject: K read GetVM_AsObject;
     property Binder: TBindingManager read FBinder;
   end;
 
@@ -83,7 +77,7 @@ uses
 
 { TFormView<T> }
 
-constructor TFormView<T,K>.Create(AOwner: TComponent);
+constructor TFormView<T>.Create(AOwner: TComponent);
 begin
 {$IFNDEF MOBILE}
   FPrevForm := Screen.ActiveForm;
@@ -93,14 +87,14 @@ begin
   FGrayOutPreviousForm := True;
 end;
 
-destructor TFormView<T,K>.Destroy;
+destructor TFormView<T>.Destroy;
 begin
   FBinder.Free;
   FViewModel := nil;
   inherited;
 end;
 
-procedure TFormView<T,K>.DoClose(var CloseAction: TCloseAction);
+procedure TFormView<T>.DoClose(var CloseAction: TCloseAction);
 begin
   CloseAction := TCloseAction.caFree;
   inherited;
@@ -120,12 +114,12 @@ begin
 {$ENDIF}
 end;
 
-procedure TFormView<T,K>.Execute;
+procedure TFormView<T>.Execute;
 begin
   Show;
 end;
 
-procedure TFormView<T,K>.ExecuteModal(const AResultProc: TProc<TModalResult>);
+procedure TFormView<T>.ExecuteModal(const AResultProc: TProc<TModalResult>);
 {$IFNDEF ANDROID}
 var
   MR: TModalResult;
@@ -152,70 +146,53 @@ begin
   ShowModal(AResultProc);
 end;
 
-function TFormView<T,K>.GetAsObject: TObject;
+function TFormView<T>.GetAsObject: TObject;
 begin
   Result := Self
 end;
 
-function TFormView<T,K>.GetViewModel: T;
+function TFormView<T>.GetViewModel: T;
 begin
-  Result := TValue.From<IViewModel>(FViewModel).AsType<T>;
+  Result := TValue.From<TObject>(FViewModel.GetAsObject).AsType<T>;
 end;
 
-function TFormView<T, K>.GetVM_AsObject: K;
-begin
-  Result := TValue.From<IViewModel>(FViewModel).AsType<K>;
-end;
-
-procedure TFormView<T,K>.InitView(AViewModel: T);
+procedure TFormView<T>.InitView(AViewModel: T);
 begin
   Guard.CheckNotNull(AViewModel, 'The viewmodel cannot be nil');
-  Guard.CheckTrue(FViewModel = nil, 'The viewmodel is already assigned');
   FViewModel := AViewModel;
   SetupView;
 end;
 
-procedure TFormView<T,K>.SetupView;
+procedure TFormView<T>.SetupView;
 begin
   //
 end;
 
 { TFrameView<T> }
 
-constructor TFrameView<T,K>.Create(AOwner: TComponent);
+constructor TFrameView<T>.Create(AOwner: TComponent);
 begin
   inherited;
   FBinder := TBindingManager.Create;
 end;
 
-destructor TFrameView<T,K>.Destroy;
+destructor TFrameView<T>.Destroy;
 begin
   FBinder.Free;
   inherited;
 end;
 
-function TFrameView<T,K>.GetAsObject: TObject;
+function TFrameView<T>.GetAsObject: TObject;
 begin
   Result := Self
 end;
 
-function TFrameView<T,K>.GetViewModel: T;
-//var
-//  LValue: TValue;
+function TFrameView<T>.GetViewModel: T;
 begin
   Result := TValue.From<IViewModel>(FViewModel).AsType<T>;
-  //Result := LValue.AsType<T>;
 end;
 
-function TFrameView<T, K>.GetVM_AsObject: K;
-//var
-//  LValue: TValue;
-begin
-  Result := TValue.From<IViewModel>(FViewModel).AsType<K>;
-//  Result := LValue.AsType<K>;
-end;
-
-procedure TFrameView<T,K>.InitView(AViewModel: T);
+procedure TFrameView<T>.InitView(AViewModel: T);
 begin
   Guard.CheckNotNull(AViewModel, 'The viewmodel cannot be nil');
   Guard.CheckTrue(FViewModel = nil, 'The viewmodel is already assigned');
@@ -223,7 +200,7 @@ begin
   SetupView;
 end;
 
-procedure TFrameView<T,K>.SetupView;
+procedure TFrameView<T>.SetupView;
 begin
   //
 end;

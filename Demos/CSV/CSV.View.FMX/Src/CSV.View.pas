@@ -10,12 +10,14 @@ uses
 
   CSV.Interfaces,
 
-  MVVM.Interfaces,
+  MVVM.Attributes,
+  MVVM.Interfaces.Architectural,
   MVVM.Controls.Platform.FMX,
   MVVM.Views.Platform.FMX;
 
 type
-  TfrmCSV = class(TFormView<ICSVFile_ViewModel>, ICSVFile_View)
+  [View_For_ViewModel(ICSVFile_View_NAME, ICSVFile_ViewModel, 'WINDOWS_DESKTOP')]
+  TfrmCSV = class(TFormView<ICSVFile_ViewModel>)
     Label1: TLabel;
     lePath: TEdit;
     btPath: TButton;
@@ -63,6 +65,7 @@ uses
   MVVM.Core,
 
   CSV.ViewModel,
+
   Spring;
 
 {$R *.fmx}
@@ -138,6 +141,6 @@ begin
 end;
 
 initialization
-  TViewFactory.Register(TfrmCSV, ICSVFile_View_NAME);
+  TfrmCSV.Classname; //as there should be no implicit create, we must do this so the rtti info of the class is included in the final exe
 
 end.

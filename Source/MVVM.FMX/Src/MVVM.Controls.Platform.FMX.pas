@@ -1,7 +1,5 @@
 unit MVVM.Controls.Platform.FMX;
 
-{$HPPEMIT 'MVVM.Controls.Platform.FMX'}
-
 interface
 
 uses

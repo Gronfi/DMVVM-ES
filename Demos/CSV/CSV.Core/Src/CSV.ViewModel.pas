@@ -11,11 +11,14 @@ uses
 
   CSV.Interfaces,
 
+  MVVM.Interfaces.Architectural,
+  MVVM.Attributes,
   MVVM.Observable,
   MVVM.Bindings;
 
 type
-  TCSVFile_ViewModel = class(TObservable, ICSVFile_ViewModel)
+  [ViewModel_Implements(ICSVFile_ViewModel, itSingleton)]
+  TCSVFile_ViewModel = class(TViewModel, ICSVFile_ViewModel)
   private
     FModelo                   : ICSVFile_Model;
     FOnProcesamientoFinalizado: IEvent<TFinProcesamiento>;
@@ -27,6 +30,7 @@ type
     procedure SetFileName(const AFileName: String);
 
     function GetProgresoProcesamiento: Integer;
+    procedure OnProgresoProceso(const ADato: Integer);
 
     procedure OnModelNotifyChanged(const ASender: TObject; const APropertyName: String);
 
@@ -68,7 +72,6 @@ uses
   System.Diagnostics,
 
   MVVM.Interfaces,
-  MVVM.Interfaces.Architectural,
   MVVM.ViewFactory,
   MVVM.Utils,
   MVVM.Core;
@@ -86,20 +89,8 @@ begin
 end;
 
 procedure TCSVFile_ViewModel.CreateNewView;
-var
-  [weak] LView : IView<ICSVFile_ViewModel>;
-  [weak] LVista: IViewForm<ICSVFile_ViewModel>;
 begin
-  try
-    LView := TViewFactory.CreateView<ICSVFile_ViewModel>(ICSVFile_View_NAME, nil, Self);
-    if Supports(LView, IView<ICSVFile_ViewModel>, LVista)  then
-      LVista.Execute;
-  except
-    on E:Exception do
-    begin
-      MVVMCore.PlatformServices.MessageDlg(E.Message, 'Data')
-    end;
-  end;
+  Utils.ShowView<ICSVFile_ViewModel>(Self, ICSVFile_View_NAME, MVVMCore.DefaultViewPlatform);
 end;
 
 destructor TCSVFile_ViewModel.Destroy;
@@ -207,21 +198,22 @@ end;
 
 procedure TCSVFile_ViewModel.OnModelNotifyChanged(const ASender: TObject; const APropertyName: String);
 begin
-  case Utils.StringToCaseSelect(APropertyName, ['ProgresoProcesamiento', 'FileName', 'IsPathOK']) of
+  case Utils.StringToCaseSelect(APropertyName, ['FileName', 'IsPathOK']) of
     0:
-      begin
-        FOnProgresoProcesamiento.Invoke(FModelo.ProgresoProcesamiento);
-      end;
-    1:
       begin
         Notify('FileName');
         Notify('IsValidFile');
       end;
-    2:
+    1:
       begin
         Notify('IsValidFile');
       end;
   end;
+end;
+
+procedure TCSVFile_ViewModel.OnProgresoProceso(const ADato: Integer);
+begin
+  FOnProgresoProcesamiento.Invoke(ADato);
 end;
 
 procedure TCSVFile_ViewModel.SetupViewModel;
@@ -229,10 +221,14 @@ var
   [weak] LObservable: INotifyChangedProperty;
 begin
   //Bindings
+  FModelo.OnProgresoProcesamiento.Add(OnProgresoProceso);
   if Supports(FModelo, INotifyChangedProperty, LObservable) then
   begin
     LObservable.Manager.OnPropertyChangedEvent.Add(OnModelNotifyChanged);
   end;
 end;
+
+initialization
+  TCSVFile_ViewModel.ClassName; //as there should be no implicit create, we must do this so the rtti info of the class is included in the final exe
 
 end.
