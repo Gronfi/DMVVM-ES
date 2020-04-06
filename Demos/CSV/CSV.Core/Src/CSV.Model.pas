@@ -10,6 +10,7 @@ uses
 
   CSV.Interfaces,
 
+  MVVM.Interfaces,
   MVVM.Observable,
   MVVM.Bindings;
 
@@ -30,6 +31,7 @@ type
     function GetIsPathOK: Boolean;
     function GetProgresoProcesamiento: Integer;
     function GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
+    function GetOnPropertyChanged: IEvent<TNotifySomethingChangedEvent>;
 
     function ProcesarRow(const ARowNo: Integer; const AData: String): Boolean;
     function ValidarDato(const ARowNo, AColumn: Integer; const AData: String): Boolean;
@@ -49,6 +51,7 @@ type
     property IsPathOk: Boolean read GetIsPathOK;
     property FileName: String read GetFileName write SetFileName;
     property ProgresoProcesamiento: Integer read GetProgresoProcesamiento;
+    property OnPropertyChanged: IEvent<TNotifySomethingChangedEvent> read GetOnPropertyChanged;
     property OnProgresoProcesamiento: IEvent<TProgresoProcesamiento> read GetOnProgresoProcesamiento;
   end;
 
@@ -106,6 +109,11 @@ end;
 function TCSVFile_Model.GetOnProgresoProcesamiento: IEvent<TProgresoProcesamiento>;
 begin
   Result := FOnProgresoProcesamiento;
+end;
+
+function TCSVFile_Model.GetOnPropertyChanged: IEvent<TNotifySomethingChangedEvent>;
+begin
+  Result := Manager.OnPropertyChangedEvent
 end;
 
 function TCSVFile_Model.GetProgresoProcesamiento: Integer;

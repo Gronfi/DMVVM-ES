@@ -222,10 +222,7 @@ var
 begin
   //Bindings
   FModelo.OnProgresoProcesamiento.Add(OnProgresoProceso);
-  if Supports(FModelo, INotifyChangedProperty, LObservable) then
-  begin
-    LObservable.Manager.OnPropertyChangedEvent.Add(OnModelNotifyChanged);
-  end;
+  FModelo.OnPropertyChanged.Add(OnModelNotifyChanged);
 end;
 
 initialization
