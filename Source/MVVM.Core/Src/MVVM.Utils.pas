@@ -32,9 +32,9 @@ type
     class function GetInterfaceTypeInfo(const GUID: TGUID): PTypeInfo; static;
     class function CreateComponent_From_RttiInstance(ARttiInstance: TRttiInstanceType; const ACreateParams: array of TValue): TComponent; static;
     class function ShowView<I:IViewModel>(AViewModel: I; const AViewName: string; const APlatform: String = ''; const AOwner: TComponent = nil): IView<I>; overload; static;
-    class procedure ShowView<I:IViewModel>(AView: IView<I>); overload; static;
+    class procedure ShowView(AView: IView); overload; static;
     class function ShowModalView<I:IViewModel>(AViewModel: I; const AViewName: string; const AResultProc: TProc<TModalResult>; const APlatform: String = ''; const AOwner: TComponent = nil): IView<I>; overload; static;
-    class procedure ShowModalView<I:IViewModel>(AView: IView<I>; const AResultProc: TProc<TModalResult>); overload; static;
+    class procedure ShowModalView(AView: IView; const AResultProc: TProc<TModalResult>); overload; static;
     //MVVMCore.DefaultViewPlatform, ICSVFile_View_NAME, nil, VistaModelo);
   end;
 
@@ -146,7 +146,7 @@ begin
   end;
 end;
 
-class procedure Utils.ShowModalView<I>(AView: IView<I>; const AResultProc: TProc<TModalResult>);
+class procedure Utils.ShowModalView(AView: IView; const AResultProc: TProc<TModalResult>);
 begin
   MVVMCore.PlatformServices.ShowModalFormView(AView.GetAsObject as TComponent, AResultProc);
 end;
@@ -162,7 +162,7 @@ begin
   end;
 end;
 
-class procedure Utils.ShowView<I>(AView: IView<I>);
+class procedure Utils.ShowView(AView: IView);
 begin
   MVVMCore.PlatformServices.ShowFormView(AView.GetAsObject as TComponent);
 end;

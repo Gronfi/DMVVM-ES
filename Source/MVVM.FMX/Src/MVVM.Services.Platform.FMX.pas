@@ -91,6 +91,8 @@ end;
 
 procedure TFMXPlatformServices.ShowFormView(AComponent: TComponent);
 begin
+  if not (AComponent.InheritsFrom(TForm)) then
+    raise Exception.Create('The component ' + AComponent.QualifiedClassName + ' must inherit from TForm');
   TForm(AComponent).Show;
 end;
 

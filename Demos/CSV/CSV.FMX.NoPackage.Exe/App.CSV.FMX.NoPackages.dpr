@@ -45,7 +45,7 @@ begin
   Vista := MVVMCore.ViewsProvider.CreateView<ICSVFile_ViewModel>(MVVMCore.DefaultViewPlatform, ICSVFile_View_NAME, nil, VistaModelo);
   Application.MainForm := TfrmCSV(Vista.GetAsObject);
 
-  Utils.ShowView<ICSVFile_ViewModel>(Vista);
+  Utils.ShowView(Vista);
 
   Application.Run;
 end.
