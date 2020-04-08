@@ -1,0 +1,37 @@
+object Form68: TForm68
+  Left = 0
+  Top = 0
+  Caption = 'Form68'
+  ClientHeight = 480
+  ClientWidth = 590
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  DesignerMasterStyle = 0
+  object Grid1: TGrid
+    Align = Client
+    CanFocus = True
+    ClipChildren = True
+    Size.Width = 590.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    OnGetValue = Grid1GetValue
+    Viewport.Width = 570.000000000000000000
+    Viewport.Height = 455.000000000000000000
+    object Column1: TColumn
+      Size.Width = 225.000000000000000000
+    end
+    object Column2: TColumn
+      Size.Width = 343.000000000000000000
+    end
+  end
+  object Button1: TButton
+    Position.X = 480.000000000000000000
+    Position.Y = 48.000000000000000000
+    TabOrder = 1
+    Text = 'Add'
+    OnClick = Button1Click
+  end
+end
