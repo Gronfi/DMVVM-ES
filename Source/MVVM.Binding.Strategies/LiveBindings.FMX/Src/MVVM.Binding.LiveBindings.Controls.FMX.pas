@@ -14,15 +14,46 @@ uses
   System.TypInfo,
   Data.DB,
 
+  //FMX.Grid,
+  FMX.Grid.Style,
+
+  FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
+  FireDAC.Stan.ExprFuncs, FireDAC.FMXUI.Wait,
+  FireDAC.Stan.Param, FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt,
+  FireDAC.Comp.DataSet, FireDAC.Comp.Client,
+
   Spring.Collections,
   System.Generics.Collections,
 
   MVVM.Bindings.LiveBindings.EnumerableAdapter,
-  //Fmx.Bind.Grid,
+
+  Fmx.Bind.Grid,
+  Fmx.Bind.DBEngExt,
+  Fmx.Bind.Editors,
+  Fmx.Bind.Navigator,
+
+  Data.Bind.Controls,
   Data.Bind.Grid,
   Data.Bind.Components,
   Data.Bind.ObjectScope,
   Data.Bind.DBScope;
+
+function ClearDataSetBindingFromComponent(ATarget: TComponent): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I := 0 to ATarget.ComponentCount - 1 do
+  begin
+    if (ATarget.Components[I] is TBindSourceDB) then
+    begin
+      ATarget.Components[I].Free;
+      Exit(True);
+    end;
+  end;
+end;
 
 initialization
 
@@ -155,27 +186,19 @@ TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TGrid,
 TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TGrid,
   procedure(ADataSet: TDataSet; AComponent: TComponent)
   var
-    LLink: TLinkGridToDataSource;
+    LLinker: TLinkGridToDataSource;
     LSource: TBindSourceDB;
-    LDS: TDataSource;
-    I: Integer;
   begin
-    // Remove possible previous link
-    for I := 0 to AComponent.ComponentCount - 1 do
-    begin
-      if (AComponent.Components[I] is TBindListLink) then
-      begin
-        AComponent.Components[I].Free;
-        Break;
-      end;
-    end;
-    LLink := TLinkGridToDataSource.Create(AComponent);
-    LLink.GridControl := AComponent;
-    LDS := TDataSource.Create(LLink);
-    LDS.DataSet := ADataSet;
-    LSource := TBindSourceDB.Create(LLink);
-    LSource.DataSource := LDS;
-    LLink.DataSource := LSource;
+    ClearDataSetBindingFromComponent(AComponent);
+
+    LSource          := TBindSourceDB.Create(AComponent);
+    LSource.DataSet  := ADataSet;
+    LLinker          := TLinkGridToDataSource.Create(LSource);
+    LLinker.Category := 'Quick Bindings';
+    LLinker.GridControl  := AComponent;
+
+    LLinker.DataSource := LSource;
+    LLinker.Active     := True;
   end);
 {$ENDREGION}
 

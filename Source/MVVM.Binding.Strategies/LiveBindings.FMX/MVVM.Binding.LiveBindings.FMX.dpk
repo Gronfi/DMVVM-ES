@@ -29,7 +29,12 @@ package MVVM.Binding.LiveBindings.FMX;
 
 requires
   MVVM.Binding.LiveBindings,
-  MVVM.Platform.FMX;
+  MVVM.Platform.FMX,
+  bindcompfmx,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon,
+  fmxFireDAC;
 
 contains
   MVVM.Binding.LiveBindings.Controls.FMX in 'Src\MVVM.Binding.LiveBindings.Controls.FMX.pas';

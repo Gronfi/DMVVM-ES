@@ -4,14 +4,34 @@ interface
 
 uses
   System.SysUtils, System.Variants, System.Classes, System.Types, System.UITypes,
-  System.Rtti, FMX.Forms, FMX.Dialogs, FMX.Types, FMX.Layouts, FMX.Styles, FMX.StdCtrls,
+  System.Rtti,
+
+  FMX.Forms, FMX.Dialogs, FMX.Types, FMX.Layouts, FMX.Styles, FMX.StdCtrls,
   FMX.Objects, FMX.Controls, FMX.Edit, FMX.Effects, FMX.Graphics,
-  FMX.Controls.Presentation, Data.Bind.GenData, Fmx.Bind.GenData,
-  Data.Bind.Components, Data.Bind.ObjectScope, System.Bindings.Outputs,
-  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt, Data.Bind.DBScope,
-  Data.DB, Datasnap.DBClient, Data.Bind.Controls, Fmx.Bind.Navigator,
-  FMX.ScrollBox, FMX.Grid, FMX.Grid.Style,
-  Fmx.Bind.Grid, Data.Bind.Grid,
+  FMX.Controls.Presentation,
+  FMX.ScrollBox,
+
+  FMX.Grid, FMX.Grid.Style,
+
+  System.Bindings.Outputs,
+
+  Fmx.Bind.GenData,
+  Fmx.Bind.Editors,
+  Fmx.Bind.DBEngExt,
+  Fmx.Bind.Navigator,
+  Fmx.Bind.Grid,
+
+  Data.Bind.GenData,
+  Data.Bind.Components,
+  Data.Bind.ObjectScope,
+  Data.Bind.EngExt,
+  Data.Bind.DBScope,
+  Data.Bind.Controls,
+  Data.Bind.Grid,
+
+  Data.DB,
+  Datasnap.DBClient,
+
   System.Generics.Collections;
 
 type

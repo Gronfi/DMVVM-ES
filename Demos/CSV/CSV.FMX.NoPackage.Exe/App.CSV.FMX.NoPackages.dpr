@@ -31,6 +31,8 @@ begin
   Application.Initialize;
   InitializePlatform;
 
+  ReportMemoryLeaksOnShutdown := True;
+
   MVVMCore.DefaultBindingStrategyName := 'LIVEBINDINGS';
   MVVMCore.DefaultViewPlatform        := 'WINDOWS_DESKTOP';
 

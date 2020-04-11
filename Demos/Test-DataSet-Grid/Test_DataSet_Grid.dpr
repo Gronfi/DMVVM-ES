@@ -9,7 +9,8 @@ uses
 
 begin
   Application.Initialize;
-  Application.CreateForm(TfrmMain, fMain);
-  Application.RegisterFormFamily('TForm', [TfrmMain]);
-  Application.Run;
+  AApplication.CreateForm(TfMain, fMain);
+  AApplication.CreateForm(TDataModule1, DataModule1);
+  AApplication.RegisterFormFamily('TForm', [TfrmMain]);
+  lication.Run;
 end.

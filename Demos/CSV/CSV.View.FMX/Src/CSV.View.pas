@@ -17,6 +17,7 @@ uses
 
 type
   [View_For_ViewModel(ICSVFile_View_NAME, ICSVFile_ViewModel, 'WINDOWS_DESKTOP')]
+  [View_For_ViewModel(ICSVFile_View_NAME, ICSVFile_ViewModel, 'LINUX_DESKTOP')]
   TfrmCSV = class(TFormView<ICSVFile_ViewModel>)
     Label1: TLabel;
     lePath: TEdit;
@@ -38,9 +39,13 @@ type
     DoNoParalelo: TAction;
     Button1: TButton;
     Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure DoSelectFileExecute(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -78,6 +83,26 @@ end;
 procedure TfrmCSV.Button2Click(Sender: TObject);
 begin
   MVVMCore.EnableBinding(DoCrearVista);
+end;
+
+procedure TfrmCSV.Button3Click(Sender: TObject);
+begin
+  lePath.Free;
+end;
+
+procedure TfrmCSV.Button4Click(Sender: TObject);
+begin
+  lePath := TEdit.Create(Self);
+  lePath.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight];
+  lePath.Position.X := -4;
+  lePath.Position.Y := 16;
+  lePath.Size.Width := 405;
+  lePath.Size.Height := 22;
+  lePath.TextPrompt := 'Introduce el path';
+  label1.AddObject(lePath);
+
+  //bindings
+  Binder.Bind(TCSVFile_ViewModel(ViewModel), 'FileName', lePath, 'Text', EBindDirection.TwoWay, [EBindFlag.TargetTracking]);
 end;
 
 { TForm1 }

@@ -114,6 +114,7 @@ implementation
 uses
   System.Generics.Defaults,
 
+  MVVM.Core,
   MVVM.Utils;
 
 { TViewProxy<TVM> }
@@ -139,7 +140,8 @@ end;
 
 procedure TViewProxy<TVM>.ExecuteModal(const AResultProc: TProc<TModalResult>);
 var
-  [weak]LViewForm: IViewForm<TVM>;
+  [weak]
+  LViewForm: IViewForm<TVM>;
 begin
   if Assigned(FViewFreeListener.ActualView) then
   begin
@@ -210,40 +212,39 @@ end;
 
 class function TViewFactory.CreateView<TVM>(const APlatform: string; const AViewName: String; const AOwner: TComponent; AViewModel: TVM): IView<TVM>;
 var
-  ViewClass: TRttiInstanceType;
-  ViewClassComp: TComponentClass;
-  ViewComp: TComponent;
+  LViewClass: TRttiInstanceType;
+  LViewComp: TComponent;
   [weak]
   LView: IView<TVM>;
   [weak]
   LViewForm: IViewForm<TVM>;
-  LName : string;
+  LName: string;
   LParams: array of TValue;
+  LViewModel: TVM;
 begin
   LName := APlatform + '.' + AViewName;
   try
-    ViewClass := nil;
+    LViewClass := nil;
     if Assigned(FRegisteredViews) then
-      FRegisteredViews.TryGetValue(LName, ViewClass);
-
-    if (ViewClass = nil) then
+      FRegisteredViews.TryGetValue(LName, LViewClass);
+    if (LViewClass = nil) then
       raise EListError.CreateFmt('Cannot create view. View "%s" is not registered.', [LName]);
-
-  SetLength(LParams, 1);
-  LParams[0] := AOwner;
-  ViewComp := Utils.CreateComponent_From_RttiInstance(ViewClass, LParams);
-    //ViewClassComp := ViewClass as TComponentClass;
-   // ViewComp := ViewClass.Create(AOwner);
-    if Supports(ViewComp, IViewForm<TVM>, LViewForm) then
+    SetLength(LParams, 1);
+    LParams[0] := AOwner;
+    LViewComp  := Utils.CreateComponent_From_RttiInstance(LViewClass, LParams);
+    if Supports(LViewComp, IViewForm<TVM>, LViewForm) then
     begin
       Result := TFormViewProxy<TVM>.Create(LViewForm);
     end
     else
     begin
-      LView  := ViewComp as IView<TVM>;
+      LView  := LViewComp as IView<TVM>;
       Result := TViewProxy<TVM>.Create(LView);
     end;
-    Result.InitView(AViewModel);
+    LViewModel := AViewModel;
+    if LViewModel = nil then
+      LViewModel := MVVMCore.ViewModelProvider<TVM>;
+    Result.InitView(LViewModel)
   except
     AViewModel := nil;
     raise;
@@ -267,7 +268,7 @@ end;
 
 destructor TFormViewProxy<TVM>.Destroy;
 begin
-FViewFreeListener.Free;
+  FViewFreeListener.Free;
   inherited;
 end;
 
@@ -278,7 +279,8 @@ end;
 
 procedure TFormViewProxy<TVM>.ExecuteModal(const AResultProc: TProc<TModalResult>);
 var
-  [weak]LViewForm: IViewForm<TVM>;
+  [weak]
+  LViewForm: IViewForm<TVM>;
 begin
   if Assigned(FViewFreeListener.ActualView) then
   begin
@@ -338,8 +340,7 @@ begin
   inherited;
 end;
 
-procedure TFormViewProxy<TVM>.TViewFreeListener.Notification(
-  AComponent: TComponent; Operation: TOperation);
+procedure TFormViewProxy<TVM>.TViewFreeListener.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   inherited;
   if (AComponent = FActualViewObject) and (Operation = opRemove) then
@@ -348,7 +349,6 @@ begin
     FActualViewObject := nil;
   end;
 end;
-
 
 class destructor TViewFactory.Destroy;
 begin
@@ -369,7 +369,7 @@ begin
   if (FRegisteredViews = nil) then
     FRegisteredViews := TDictionary<String, TRttiInstanceType>.Create(TIStringComparer.Ordinal);
 
-  LALias := Utils.iif<String>(APlatform.IsEmpty, AViewName, APlatform + '.' + AViewName);
+  LAlias := Utils.iif<String>(APlatform.IsEmpty, AViewName, APlatform + '.' + AViewName);
 
   FRegisteredViews.AddOrSetValue(LAlias, AViewClass);
 end;

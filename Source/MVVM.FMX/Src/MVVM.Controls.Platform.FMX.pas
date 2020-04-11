@@ -812,6 +812,7 @@ procedure TAction.Bind(const AExecute: TExecuteRttiMethod;
   const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
 begin
   FExecute    := DoExecuteRtti;
+  FRttiExecute:= AExecute;
   FCanExecute := ACanExecute;
 end;
 
@@ -819,6 +820,7 @@ procedure TAction.Bind(const AExecute: TExecuteAnonymous;
   const ACanExecute: TCanExecuteMethod; const ABindingStrategy: String);
 begin
   FExecute    := DoExecuteAnonymous;
+  FAnomExecute:= AExecute;
   FCanExecute := ACanExecute;
 end;
 

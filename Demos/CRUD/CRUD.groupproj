@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{F33A2D2A-4FE7-4560-92E7-9AE4753A9FAA}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="CRUD.Core\CRUD.Core.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CRUD.FMX\CRUD.View.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="CRUD.FMX.App\App.CRUD.FMX.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="CRUD_Core">
+        <MSBuild Projects="CRUD.Core\CRUD.Core.dproj"/>
+    </Target>
+    <Target Name="CRUD_Core:Clean">
+        <MSBuild Projects="CRUD.Core\CRUD.Core.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CRUD_Core:Make">
+        <MSBuild Projects="CRUD.Core\CRUD.Core.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="CRUD_View_FMX">
+        <MSBuild Projects="CRUD.FMX\CRUD.View.FMX.dproj"/>
+    </Target>
+    <Target Name="CRUD_View_FMX:Clean">
+        <MSBuild Projects="CRUD.FMX\CRUD.View.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="CRUD_View_FMX:Make">
+        <MSBuild Projects="CRUD.FMX\CRUD.View.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="App_CRUD_FMX">
+        <MSBuild Projects="CRUD.FMX.App\App.CRUD.FMX.dproj"/>
+    </Target>
+    <Target Name="App_CRUD_FMX:Clean">
+        <MSBuild Projects="CRUD.FMX.App\App.CRUD.FMX.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="App_CRUD_FMX:Make">
+        <MSBuild Projects="CRUD.FMX.App\App.CRUD.FMX.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="CRUD_Core;CRUD_View_FMX;App_CRUD_FMX"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="CRUD_Core:Clean;CRUD_View_FMX:Clean;App_CRUD_FMX:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="CRUD_Core:Make;CRUD_View_FMX:Make;App_CRUD_FMX:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

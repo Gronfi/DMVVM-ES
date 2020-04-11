@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{92CAEF6B-12AE-49D0-B53E-1613FF92E732}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="Test_DataSet_Grid.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="Test_DataSet_Grid">
+        <MSBuild Projects="Test_DataSet_Grid.dproj"/>
+    </Target>
+    <Target Name="Test_DataSet_Grid:Clean">
+        <MSBuild Projects="Test_DataSet_Grid.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="Test_DataSet_Grid:Make">
+        <MSBuild Projects="Test_DataSet_Grid.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="Test_DataSet_Grid"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="Test_DataSet_Grid:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="Test_DataSet_Grid:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -28,7 +28,9 @@ package MVVM.Core;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
+  Spring.Base,
+  Spring.Core,
+  Spring.Extensions,
   dbrtl;
 
 contains

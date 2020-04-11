@@ -42,6 +42,8 @@ type
 
     class procedure InitializationDone; static;
 
+    class function ViewModelProvider<T: IViewModel>: T; static;
+
     class function ViewsProvider: TViewFactoryClass; static;
 
     class procedure DelegateExecution(AProc: TProc; AExecutionMode: EDelegatedExecutionMode); overload; static;
@@ -69,7 +71,7 @@ class procedure MVVMCore.AutoRegister;
 var
   Ctx  : TRttiContext;
   Typ  : TRttiType;
-  TypI : TRttiInterfaceType ;
+  //TypI : TRttiInterfaceType ;
   LAttr: TCustomAttribute;
   LVMA : View_For_ViewModel;
   LVMI : ViewModel_Implements;
@@ -245,16 +247,24 @@ class function MVVMCore.DisableBinding(AObject: TObject): Boolean;
 var
   [weak] LBinding: IBindable;
 begin
+  Result := False;
   if Supports(AObject, IBindable, LBinding) then
+  begin
     LBinding.Binding.Enabled := False;
+    Result := True;
+  end;
 end;
 
 class function MVVMCore.EnableBinding(AObject: TObject): Boolean;
 var
   [weak] LBinding: IBindable;
 begin
+  Result := False;
   if Supports(AObject, IBindable, LBinding) then
+  begin
     LBinding.Binding.Enabled := True;
+    Result := True;
+  end;
 end;
 
 class procedure MVVMCore.InitializationDone;
@@ -297,6 +307,11 @@ end;
 class function MVVMCore.ViewsProvider: TViewFactoryClass;
 begin
   Result := TViewFactory;
+end;
+
+class function MVVMCore.ViewModelProvider<T>: T;
+begin
+  Result := MVVMCore.FContainer.Resolve<T>;
 end;
 
 end.

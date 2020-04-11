@@ -37,7 +37,9 @@ type
       const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const ABindingStrategy: String = ''; const AExtraParams: TBindExtraParams = []); overload;
     procedure BindCollection<T: Class>(const ACollection: TEnumerable<T>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
+
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil; const ABindingStrategy: String = '');
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String = ''); //basic link
 
     procedure BindAction(AAction: IBindableAction; const ABindingStrategy: String = ''); overload;
 
@@ -100,6 +102,14 @@ begin
   LEstrategia.BindDataSet(ADataSet, ATarget, ATemplate);
 end;
 
+procedure TBindingManager.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToGrid(ADataSet, ATarget);
+end;
+
 function TBindingManager.GetSelectedBindingOrDefault(const ABindingStrategy: String): IBindingStrategy;
 var
   LMetodo: String;
@@ -112,7 +122,7 @@ begin
   if not FDictionaryStrategies.TryGetValue(LMetodo, Result) then
   begin
     Result := FDictionaryBindingStrategies[LMetodo].Create;
-    FDictionaryStrategies.AddOrSetValue(LMetodo, Result);
+    FDictionaryStrategies[LMetodo] := Result;
   end;
 end;
 
@@ -178,7 +188,7 @@ end;
 
 class procedure TBindingManager.RegisterBindingStrategy(const ABindingStrategy: String; ABindingStrategyClass: TClass_BindingStrategyBase);
 begin
-  FDictionaryBindingStrategies.AddOrSetValue(ABindingStrategy, ABindingStrategyClass);
+  FDictionaryBindingStrategies[ABindingStrategy] := ABindingStrategyClass;
 end;
 
 end.

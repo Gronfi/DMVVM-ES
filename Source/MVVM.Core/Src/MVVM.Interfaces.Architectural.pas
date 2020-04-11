@@ -20,7 +20,7 @@ type
     procedure SetupViewModel;
   end;
 
-  TViewModel = class abstract(TObservable, IViewModel)
+  TViewModel = class abstract(TObservable, IViewModel, INotifyChangedProperty, INotifyFree)
   public
     procedure SetupViewModel; virtual; abstract;
 

@@ -41,7 +41,7 @@ implementation
 
 { ViewForVM }
 
-constructor View_For_ViewModel.Create(const AViewALias: string; AVMInterfaceID: TGUID; const APlatform: String);
+constructor View_For_ViewModel.Create(const AViewALias: string; AVMInterfaceID: TGUID;  const APlatform: String);
 begin
   FVMInterface := AVMInterfaceID;
   FViewAlias   := AViewALias;

@@ -160,6 +160,26 @@ object frmCSV: TfrmCSV
     Text = 'Enable Crear nueva Vista'
     OnClick = Button2Click
   end
+  object Button3: TButton
+    Position.X = 312.000000000000000000
+    Position.Y = 200.000000000000000000
+    Size.Width = 153.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 16
+    Text = 'Borrar Edit de Path'
+    OnClick = Button3Click
+  end
+  object Button4: TButton
+    Position.X = 312.000000000000000000
+    Position.Y = 232.000000000000000000
+    Size.Width = 153.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 20
+    Text = 'Add Edit de PAth and bind'
+    OnClick = Button4Click
+  end
   object ActionList1: TActionList
     Left = 360
     Top = 64

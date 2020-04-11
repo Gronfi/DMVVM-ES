@@ -208,24 +208,41 @@ type
 {$ENDREGION}
 {$REGION 'IBINDING'}
 
+  TOnBindingAssignedValueEvent = procedure(const AObject: TObject; const AProperty: String; const AValue: TValue) of object;
+
   IBinding = interface
     ['{13B534D5-094F-4DF3-AE62-C2BD8B703215}']
+    function GetID: string;
+
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
+
+    function GetOnBindingAssignedValueEvent: TOnBindingAssignedValueEvent;
+    procedure SetOnBindingAssignedValueEvent(AValue: TOnBindingAssignedValueEvent);
+
+    procedure DoOnBindingAssignedValue(const AObject: TObject; const AProperty: String; const AValue: TValue);
 
     procedure DoEnabled;
     procedure DoDisabled;
 
+    function IsObjectInBinding(const AObject: TObject): Boolean;
+
+    property ID: string read GetID;
+    property OnBindingAssignedValueEvent: TOnBindingAssignedValueEvent read GetOnBindingAssignedValueEvent write SetOnBindingAssignedValueEvent;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
-  TBindingBase = class abstract(TComponent, IBinding)
+  TBindingBase = class abstract(TInterfacedObject, IBinding, IInterface) //TComponent
   const
     ENABLED_STATE                   = 0;
     DISABLED_ACTIONS_APPLY_ON_VALUE = 1;
   protected
+    FID: string;
     FEnabled: Integer;
     FSynchronizer: IReadWriteSync;
+    FOnBindingAssignedValueEvent: TOnBindingAssignedValueEvent;
+
+    function GetID: string;
 
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
@@ -233,10 +250,18 @@ type
     procedure DoEnabled; virtual;
     procedure DoDisabled; virtual;
 
+    function GetOnBindingAssignedValueEvent: TOnBindingAssignedValueEvent;
+    procedure SetOnBindingAssignedValueEvent(AValue: TOnBindingAssignedValueEvent);
+
+    procedure DoOnBindingAssignedValue(const AObject: TObject; const AProperty: String; const AValue: TValue);
+
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
 
+    function IsObjectInBinding(const AObject: TObject): Boolean; virtual;
+
+    property ID: string read GetID;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
@@ -260,14 +285,28 @@ type
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
   end;
 
+  TProcFreeNotify = procedure (AComponent: TComponent) of object;
+
+  TFreeProxyComponent = class(TComponent)
+  protected
+    FProc: TProcFreeNotify;
+    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+  public
+    procedure SubscribeToObject(const AObject: TObject);
+    procedure UnSubscribeFromObject(const AObject: TObject);
+
+    property DoOnFreeNotification: TProcFreeNotify read FProc write FProc;
+  end;
+
   TBindingDefault = class abstract(TBindingBase, IBindingDefault)
   protected
-    FBindingStrategy: IBindingStrategy;
+    FInternalComponent: TFreeProxyComponent;
+    [weak] FBindingStrategy : IBindingStrategy;
     FTrackedInstances: ISet<Pointer>;
 
     function GetBindingStrategy: IBindingStrategy;
 
-    procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    procedure Notification(AComponent: TComponent);
   public
     constructor Create(ABindingStrategy: IBindingStrategy); overload;
     destructor Destroy; override;
@@ -314,47 +353,6 @@ type
   end;
 
   TBindingCommandClass = class of TBindingCommandBase;
-
-  (*
-    TBindingBase = class abstract(TComponent, IBinding)
-    protected
-    FEnabled: Integer;
-    FSynchronizer: IReadWriteSync;
-    FBindingStrategy: IBindingStrategy;
-    FTrackedInstances: ISet<Pointer>;
-
-    function GetEnabled: Boolean;
-    procedure SetEnabled(const AValue: Boolean);
-
-    procedure DoEnabled; virtual;
-    procedure DoDisabled; virtual;
-
-    procedure Notification(AComponent: TComponent;
-    Operation: TOperation); override;
-    public
-    constructor Create(ABindingStrategy: IBindingStrategy); overload;
-    destructor Destroy; override;
-
-    procedure CheckNotificationSupport(AObject: TObject; ATracking: Boolean);
-    virtual; // DAVID? sobra?
-
-    function GetBindingStrategy: IBindingStrategy;
-
-    procedure HandlePropertyChanged(const ASender: TObject;
-    const APropertyName: String); virtual;
-    procedure HandleLeafPropertyChanged(const ASender: TObject;
-    const APropertyName: String); virtual;
-
-    procedure SetFreeNotification(const AInstance: TObject); virtual;
-    procedure RemoveFreeNotification(const AInstance: TObject); virtual;
-    procedure HandleFreeEvent(const ASender, AInstance: TObject); virtual;
-
-    procedure SetManager(const AInstance: TObject); virtual;
-
-    property BindingStrategy: IBindingStrategy read GetBindingStrategy;
-    property Enabled: Boolean read GetEnabled write SetEnabled;
-    end;
-  *)
 
 {$ENDREGION}
   { Abstract base template class that defines the mapping between properties of
@@ -483,6 +481,8 @@ type
   end;
 {$ENDREGION}
 {$REGION 'IBindingStrategy'}
+  TBindingList = IList<IBinding>;
+
   IBindingStrategy = interface
     ['{84676E39-0351-4F3E-AB66-814E022014BD}']
     procedure Start;
@@ -495,29 +495,43 @@ type
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
 
+    function GetBindings: TBindingList;
+
     procedure Notify(const ASource: TObject; const APropertyName: String = ''); overload;
     procedure Notify(const ASource: TObject; const APropertiesNames: TArray<String>); overload;
 
-    procedure AddBinding(ABinding: TBindingBase);
+    procedure AddBinding(ABinding: IBinding);
+    procedure RemoveBinding(ABinding: IBinding);
     function BindsCount: Integer;
     procedure ClearBindings;
 
-    function GetPlatformBindActionCommandType: TBindingCommandClass;
+    //function GetPlatformBindActionCommandType: TBindingCommandClass;
 
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
+
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil);
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); //basic link
 
     procedure BindAction(AAction: IBindableAction); overload;
 
+    procedure Unbind(const ASource: TObject); overload;
+
+    property Bindings: TBindingList read GetBindings;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 {$ENDREGION}
 {$REGION 'TBindingStrategyBase'}
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   protected
-    FSynchronizer: IReadWriteSync;
+    FBindings         : TBindingList;
+    FSynchronizer     : IReadWriteSync;
+
+    function GetEnabled: Boolean; virtual; abstract;
+    procedure SetEnabled(const AValue: Boolean); virtual; abstract;
+
+    function GetBindings: TBindingList;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -529,26 +543,28 @@ type
     procedure AdquireWrite;
     procedure ReleaseWrite;
 
-    function GetEnabled: Boolean; virtual; abstract;
-    procedure SetEnabled(const AValue: Boolean); virtual; abstract;
-
     procedure Notify(const AObject: TObject; const APropertyName: String = ''); overload; virtual; abstract;
     procedure Notify(const AObject: TObject; const APropertiesNames: TArray<String>); overload; virtual;
 
-    procedure AddBinding(ABinding: TBindingBase); virtual; abstract;
-    procedure ClearBindings; virtual; abstract;
+    procedure AddBinding(ABinding: IBinding); virtual;
+    procedure RemoveBinding(ABinding: IBinding); virtual;
+    procedure ClearBindings; virtual;
     function BindsCount: Integer; virtual;
 
-    function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
+    //function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; virtual;
-      abstract;
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); virtual; abstract;
+
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil); virtual; abstract;
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); virtual; abstract;
 
     procedure BindAction(AAction: IBindableAction); overload; virtual; abstract;
 
+    procedure Unbind(const ASource: TObject); overload; virtual; abstract;
+
+    property Bindings: TBindingList read GetBindings;
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
@@ -580,6 +596,17 @@ end;
 
 { TBindingStrategyBase }
 
+procedure TBindingStrategyBase.AddBinding(ABinding: IBinding);
+begin
+  AdquireWrite;
+  try
+    Utils.IdeDebugMsg('<TBindingStrategyBase.AddBinding> ID: ' + ABinding.ID);
+    FBindings.Add(ABinding);
+  finally
+    ReleaseWrite
+  end;
+end;
+
 procedure TBindingStrategyBase.AdquireRead;
 begin
   FSynchronizer.BeginRead;
@@ -592,19 +619,42 @@ end;
 
 function TBindingStrategyBase.BindsCount: Integer;
 begin
-  Result := 0;
+  AdquireRead;
+  try
+    Result := FBindings.Count
+  finally
+    ReleaseRead;
+  end;
+end;
+
+procedure TBindingStrategyBase.ClearBindings;
+begin
+  AdquireWrite;
+  try
+    FBindings.Clear;
+  finally
+    ReleaseWrite;
+  end;
 end;
 
 constructor TBindingStrategyBase.Create;
 begin
   inherited;
-  FSynchronizer := TMREWSync.Create;
+  FSynchronizer      := TMREWSync.Create;
+  FBindings          := TCollections.CreateList<IBinding>;
 end;
 
 destructor TBindingStrategyBase.Destroy;
 begin
+  ClearBindings;
+  FBindings     := nil;
   FSynchronizer := nil;
   inherited;
+end;
+
+function TBindingStrategyBase.GetBindings: TBindingList;
+begin
+  Result := FBindings;
 end;
 
 procedure TBindingStrategyBase.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
@@ -625,6 +675,20 @@ begin
   FSynchronizer.EndWrite;
 end;
 
+procedure TBindingStrategyBase.RemoveBinding(ABinding: IBinding);
+begin
+  Utils.IdeDebugMsg('<TBindingStrategyBase.RemoveBinding> ID: ' + ABinding.ID);
+  AdquireWrite;
+  try
+    FBindings.RemoveAll(function (const AABinding: IBinding): Boolean
+                        begin
+                          Result := ABinding.ID = AABinding.ID;
+                        end);
+  finally
+    ReleaseWrite
+  end;
+end;
+
 procedure TBindingStrategyBase.Start;
 begin;
 end;
@@ -633,7 +697,8 @@ end;
 
 constructor TBindingBase.Create;
 begin
-  inherited Create(nil);
+  inherited Create;
+  FID           := GUIDToString(TGuid.NewGuid);
   FEnabled      := ENABLED_STATE;
   FSynchronizer := TMREWSync.Create;
 end;
@@ -649,6 +714,12 @@ begin
   //
 end;
 
+procedure TBindingBase.DoOnBindingAssignedValue(const AObject: TObject; const AProperty: String; const AValue: TValue);
+begin
+  if Assigned(FOnBindingAssignedValueEvent) then
+    FOnBindingAssignedValueEvent(AObject, AProperty, AValue);
+end;
+
 procedure TBindingBase.DoDisabled;
 begin
   //
@@ -662,6 +733,21 @@ begin
   finally
     FSynchronizer.EndRead
   end;
+end;
+
+function TBindingBase.GetID: string;
+begin
+  Result := FID;
+end;
+
+function TBindingBase.GetOnBindingAssignedValueEvent: TOnBindingAssignedValueEvent;
+begin
+  Result := FOnBindingAssignedValueEvent
+end;
+
+function TBindingBase.IsObjectInBinding(const AObject: TObject): Boolean;
+begin
+  Result := False;
 end;
 
 procedure TBindingBase.SetEnabled(const AValue: Boolean);
@@ -690,6 +776,11 @@ begin
   finally
     FSynchronizer.EndWrite;
   end;
+end;
+
+procedure TBindingBase.SetOnBindingAssignedValueEvent(AValue: TOnBindingAssignedValueEvent);
+begin
+  FOnBindingAssignedValueEvent := AValue;
 end;
 
 { TBindingDefault }
@@ -729,6 +820,8 @@ end;
 constructor TBindingDefault.Create(ABindingStrategy: IBindingStrategy);
 begin
   inherited Create;
+  FInternalComponent:= TFreeProxyComponent.Create(nil);
+  FInternalComponent.DoOnFreeNotification := Notification;
   FTrackedInstances := TCollections.CreateSet<Pointer>;
   FBindingStrategy  := ABindingStrategy;
 end;
@@ -747,6 +840,7 @@ begin
     end;
     FTrackedInstances := nil;
   end;
+  FInternalComponent.Free;
   FBindingStrategy  := nil;
   FTrackedInstances := nil;
   inherited;
@@ -757,6 +851,7 @@ begin
   Result := FBindingStrategy
 end;
 
+// En teoría si llegamos aquí hay que destruir este binding, pues una parte del binding se ha destruido
 procedure TBindingDefault.HandleFreeEvent(const ASender, AInstance: TObject);
 begin
   FSynchronizer.BeginWrite;
@@ -764,6 +859,11 @@ begin
     FTrackedInstances.Remove(AInstance);
   finally
     FSynchronizer.EndWrite;
+  end;
+  if Assigned(FBindingStrategy) then
+  begin
+    FBindingStrategy.RemoveBinding(Self);
+    FBindingStrategy := nil;
   end;
 end;
 
@@ -777,17 +877,21 @@ begin
   //
 end;
 
-procedure TBindingDefault.Notification(AComponent: TComponent; Operation: TOperation);
+procedure TBindingDefault.Notification(AComponent: TComponent);
 begin
-  inherited;
-  if (Operation = opRemove) then
+//  inherited;
+//  if (Operation = opRemove) then
+//  begin
+//    Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
     HandleFreeEvent(AComponent, AComponent);
+//  end;
 end;
 
 procedure TBindingDefault.RemoveFreeNotification(const AInstance: TObject);
 begin
   if (AInstance is TComponent) then
-    TComponent(AInstance).RemoveFreeNotification(Self);
+    FInternalComponent.UnSubscribeFromObject(AInstance);
+    //TComponent(AInstance).RemoveFreeNotification(Self);
 end;
 
 procedure TBindingDefault.SetFreeNotification(const AInstance: TObject);
@@ -803,7 +907,8 @@ begin
     finally
       FSynchronizer.EndWrite;
     end;
-    TComponent(AInstance).FreeNotification(Self);
+    FInternalComponent.SubscribeToObject(AInstance);
+    //TComponent(AInstance).FreeNotification(Self);
   end
   else if Supports(AInstance, INotifyFree, LNotifyFree) then
   begin
@@ -1021,6 +1126,28 @@ begin
     if Assigned(FCanExecute) then
       Result := FCanExecute;
   end;
+end;
+
+{ TFreeProxyComponent }
+
+procedure TFreeProxyComponent.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (Operation = opRemove) then
+  begin
+    Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
+    Fproc(AComponent);
+  end;
+end;
+
+procedure TFreeProxyComponent.SubscribeToObject(const AObject: TObject);
+begin
+  TComponent(AObject).FreeNotification(Self);
+end;
+
+procedure TFreeProxyComponent.UnSubscribeFromObject(const AObject: TObject);
+begin
+  TComponent(AObject).RemoveFreeNotification(Self);
 end;
 
 end.
