@@ -2,40 +2,72 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Menu'
-  ClientHeight = 364
-  ClientWidth = 700
+  ClientHeight = 101
+  ClientWidth = 223
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = FormCreate
   DesignerMasterStyle = 0
-  object Button1: TButton
-    Position.X = 8.000000000000000000
-    Position.Y = 8.000000000000000000
-    TabOrder = 2
-    Text = 'Personas'
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Position.X = 8.000000000000000000
-    Position.Y = 40.000000000000000000
-    TabOrder = 3
-    Text = 'Coches'
+  object Layout1: TLayout
+    Align = Client
+    Size.Width = 223.000000000000000000
+    Size.Height = 101.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    object Rectangle1: TRectangle
+      Align = Top
+      Fill.Color = claCrimson
+      Size.Width = 223.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      object Text3: TText
+        Align = Client
+        Size.Width = 223.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        Text = 'Tablas'
+        TextSettings.Font.Size = 16.000000000000000000
+        TextSettings.Font.StyleExt = {00070000000000000004000000}
+        TextSettings.FontColor = claWhite
+      end
+    end
+    object Button1: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 64.000000000000000000
+      TabOrder = 1
+      Text = 'Personas'
+      OnClick = Button1Click
+    end
+    object Button2: TButton
+      Position.X = 136.000000000000000000
+      Position.Y = 64.000000000000000000
+      TabOrder = 2
+      Text = 'Coches'
+      OnClick = Button2Click
+    end
+    object ShadowEffect1: TShadowEffect
+      Distance = 3.000000000000000000
+      Direction = 45.000000000000000000
+      Softness = 0.300000011920929000
+      Opacity = 0.600000023841857900
+      ShadowColor = claBlack
+    end
   end
   object FDConnection1: TFDConnection
     Params.Strings = (
       'Database=..\..\..\Demos\Data\bd.db'
       'DriverID=SQLite')
-    Left = 32
-    Top = 72
+    Left = 24
+    Top = 8
   end
   object FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink
-    Left = 32
-    Top = 120
+    Left = 96
+    Top = 48
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
     Provider = 'FMX'
-    Left = 160
-    Top = 120
+    Left = 176
+    Top = 8
   end
 end

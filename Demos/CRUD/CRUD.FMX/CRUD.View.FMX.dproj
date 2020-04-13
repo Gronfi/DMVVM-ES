@@ -89,6 +89,26 @@
             <Form>frmPersonasDesktop</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="Src\New.Persona.View.Desktop.pas">
+            <Form>frmNewPersona</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Src\Update.Persona.View.Desktop.pas">
+            <Form>frmUpdatePersona</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Src\Coches.View.Desktop.pas">
+            <Form>frmCochesDesktop</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Src\New.Coche.View.Desktop.pas">
+            <Form>frmNewCoche</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Src\Update.Coche.View.Desktop.pas">
+            <Form>frmUpdateCoche</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

@@ -35,6 +35,7 @@ requires
 contains
   DataSet.Interfaces in 'Src\DataSet.Interfaces.pas',
   DataSet.Model in 'Src\DataSet.Model.pas' {DataSet_Model: TDataModule},
-  DataSet.ViewModel in 'Src\DataSet.ViewModel.pas';
+  DataSet.ViewModel in 'Src\DataSet.ViewModel.pas',
+  DataSet.Types in 'Src\DataSet.Types.pas';
 
 end.

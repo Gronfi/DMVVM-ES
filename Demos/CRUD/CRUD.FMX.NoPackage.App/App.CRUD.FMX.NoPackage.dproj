@@ -69,7 +69,7 @@
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
         <SanitizedProjectName>App_CRUD_FMX_NoPackage</SanitizedProjectName>
-        <DCC_UnitSearchPath>..\..\..\ThirdParty\Spring4D\;..\..\..\ThirdParty\Spring4D\Base;..\..\..\ThirdParty\Spring4D\Base\Collections;..\..\..\ThirdParty\Spring4D\Base\Logging;..\..\..\ThirdParty\Spring4D\Base\Patterns;..\..\..\ThirdParty\Spring4D\Core;..\..\..\ThirdParty\Spring4D\Core\Container;..\..\..\ThirdParty\Spring4D\Core\Interception;..\..\..\ThirdParty\Spring4D\Core\Logging;..\..\..\ThirdParty\Spring4D\Core\Services;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\ThirdParty\Spring4D\Source\;..\..\..\ThirdParty\Spring4D\Source\Base\;..\..\..\ThirdParty\Spring4D\Source\Base\Collections;..\..\..\ThirdParty\Spring4D\Source\Base\Logging;..\..\..\ThirdParty\Spring4D\Source\Base\Patterns;..\..\..\ThirdParty\Spring4D\Source\Core;..\..\..\ThirdParty\Spring4D\Source\Core\Container;..\..\..\ThirdParty\Spring4D\Source\Core\Interception;..\..\..\ThirdParty\Spring4D\Source\Core\Logging;..\..\..\ThirdParty\Spring4D\Source\Core\Services;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>3082</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
@@ -156,11 +156,32 @@
             <Form>frmPersonasDesktop</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="..\DataSet.Resources.Common\Personas.Resources.Common.pas"/>
+        <DCCReference Include="..\CRUD.Resources.Common\CRUD.Resources.Common.pas"/>
         <DCCReference Include="..\CRUD.FMX.App\Src\uMain.pas">
             <Form>frmMain</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="..\CRUD.FMX\Src\Coches.View.Desktop.pas">
+            <Form>frmCochesDesktop</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="..\CRUD.FMX\Src\New.Coche.View.Desktop.pas">
+            <Form>frmNewCoche</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="..\CRUD.FMX\Src\New.Persona.View.Desktop.pas">
+            <Form>frmNewPersona</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="..\CRUD.FMX\Src\Update.Coche.View.Desktop.pas">
+            <Form>frmUpdateCoche</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="..\CRUD.FMX\Src\Update.Persona.View.Desktop.pas">
+            <Form>frmUpdatePersona</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="..\CRUD.Core\Src\DataSet.Types.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

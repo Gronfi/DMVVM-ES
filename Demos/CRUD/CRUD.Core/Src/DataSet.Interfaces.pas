@@ -12,19 +12,15 @@ uses
   MVVM.Interfaces.Architectural,
   MVVM.Bindings,
 
+  DataSet.Types,
   DataSet.Model;
 
 type
-  TFieldConverter = record
-    FieldName : string;
-    FieldValue: TValue;
-  end;
-
-  TFieldConverters = array of TFieldConverter;
-
   IDataSet_ViewModel = Interface(IViewModel)
   ['{452FF42A-9FE0-49D0-A3D1-DE6422E1202B}']
     function GetDataSet: TDataSet;
+
+    function GetIsOpen: Boolean;
 
     function GetTableName: String;
     procedure SetTableName(const ATableName: string);
@@ -37,7 +33,8 @@ type
 
     procedure SetModel(AModel: TDataSet_Model);
 
-    procedure GetRows; //hace un refresco y abre la tabla si estuviera cerrada
+    procedure MakeGetRows;
+    function GetRows(const AFields: TFieldsToGet): TFieldConverters;
     procedure DeleteActiveRow;
     procedure MakeAppend;
     procedure AppendRow(const AFields: TFieldConverters);
@@ -47,6 +44,7 @@ type
     property NewRowView: string read GetNewRowView write SetNewRowView;
     property UpdateRowView: string read GetUpdateRowView write SetUpdateRowView;
     property TableName: string read GetTableName write SetTableName;
+    property IsOpen: Boolean read GetIsOpen;
     property DataSet: TDataSet read GetDataSet;
   end;
 

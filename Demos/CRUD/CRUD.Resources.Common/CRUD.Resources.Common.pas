@@ -1,4 +1,4 @@
-unit Personas.Resources.Common;
+unit CRUD.Resources.Common;
 
 interface
 
@@ -10,7 +10,7 @@ uses
 var
   Modelo        : TDataSet_Model;
   VistaModelo   : IDataSet_ViewModel;
-  VistaPersonas : IView<IDataSet_ViewModel>;
+  VistaTabla    : IView<IDataSet_ViewModel>;
 
 implementation
 

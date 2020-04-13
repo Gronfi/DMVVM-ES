@@ -11,6 +11,7 @@ uses
 
   DataSet.Interfaces,
   DataSet.Model,
+  DataSet.Types,
 
   MVVM.Attributes,
   MVVM.Interfaces,
@@ -39,6 +40,8 @@ type
     function GetUpdateRowView: string;
     procedure SetUpdateRowView(const AViewName: string);
 
+    function GetIsOpen: Boolean;
+
   public
     procedure SetupViewModel; override;
 
@@ -47,7 +50,8 @@ type
     procedure CloseDataSet;
     procedure OpenDataSet;
 
-    procedure GetRows;
+    procedure MakeGetRows;
+    function GetRows(const AFields: TFieldsToGet): TFieldConverters;
     procedure DeleteActiveRow;
     procedure MakeAppend;
     procedure AppendRow(const AFields: TFieldConverters);
@@ -57,6 +61,7 @@ type
     property NewRowView: string read GetNewRowView write SetNewRowView;
     property UpdateRowView: string read GetUpdateRowView write SetUpdateRowView;
     property TableName: string read GetTableName write SetTableName;
+    property IsOpen: Boolean read GetIsOpen;
     property DataSet: TDataSet read GetDataSet;
     property Model: TDataSet_Model read GetModel;
   end;
@@ -64,6 +69,7 @@ type
 implementation
 
 uses
+  System.Rtti,
   System.SysUtils,
   System.Threading,
   System.Diagnostics,
@@ -82,66 +88,8 @@ begin
 end;
 
 procedure TDataSet_ViewModel.AppendRow(const AFields: TFieldConverters);
-var
-  I: Integer;
 begin
-  FModel.DataSet.Append;
-  try
-    for I := Low(AFields) to High(AFields) do
-    begin
-      FModel.DataSet.FieldByName(AFields[I].FieldName).AssignValue(AFields[I].FieldValue.AsVarRec);
-      (*
-      case AFields[I].FieldValue.Kind of
-        tkInteger:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsInteger := AFields[I].FieldValue.AsInteger;
-          end;
-        tkChar, tkString, tkWChar, tkLString, tkWString, tkUString:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsString := AFields[I].FieldValue.AsString;
-          end;
-        tkFloat:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsFloat := AFields[I].FieldValue.As;
-          end;
-        tkClass:
-          begin
-
-          end;
-        tkVariant:
-          begin
-
-          end;
-        tkInt64:
-          begin
-
-          end;
-        else begin
-  //      tkArray
-  //      tkMethod
-  //      tkEnumeration
-  //      tkSet
-  //      tkRecord
-  //      tkInterface
-  //      tkDynArray
-  //      tkClassRef
-  //      tkUnknown
-  //      tkPointer
-  //      tkProcedure
-  //      tkMRecord
-               raise Exception.Create('<TDataSet_ViewModel.AppendRow> Invalid Type!');
-             end;
-      end;
-      *)
-    end;
-    FModel.DataSet.Post;
-  except
-    on E:Exception do
-    begin
-      FModel.DataSet.Cancel;
-      raise;
-    end;
-  end;
+  FModel.AppendRow(AFields);
 end;
 
 procedure TDataSet_ViewModel.CloseDataSet;
@@ -165,6 +113,11 @@ begin
   Result := FModel.DataSet;
 end;
 
+function TDataSet_ViewModel.GetIsOpen: Boolean;
+begin
+  Result := FModel.IsOpen
+end;
+
 function TDataSet_ViewModel.GetModel: TDataSet_Model;
 begin
   Result := FModel
@@ -175,11 +128,9 @@ begin
   Result := FNewRowView
 end;
 
-procedure TDataSet_ViewModel.GetRows;
+function TDataSet_ViewModel.GetRows(const AFields: TFieldsToGet): TFieldConverters;
 begin
-  if not FModel.IsOpen then
-    FModel.Open
-  else FModel.DataSet.Refresh;
+  Result := FModel.GetRows(AFields);
 end;
 
 function TDataSet_ViewModel.GetTableName: String;
@@ -202,6 +153,13 @@ begin
                                                    begin
                                                      ;
                                                    end, MVVMCore.DefaultViewPlatform);
+end;
+
+procedure TDataSet_ViewModel.MakeGetRows;
+begin
+  if not FModel.IsOpen then
+    FModel.Open
+  else FModel.DataSet.Refresh;
 end;
 
 procedure TDataSet_ViewModel.MakeUpdate;
@@ -257,67 +215,9 @@ begin
   end;
 end;
 
-procedure TDataSet_ViewModel.UpdateActiveRow;
-var
-  I: Integer;
+procedure TDataSet_ViewModel.UpdateActiveRow(const AFields: TFieldConverters);
 begin
-  FModel.DataSet.Edit;
-  try
-    for I := Low(AFields) to High(AFields) do
-    begin
-      FModel.DataSet.FieldByName(AFields[I].FieldName).AssignValue(AFields[I].FieldValue.AsVarRec);
-      (*
-      case AFields[I].FieldValue.Kind of
-        tkInteger:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsInteger := AFields[I].FieldValue.AsInteger;
-          end;
-        tkChar, tkString, tkWChar, tkLString, tkWString, tkUString:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsString := AFields[I].FieldValue.AsString;
-          end;
-        tkFloat:
-          begin
-            FModel.DataSet.FieldByName(AFields[I].FieldName).AsFloat := AFields[I].FieldValue.As;
-          end;
-        tkClass:
-          begin
-
-          end;
-        tkVariant:
-          begin
-
-          end;
-        tkInt64:
-          begin
-
-          end;
-        else begin
-  //      tkArray
-  //      tkMethod
-  //      tkEnumeration
-  //      tkSet
-  //      tkRecord
-  //      tkInterface
-  //      tkDynArray
-  //      tkClassRef
-  //      tkUnknown
-  //      tkPointer
-  //      tkProcedure
-  //      tkMRecord
-               raise Exception.Create('<TDataSet_ViewModel.AppendRow> Invalid Type!');
-             end;
-      end;
-      *)
-    end;
-    FModel.DataSet.Post;
-  except
-    on E:Exception do
-    begin
-      FModel.DataSet.Cancel;
-      raise;
-    end;
-  end;
+  FModel.UpdateActiveRow(AFields);
 end;
 
 initialization

@@ -11,7 +11,8 @@ uses
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async,
   FireDAC.Phys, FireDAC.FMXUI.Wait, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteDef, FMX.Controls.Presentation, FMX.StdCtrls,
-  FireDAC.Phys.SQLite, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.UI;
+  FireDAC.Phys.SQLite, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.UI,
+  FMX.Objects, FMX.Effects, FMX.Layouts;
 
 type
   TfrmMain = class(TForm)
@@ -20,8 +21,13 @@ type
     Button1: TButton;
     Button2: TButton;
     FDGUIxWaitCursor1: TFDGUIxWaitCursor;
+    Rectangle1: TRectangle;
+    Text3: TText;
+    ShadowEffect1: TShadowEffect;
+    Layout1: TLayout;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
     procedure InitializateResources;
@@ -36,7 +42,7 @@ var
 implementation
 
 uses
-  Personas.Resources.Common,
+  CRUD.Resources.Common,
   DataSet.Interfaces,
   DataSet.Model,
   DataSet.ViewModel,
@@ -48,8 +54,17 @@ uses
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
-  VistaPersonas := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'PersonasMain', nil, VistaModelo);
-  Utils.ShowModalView(VistaPersonas, procedure (AResult: TModalResult)
+  VistaTabla := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'PersonasMain', nil, VistaModelo);
+  Utils.ShowModalView(VistaTabla, procedure (AResult: TModalResult)
+                                     begin
+                                       //
+                                     end);
+end;
+
+procedure TfrmMain.Button2Click(Sender: TObject);
+begin
+  VistaTabla := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'CochesMain', nil, VistaModelo);
+  Utils.ShowModalView(VistaTabla, procedure (AResult: TModalResult)
                                      begin
                                        //
                                      end);

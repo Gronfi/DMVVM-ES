@@ -671,9 +671,10 @@ type
 {$ENDREGION 'FMX.ComboBox'}
 
 {$REGION 'TGrid'}
-  TGrid = class(FMX.Grid.TGrid)
+(*  TGrid = class(FMX.Grid.TGrid)
 
   end;
+*)
 {$ENDREGION}
 
 implementation

@@ -14,7 +14,7 @@ uses
   DataSet.Model,
   DataSet.ViewModel,
   Personas.View.Desktop {frmDataSetDesktop},
-  Personas.Resources.Common in '..\DataSet.Resources.Common\Personas.Resources.Common.pas',
+  CRUD.Resources.Common in '..\CRUD.Resources.Common\CRUD.Resources.Common.pas',
   uMain in 'Src\uMain.pas' {frmMain};
 
 {$R *.res}

@@ -1,0 +1,117 @@
+object frmUpdatePersona: TfrmUpdatePersona
+  Left = 0
+  Top = 0
+  Caption = 'Form2'
+  ClientHeight = 239
+  ClientWidth = 290
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Button1: TButton
+    Action = actUpdate
+    Enabled = True
+    ImageIndex = -1
+    Position.X = 8.000000000000000000
+    Position.Y = 200.000000000000000000
+    Size.Width = 89.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+  end
+  object Button2: TButton
+    ModalResult = 1
+    Position.X = 200.000000000000000000
+    Position.Y = 200.000000000000000000
+    Size.Width = 80.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Close'
+  end
+  object edtApellidos: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 2
+    Position.X = 176.000000000000000000
+    Position.Y = 120.000000000000000000
+  end
+  object edtFechaNacimiento: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Position.X = 176.000000000000000000
+    Position.Y = 144.000000000000000000
+  end
+  object edtNombre: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 5
+    Position.X = 176.000000000000000000
+    Position.Y = 96.000000000000000000
+  end
+  object edtPeso: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 6
+    Position.X = 176.000000000000000000
+    Position.Y = 168.000000000000000000
+  end
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 96.000000000000000000
+    Text = 'Nombre'
+    TabOrder = 8
+  end
+  object Label2: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 120.000000000000000000
+    Text = 'Apellidos'
+    TabOrder = 9
+  end
+  object Label3: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 144.000000000000000000
+    Text = 'Fecha Nacimiento'
+    TabOrder = 10
+  end
+  object Label4: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 168.000000000000000000
+    Text = 'Peso'
+    TabOrder = 11
+  end
+  object Rectangle1: TRectangle
+    Align = Top
+    Fill.Color = claCornflowerblue
+    Size.Width = 290.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    object Text3: TText
+      Align = Client
+      Size.Width = 290.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Update.Persona'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claWhite
+    end
+  end
+  object Label5: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 56.000000000000000000
+    Text = 'ID'
+    TabOrder = 7
+  end
+  object edtID: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 4
+    ReadOnly = True
+    Position.X = 176.000000000000000000
+    Position.Y = 56.000000000000000000
+  end
+  object ActionList1: TActionList
+    Left = 128
+    Top = 200
+    object actUpdate: TAction
+      Text = 'Update'
+    end
+  end
+end

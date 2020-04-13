@@ -24,8 +24,14 @@ uses
   DataSet.Model in '..\CRUD.Core\Src\DataSet.Model.pas',
   DataSet.ViewModel in '..\CRUD.Core\Src\DataSet.ViewModel.pas',
   Personas.View.Desktop in '..\CRUD.FMX\Src\Personas.View.Desktop.pas' {frmPersonasDesktop},
-  Personas.Resources.Common in '..\DataSet.Resources.Common\Personas.Resources.Common.pas',
-  uMain in '..\CRUD.FMX.App\Src\uMain.pas' {frmMain};
+  CRUD.Resources.Common in '..\CRUD.Resources.Common\CRUD.Resources.Common.pas',
+  uMain in '..\CRUD.FMX.App\Src\uMain.pas' {frmMain},
+  Coches.View.Desktop in '..\CRUD.FMX\Src\Coches.View.Desktop.pas' {frmCochesDesktop},
+  New.Coche.View.Desktop in '..\CRUD.FMX\Src\New.Coche.View.Desktop.pas' {frmNewCoche},
+  New.Persona.View.Desktop in '..\CRUD.FMX\Src\New.Persona.View.Desktop.pas' {frmNewPersona},
+  Update.Coche.View.Desktop in '..\CRUD.FMX\Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},
+  Update.Persona.View.Desktop in '..\CRUD.FMX\Src\Update.Persona.View.Desktop.pas' {frmUpdatePersona},
+  DataSet.Types in '..\CRUD.Core\Src\DataSet.Types.pas';
 
 {$R *.res}
 
@@ -39,5 +45,7 @@ begin
   MVVMCore.InitializationDone;
 
   Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmNewPersona, frmNewPersona);
+  Application.CreateForm(TfrmUpdateCoche, frmUpdateCoche);
   Application.Run;
 end.

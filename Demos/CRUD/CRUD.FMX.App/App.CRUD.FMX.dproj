@@ -133,7 +133,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="..\DataSet.Resources.Common\Personas.Resources.Common.pas"/>
+        <DCCReference Include="..\CRUD.Resources.Common\CRUD.Resources.Common.pas"/>
         <DCCReference Include="Src\uMain.pas">
             <Form>frmMain</Form>
             <FormType>fmx</FormType>

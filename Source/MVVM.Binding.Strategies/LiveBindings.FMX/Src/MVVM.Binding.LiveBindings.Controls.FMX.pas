@@ -14,7 +14,7 @@ uses
   System.TypInfo,
   Data.DB,
 
-  //FMX.Grid,
+  FMX.Grid,
   FMX.Grid.Style,
 
   FireDAC.Stan.Intf, FireDAC.Stan.Option,
