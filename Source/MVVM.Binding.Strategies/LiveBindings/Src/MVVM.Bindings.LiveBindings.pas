@@ -63,17 +63,23 @@ type
     constructor Create; override;
     destructor Destroy; override;
 
-    //function GetPlatformBindActionCommandType: TBindingCommandClass; override;
+    // function GetPlatformBindActionCommandType: TBindingCommandClass; override;
 
     procedure Notify(const AObject: TObject; const APropertyName: string = ''); overload; override;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; override;
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; override;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload; override;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); override;
 
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil); override;
+    function ClearDataSetBindingFromComponent(ATarget: TComponent): Boolean;
 
-    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); override;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String); overload; override;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass); overload; override;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String); overload; override;
+
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; override;
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload; override;
 
     procedure BindAction(AAction: IBindableAction); overload; override;
 
@@ -88,8 +94,9 @@ type
 implementation
 
 uses
-  //Data.Bind.Components,
-  //Data.Bind.DBScope,
+  Data.Bind.Grid,
+  Data.Bind.Components,
+  Data.Bind.DBScope,
 
   MVVM.Core,
   MVVM.Utils,
@@ -98,15 +105,13 @@ uses
 
 { TStrategy_LiveBindings }
 
-procedure TStrategy_LiveBindings.Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection; const AFlags: EBindFlags; const AValueConverterClass: TBindingValueConverterClass; const AExtraParams: TBindExtraParams);
+procedure TStrategy_LiveBindings.Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection; const AFlags: EBindFlags; const AValueConverterClass: TValueConverterClass; const AExtraParams: TBindExtraParams);
 var
   LSrcProperty, LDstProperty: String;
   lAssocInput, lAssocOutput: IScope;
-  lManaged1, lManaged2: IBindingDefault; //TInternalBindindExpression
+  lManaged1, lManaged2: IBindingDefault;
   LToAdd1, LToAdd2: IBinding;
   LOptions: TBindings.TCreateOptions;
-  //LNotifyPropertyChanged: INotifyChangedProperty;
-  //LNotifyPropertyChangeTracking: INotifyPropertyTrackingChanged;
 begin
   LOptions := [coNotifyOutput];
   if not(EBindFlag.DontApply in AFlags) then
@@ -126,7 +131,6 @@ begin
   end;
   LToAdd1 := TInternalBindindExpression.Create(Self, [lAssocInput], LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
   Supports(LToAdd1, IBindingDefault, lManaged1);
-  //lManaged1 := TInternalBindindExpression.Create(Self, [lAssocInput], LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
 
   // Free Event
   lManaged1.SetManager(ASource);
@@ -184,7 +188,7 @@ begin
   lAssocOutput := TBindings.CreateAssociationScope([Associate(ATarget, ATargetAlias)]);
   LSrcProperty := ASourceExpresion;
   LDstProperty := ATargetPropertyPath;
-  LToAdd     := TInternalBindindExpression.Create(Self, [lAssocInput], LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
+  LToAdd       := TInternalBindindExpression.Create(Self, [lAssocInput], LSrcProperty, [lAssocOutput], LDstProperty, nil, nil, LOptions);
   Supports(LToAdd, IBindingDefault, lManaged);
   // asociacion de eventos de fin
   for I := 0 to LCnt - 1 do
@@ -205,7 +209,7 @@ begin
   LObject := AAction as TContainedAction;
   // if already Exists the binded object we reuse the command
   if not ExistBindingCommandActionFor(LObject, LCommand) then
-    LCommand := TBindingCommandAction.Create(LObject);
+    LCommand      := TBindingCommandAction.Create(LObject);
   AAction.Binding := LCommand;
   AddBinding(LCommand);
 end;
@@ -246,13 +250,137 @@ begin
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
 end;
 
+procedure TStrategy_LiveBindings.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String);
+var
+  LinkPropertyToFieldBitmap: TLinkPropertyToField;
+  LSource: TBindSourceDB;
+begin
+  LSource                                     := TBindSourceDB.Create(nil); //DAVE
+  LSource.DataSet                             := ADataSet;
+  LinkPropertyToFieldBitmap                   := TLinkPropertyToField.Create(nil); //DAVE
+  LinkPropertyToFieldBitmap.Category          := 'Quick Bindings';
+  LinkPropertyToFieldBitmap.DataSource        := LSource;
+  LinkPropertyToFieldBitmap.FieldName         := AFieldName;
+  LinkPropertyToFieldBitmap.Component         := ATarget;
+  LinkPropertyToFieldBitmap.ComponentProperty := ATargetPropertyPath;
+  LinkPropertyToFieldBitmap.Active            := True;
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass);
+begin
+  raise Exception.Create('Method not suitable for this kind of binding (LiveBindings)');
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath, ACustomFormat: String);
+var
+  LinkPropertyToFieldBitmap: TLinkPropertyToField;
+  LSource: TBindSourceDB;
+begin
+  LSource                                     := TBindSourceDB.Create(nil); //DAVE
+  LSource.DataSet                             := ADataSet;
+  LinkPropertyToFieldBitmap                   := TLinkPropertyToField.Create(nil); //DAVE
+  LinkPropertyToFieldBitmap.Category          := 'Quick Bindings';
+  LinkPropertyToFieldBitmap.DataSource        := LSource;
+  LinkPropertyToFieldBitmap.FieldName         := AFieldName;
+  LinkPropertyToFieldBitmap.Component         := ATarget;
+  LinkPropertyToFieldBitmap.CustomFormat      := ACustomFormat;
+  LinkPropertyToFieldBitmap.ComponentProperty := ATargetPropertyPath;
+  LinkPropertyToFieldBitmap.Active            := True;
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate);
+var
+  LGridLinker: TLinkGridToDataSource;
+  LColumnLinker: TLinkGridToDataSourceColumn;
+  LSource: TBindSourceDB;
+  I, J: Integer;
+  LExisteS, LExisteL: Boolean;
+begin
+  Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ADataSet) cannot be null');
+  Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ATarget) cannot be null');
+  // mirar si existe o no un linkado previo
+  LExisteS := False;
+  LExisteL := False;
+  for I    := 0 to ATarget.ComponentCount - 1 do
+  begin
+    if (ATarget.Components[I] is TBindSourceDB) then
+    begin
+      LExisteS := True;
+      LSource  := ATarget.Components[I] as TBindSourceDB;
+      for J    := 0 to ATarget.Components[I].ComponentCount - 1 do
+      begin
+        if (ATarget.Components[I].Components[J] is TLinkGridToDataSource) then
+        begin
+          LGridLinker        := ATarget.Components[I].Components[J] as TLinkGridToDataSource;
+          LGridLinker.Active := False;
+          LExisteL           := True;
+          Break;
+        end;
+      end;
+      if LExisteL then
+        Break;
+    end;
+  end;
+  if not LExisteS then
+  begin
+    LSource         := TBindSourceDB.Create(ATarget);
+    LSource.DataSet := ADataSet;
+  end;
+  if not LExisteL then
+  begin
+    LGridLinker             := TLinkGridToDataSource.Create(LSource);
+    LGridLinker.Category    := 'Quick Bindings';
+    LGridLinker.GridControl := ATarget;
+    LGridLinker.DataSource  := LSource;
+  end;
+  for I := Low(AColumnLinks) to High(AColumnLinks) do
+  begin
+    LColumnLinker              := LGridLinker.Columns.Add;
+    LColumnLinker.MemberName   := AColumnLinks[I].DataSetField;
+    LColumnLinker.Header       := AColumnLinks[I].HeaderText;
+    LColumnLinker.ReadOnly     := AColumnLinks[I].ReadOnly;
+    LColumnLinker.Width        := AColumnLinks[I].Width;
+    LColumnLinker.Visible      := True;
+    LColumnLinker.CustomFormat := AColumnLinks[I].CustomFormat;
+    LColumnLinker.CustomParse  := AColumnLinks[I].CustomParse;
+    LColumnLinker.ColumnStyle  := AColumnLinks[I].ColumnStyle;
+  end;
+  LGridLinker.Active := True;
+end;
+
 procedure TStrategy_LiveBindings.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent);
+var
+  LLinker: TLinkGridToDataSource;
+  LSource: TBindSourceDB;
 begin
   Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ADataSet) cannot be null');
   Guard.CheckNotNull(ATarget, '<BindDataSet> (Param=ATarget) cannot be null');
 
-  if not InternalBindDataSet(ADataSet, ATarget) then
-    raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
+  ClearDataSetBindingFromComponent(ATarget);
+
+  LSource             := TBindSourceDB.Create(ATarget);
+  LSource.DataSet     := ADataSet;
+  LLinker             := TLinkGridToDataSource.Create(LSource);
+  LLinker.Category    := 'Quick Bindings';
+  LLinker.GridControl := ATarget;
+
+  LLinker.DataSource := LSource;
+  LLinker.Active     := True;
+end;
+
+function TStrategy_LiveBindings.ClearDataSetBindingFromComponent(ATarget: TComponent): Boolean;
+var
+  I: Integer;
+begin
+  Result := False;
+  for I  := 0 to ATarget.ComponentCount - 1 do
+  begin
+    if (ATarget.Components[I] is TBindSourceDB) then
+    begin
+      ATarget.Components[I].Free;
+      Exit(True);
+    end;
+  end;
 end;
 
 constructor TStrategy_LiveBindings.Create;
@@ -280,13 +408,13 @@ end;
 
 procedure TStrategy_LiveBindings.DoDisableAll;
 var
-  I: IBinding; //TBindingBase
+  I: IBinding; // TBindingBase
 begin
   AdquireWrite;
   try
     for I in FBindings do
     begin
-      I.Enabled := false;
+      I.Enabled := False;
     end;
   finally
     ReleaseWrite;
@@ -295,7 +423,7 @@ end;
 
 procedure TStrategy_LiveBindings.DoEnableAll;
 var
-  I: IBinding; //TBindingBase
+  I: IBinding; // TBindingBase
 begin
   AdquireWrite;
   try
@@ -313,7 +441,7 @@ var
   I: IBinding;
   LData: TBindingCommandAction;
 begin
-  Result := false;
+  Result := False;
   AdquireRead;
   try
     for I in FBindings do
@@ -333,16 +461,16 @@ begin
   Result := FEnabled
 end;
 
-//function TStrategy_LiveBindings.GetPlatformBindActionCommandType: TBindingCommandClass;
-//begin
+// function TStrategy_LiveBindings.GetPlatformBindActionCommandType: TBindingCommandClass;
+// begin
 //
-//end;
+// end;
 
 function TStrategy_LiveBindings.InternalBindCollection(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>): Boolean;
 var
   LClass: TClass;
 begin
-  Result := false;
+  Result := False;
   for LClass in FObjectListLinkers.Keys do
   begin
     if AComponent.ClassType.InheritsFrom(LClass) then
@@ -358,7 +486,7 @@ var
   // LProc: TProc<TDataSet, TComponent>;
   LClass: TClass;
 begin
-  Result := false;
+  Result := False;
   for LClass in FObjectDataSetLinkers.Keys do
   begin
     if AComponent.ClassType.InheritsFrom(LClass) then
@@ -394,7 +522,7 @@ begin
         begin
           DoEnableAll;
         end;
-      false:
+      False:
         begin
           DoDisableAll;
         end;
@@ -405,25 +533,26 @@ end;
 procedure TStrategy_LiveBindings.Unbind(const ASource: TObject);
 var
   LBindingsToRemove: IEnumerable<IBinding>;
-//  LBinding: IBinding;
+  // LBinding: IBinding;
 begin
   AdquireWrite;
   try
-    LBindingsToRemove := FBindings.Where(function (const ABinding: IBinding): Boolean //TBindingBase
-                         begin
-                           Result := ABinding.IsObjectInBinding(ASource)
-                         end);
+    LBindingsToRemove := FBindings.Where(
+      function(const ABinding: IBinding): Boolean // TBindingBase
+      begin
+        Result := ABinding.IsObjectInBinding(ASource)
+      end);
     FBindings.RemoveRange(LBindingsToRemove.ToArray);
-//    FBindings.RemoveAll(function (const ABinding: TBindingBase): Boolean
-//                        begin
-//                          Result := ABinding.IsObjectInBinding(ASource)
-//                        end
-//                       );
+    // FBindings.RemoveAll(function (const ABinding: TBindingBase): Boolean
+    // begin
+    // Result := ABinding.IsObjectInBinding(ASource)
+    // end
+    // );
   finally
     ReleaseWrite
   end;
-  //for LBinding in LBindingsToRemove do
-  //  LBinding.Free;
+  // for LBinding in LBindingsToRemove do
+  // LBinding.Free;
 end;
 
 { TStrategy_LiveBindings.TInternalBindindExpression }
@@ -431,7 +560,7 @@ end;
 constructor TStrategy_LiveBindings.TInternalBindindExpression.Create(ABindingStrategy: IBindingStrategy; const InputScopes: array of IScope; const BindExprStr: string; const OutputScopes: array of IScope; const OutputExpr: string; const OutputConverter: IValueRefConverter; Manager: TBindingManager; Options: TBindings.TCreateOptions);
 begin
   inherited Create(ABindingStrategy);
-  FExpression := TBindings.CreateManagedBinding(InputScopes, BindExprStr, OutputScopes, OutputExpr, nil, nil, Options);
+  FExpression                      := TBindings.CreateManagedBinding(InputScopes, BindExprStr, OutputScopes, OutputExpr, nil, nil, Options);
   FExpression.OnAssignedValueEvent := OnBindingAssignedValueEvent;
 end;
 
@@ -439,7 +568,7 @@ destructor TStrategy_LiveBindings.TInternalBindindExpression.Destroy;
 begin
   Utils.IdeDebugMsg('<TStrategy_LiveBindings.TInternalBindindExpression.Destroy> ID: ' + ID);
   TBindings.RemoveBinding(FExpression);
-  //FExpression.Free;
+  // FExpression.Free;
   inherited;
 end;
 

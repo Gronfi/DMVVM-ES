@@ -13,7 +13,7 @@ uses
   MVVM.Attributes,
   MVVM.Interfaces, MVVM.Bindings,
   MVVM.Controls.Platform.FMX,
-  MVVM.Views.Platform.FMX;
+  MVVM.Views.Platform.FMX, FMX.Objects;
 
 type
   [View_For_ViewModel('CochesMain', IDataSet_ViewModel, 'WINDOWS_DESKTOP')]
@@ -29,6 +29,7 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Image1: TImage;
   protected
     { Private declarations }
     procedure SetupView; override;
@@ -37,6 +38,9 @@ type
   end;
 
 implementation
+
+uses
+  MVVM.Types;
 
 {$R *.fmx}
 
@@ -70,7 +74,11 @@ begin
   // Dataset binding
   ViewModel.MakeGetRows;
 
-  Binder.BindDataSetToGrid(ViewModel.DataSet, Grid1);
+  Binder.BindDataSetToGrid(ViewModel.DataSet, Grid1, [
+                                                       TGridColumnTemplate.Create('ID', 'ID', True, 50, '', '', ''),
+                                                       TGridColumnTemplate.Create('NOMBRE', 'NOMBRE', True, 150, '', '', '')
+                                                     ]);
+  Binder.BindDataSetFieldToProperty(ViewModel.DataSet, 'IMAGEN', Image1, 'Bitmap');
 end;
 
 initialization

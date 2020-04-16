@@ -69,15 +69,15 @@ uses
 
 class procedure MVVMCore.AutoRegister;
 var
-  Ctx  : TRttiContext;
-  Typ  : TRttiType;
-  //TypI : TRttiInterfaceType ;
+  Ctx: TRttiContext;
+  Typ: TRttiType;
+  // TypI : TRttiInterfaceType ;
   LAttr: TCustomAttribute;
-  LVMA : View_For_ViewModel;
-  LVMI : ViewModel_Implements;
+  LVMA: View_For_ViewModel;
+  LVMI: ViewModel_Implements;
   LInstanceType: TRttiInstanceType;
   LInterfaces: TArray<TRttiInterfaceType>;
-  I : Integer;
+  I: Integer;
 begin
   Ctx := TRttiContext.Create;
   try
@@ -86,16 +86,17 @@ begin
       // Loop for attributes
       for LAttr in Typ.GetAttributes do
       begin
-        //Utils.IdeDebugMsg('Atributo: ' + LAttr.QualifiedClassName);
+        // Utils.IdeDebugMsg('Atributo: ' + LAttr.QualifiedClassName);
         case Utils.AttributeToCaseSelect(LAttr, [View_For_ViewModel, ViewModel_Implements]) of
           0: // View_For_ViewModel
             begin
               LVMA := LAttr as View_For_ViewModel;
-              if not Typ.IsInstance then Continue;
+              if not Typ.IsInstance then
+                Continue;
               LInstanceType := Typ.AsInstance;
               TViewFactory.Register(LInstanceType, LVMA.ViewAlias, LVMA.Platform);
             end;
-          1: //ViewModel_Implements
+          1: // ViewModel_Implements
             begin
               LVMI := LAttr as ViewModel_Implements;
               if Typ.IsInstance then
@@ -139,8 +140,8 @@ end;
 
 class constructor MVVMCore.CreateC;
 begin
-  FContainer    := TContainer.Create;
-  FSynchronizer := TMREWSync.Create;
+  FContainer                  := TContainer.Create;
+  FSynchronizer               := TMREWSync.Create;
   FDefaultBindingStrategyName := '';
   FDefaultViewPlatform        := '';
 end;
@@ -245,25 +246,27 @@ end;
 
 class function MVVMCore.DisableBinding(AObject: TObject): Boolean;
 var
-  [weak] LBinding: IBindable;
+  [weak]
+  LBinding: IBindable;
 begin
   Result := False;
   if Supports(AObject, IBindable, LBinding) then
   begin
     LBinding.Binding.Enabled := False;
-    Result := True;
+    Result                   := True;
   end;
 end;
 
 class function MVVMCore.EnableBinding(AObject: TObject): Boolean;
 var
-  [weak] LBinding: IBindable;
+  [weak]
+  LBinding: IBindable;
 begin
   Result := False;
   if Supports(AObject, IBindable, LBinding) then
   begin
     LBinding.Binding.Enabled := True;
-    Result := True;
+    Result                   := True;
   end;
 end;
 

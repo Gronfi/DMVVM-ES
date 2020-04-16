@@ -7,13 +7,13 @@ uses
   MVVM.Interfaces.Architectural;
 
 type
-  //Attributes
+  // Attributes
   EInstanceType = (itSingleton, itNewInstance);
 
   TMVVMCustomAttribute = class(TCustomAttribute)
   end;
 
-  //[ViewForViewModel('EDITOR_USUARIOS', IMyViewModel1, 'WindowsDesktop']
+  // [ViewForViewModel('EDITOR_USUARIOS', IMyViewModel1, 'WindowsDesktop']
   View_For_ViewModel = class(TMVVMCustomAttribute)
   strict private
     FViewAlias: string;
@@ -26,10 +26,10 @@ type
     property Platform: String read FPlatform;
   end;
 
-  //[ViewModel_Implements(ICSVFile_ViewModel, AsSingleton)]
+  // [ViewModel_Implements(ICSVFile_ViewModel, AsSingleton)]
   ViewModel_Implements = class(TMVVMCustomAttribute)
   strict private
-    FVMInterface : TGUID;
+    FVMInterface: TGUID;
     FInstanceType: EInstanceType;
   public
     constructor Create(AVMInterfaceID: TGUID; const AInstanceType: EInstanceType = EInstanceType.itNewInstance);
@@ -41,7 +41,7 @@ implementation
 
 { ViewForVM }
 
-constructor View_For_ViewModel.Create(const AViewALias: string; AVMInterfaceID: TGUID;  const APlatform: String);
+constructor View_For_ViewModel.Create(const AViewALias: string; AVMInterfaceID: TGUID; const APlatform: String);
 begin
   FVMInterface := AVMInterfaceID;
   FViewAlias   := AViewALias;
@@ -52,8 +52,8 @@ end;
 
 constructor ViewModel_Implements.Create(AVMInterfaceID: TGUID; const AInstanceType: EInstanceType);
 begin
-  FVMInterface := AVMInterfaceID;
-  FInstanceType:= AInstanceType;
+  FVMInterface  := AVMInterfaceID;
+  FInstanceType := AInstanceType;
 end;
 
 end.

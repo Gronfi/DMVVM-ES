@@ -13,23 +13,6 @@ uses
 
   FMX.Grid, FMX.Grid.Style,
 
-//  System.Bindings.Outputs,
-//  Fmx.Bind.GenData,
-//  Fmx.Bind.Editors,
-//  Fmx.Bind.DBEngExt,
-//  Fmx.Bind.Navigator,
-//  Fmx.Bind.Grid,
-//
-//  Data.Bind.GenData,
-//  Data.Bind.Components,
-//  Data.Bind.ObjectScope,
-//  Data.Bind.EngExt,
-//  Data.Bind.DBScope,
-//  Data.Bind.Controls,
-//  Data.Bind.Grid,
-
-  //Data.DB,
-
   System.Generics.Collections,
 
   FireDAC.Stan.Intf, FireDAC.Stan.Option,
@@ -45,7 +28,7 @@ uses
   Data.Bind.Grid,
   Data.Bind.DBScope,
   Data.Bind.Controls,
-  Fmx.Bind.Navigator;
+  Fmx.Bind.Navigator, Datasnap.DBClient, FMX.Memo;
 
 type
   TfrmMain = class(TForm)
@@ -59,14 +42,24 @@ type
     Image1: TImage;
     Label1: TLabel;
     InfoLabel: TLabel;
-    FDConnection1: TFDConnection;
-    FDTable1: TFDTable;
+    Button1: TButton;
+    cdsSource: TClientDataSet;
+    cdsSourceSpeciesNo: TFloatField;
+    cdsSourceCategory: TStringField;
+    cdsSourceCommon_Name: TStringField;
+    cdsSourceSpeciesName: TStringField;
+    cdsSourceLengthcm: TFloatField;
+    cdsSourceLength_In: TFloatField;
+    cdsSourceNotes: TMemoField;
+    cdsSourceGraphic: TGraphicField;
+    Memo1: TMemo;
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure CheckBox1Change(Sender: TObject);
     procedure Timer1Timer(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -94,6 +87,7 @@ type
     class function EnableBindingFromGrid(AGrid: TCustomGrid; ADataSet: TDataSet): Boolean; static;
     class procedure BindDataSetToGrid(ADataSet: TDataSet; AGrid: TCustomGrid); overload; static;
     class procedure BindDataSetToGrid(ADataSet: TDataSet; AGrid: TCustomGrid; const AColumnLinks: array of TColumnConfig); overload; static;
+    class procedure RemoveBindingDataSetColumnsFromGrid( AGrid: TCustomGrid; const AColumns: array of String); overload; static;
   end;
 
 var
@@ -103,15 +97,20 @@ implementation
 
 {$R *.fmx}
 
+procedure TfrmMain.Button1Click(Sender: TObject);
+begin
+  TBinder.RemoveBindingDataSetColumnsFromGrid(Grid1, ['Species No'])
+end;
+
 procedure TfrmMain.Button4Click(Sender: TObject);
 begin
-  TBinder.BindDataSetToGrid(FDTable1, Grid1);
+  TBinder.BindDataSetToGrid(cdsSource, Grid1);
 end;
 
 procedure TfrmMain.Button5Click(Sender: TObject);
 begin
-  TBinder.ClearDataSetBindingFromGrid(Grid1);
-  TBinder.BindDataSetToGrid(FDTable1, Grid1,
+  //TBinder.ClearDataSetBindingFromGrid(Grid1);
+  TBinder.BindDataSetToGrid(cdsSource, Grid1,
                             [
                               TBinder.TColumnConfig.Create('Common_Name', 'Common Name', False, 200, True, '%s + '' - '' + DataSet.Category.Text', '', ''),
                               TBinder.TColumnConfig.Create('Species No', 'Species No', True, 100, True, '', '', ''),
@@ -122,7 +121,7 @@ end;
 
 procedure TfrmMain.Button7Click(Sender: TObject);
 begin
-  TBinder.BindDataSetToGrid(FDTable1, Grid1,
+  TBinder.BindDataSetToGrid(cdsSource, Grid1,
   [
     TBinder.TColumnConfig.Create('Graphic', 'Bitmap', False, 100, True, '', '', '')
   ]);
@@ -151,21 +150,21 @@ procedure TfrmMain.Timer1Timer(Sender: TObject);
 var
   LActual: Integer;
 begin
-  LActual := FDTable1.RecNo;
+  LActual := cdsSource.RecNo;
   TBinder.DisableBindingFromGrid(Grid1);
   try
-    FDTable1.First;
-    while not FDTable1.Eof do
+    cdsSource.First;
+    while not cdsSource.Eof do
     begin
-      FDTable1.Edit;
-      FDTable1.FieldByName('Length_In').AsInteger := (FDTable1.FieldByName('Length_In').AsInteger + Random(20)) MOD 100 ;
-      FDTable1.Post;
+      cdsSource.Edit;
+      cdsSource.FieldByName('Length_In').AsInteger := (cdsSource.FieldByName('Length_In').AsInteger + Random(20)) MOD 100 ;
+      cdsSource.Post;
 
-      FDTable1.Next;
+      cdsSource.Next;
     end;
   finally
-    FDTable1.RecNo := LActual;
-    TBinder.EnableBindingFromGrid(Grid1, FDTable1);
+    cdsSource.RecNo := LActual;
+    TBinder.EnableBindingFromGrid(Grid1, cdsSource);
   end;
 end;
 
@@ -192,57 +191,89 @@ var
   LColumnLinker: TLinkGridToDataSourceColumn;
   LSource: TBindSourceDB;
   I, J      : Integer;
-  LExisteS, LExisteL: Boolean;
+  LExisteS, LExisteL, LExisteC: Boolean;
+  LDebug: TStringList;
 begin
-  //mirar si existe o no un linkado previo
-  LExisteS := False;
-  LExisteL := False;
-  for I := 0 to AGrid.ComponentCount - 1 do
-  begin
-    if (AGrid.Components[I] is TBindSourceDB) then
+  fMain.Memo1.lines.Clear;
+  LDebug := TStringList.Create;
+  try
+    //mirar si existe o no un linkado previo
+    LExisteS := False;
+    LExisteL := False;
+    LDebug.add('STEP0');
+    for I := 0 to AGrid.ComponentCount - 1 do
     begin
-      LExisteS := True;
-      LSource := AGrid.Components[I] as TBindSourceDB;
-      for J := 0 to AGrid.Components[I].ComponentCount - 1 do
+      LDebug.add('STEP1: ' + AGrid.Components[I].QualifiedClassName);
+      if (AGrid.Components[I] is TBindSourceDB) then
       begin
-        if (AGrid.Components[I].Components[J] is TLinkGridToDataSource) then
+        LDebug.add('STEP2');
+        LExisteS := True;
+        LSource := AGrid.Components[I] as TBindSourceDB;
+        for J := 0 to AGrid.Components[I].ComponentCount - 1 do
         begin
-          LGridLinker := AGrid.Components[I].Components[J] as TLinkGridToDataSource;
-          LGridLinker.Active := False;
-          LExisteL := True;
+          LDebug.add('STEP3: ' + AGrid.Components[I].Components[J].QualifiedClassName);
+          if (AGrid.Components[I].Components[J] is TLinkGridToDataSource) then
+          begin
+            LDebug.add('STEP4');
+            LGridLinker := AGrid.Components[I].Components[J] as TLinkGridToDataSource;
+            LGridLinker.Active := False;
+            LExisteL := True;
+            Break;
+          end;
+        end;
+        break;
+      end;
+    end;
+    LDebug.add('STEP5');
+    if not LExisteS then
+    begin
+      LDebug.add('STEP6: crea TBindSourceDB');
+      LSource          := TBindSourceDB.Create(AGrid);
+      LSource.DataSet  := ADataSet;
+    end;
+    if not LExisteL then
+    begin
+      LDebug.add('STEP7: crea TLinkGridToDataSource');
+      LGridLinker          := TLinkGridToDataSource.Create(LSource);
+      LGridLinker.Category := 'Quick Bindings';
+      LGridLinker.GridControl  := AGrid;
+
+      LGridLinker.DataSource := LSource;
+    end;
+    LDebug.add('STEP8');
+    for I := Low(AColumnLinks) to High(AColumnLinks) do
+    begin
+      LExisteC := False;
+      for J := 0 to LGridLinker.Columns.Count - 1 do
+      begin
+        if LGridLinker.Columns.Items[J].Header = AColumnLinks[I].GHeader then
+        begin
+          LDebug.add('STEP9: ' + AColumnLinks[I].GHeader);
+          LExisteC := True;
           Break;
         end;
       end;
-      if LExisteL then
-        break;
+      LDebug.add('STEP10');
+      if not LExisteC then
+      begin
+        LDebug.add('STEP11');
+        LColumnLinker := LGridLinker.Columns.Add;
+        LColumnLinker.MemberName := AColumnLinks[I].DSField;
+        LColumnLinker.Header     := AColumnLinks[I].GHeader;
+        LColumnLinker.ReadOnly   := AColumnLinks[I].ReadOnly;
+        LColumnLinker.Width      := AColumnLinks[I].Width;
+        LColumnLinker.Visible    := AColumnLinks[I].Visible;
+        LColumnLinker.CustomFormat := AColumnLinks[I].CustomFormat;
+        LColumnLinker.CustomParse  := AColumnLinks[I].CustomParse;
+        LColumnLinker.ColumnStyle  := AColumnLinks[I].ColumnStyle;
+      end;
     end;
+    LDebug.add('STEP12');
+    LGridLinker.Active   := True;
+    fMain.Memo1.lines.add(LDebug.Text);
+  finally
+    LDebug.Free;
   end;
-  if not LExisteS then
-  begin
-    LSource          := TBindSourceDB.Create(AGrid);
-    LSource.DataSet  := ADataSet;
-  end;
-  if not LExisteL then
-  begin
-    LGridLinker          := TLinkGridToDataSource.Create(LSource);
-    LGridLinker.Category := 'Quick Bindings';
-    LGridLinker.GridControl  := AGrid;
-
-    LGridLinker.DataSource := LSource;
-  end;
-  for I := Low(AColumnLinks) to High(AColumnLinks) do
-  begin
-    LColumnLinker := LGridLinker.Columns.Add;
-    LColumnLinker.MemberName := AColumnLinks[I].DSField;
-    LColumnLinker.Header     := AColumnLinks[I].GHeader;
-    LColumnLinker.ReadOnly   := AColumnLinks[I].ReadOnly;
-    LColumnLinker.Width      := AColumnLinks[I].Width;
-    LColumnLinker.Visible    := AColumnLinks[I].Visible;
-    LColumnLinker.CustomFormat := AColumnLinks[I].CustomFormat;
-    LColumnLinker.CustomParse  := AColumnLinks[I].CustomParse;
-    LColumnLinker.ColumnStyle  := AColumnLinks[I].ColumnStyle;
-  end;
-  LGridLinker.Active   := True;
 end;
 
 class function TBinder.ClearDataSetBindingFromGrid(AGrid: TCustomGrid): Boolean;
@@ -288,6 +319,59 @@ begin
       Exit(True);
     end;
   end;
+end;
+
+class procedure TBinder.RemoveBindingDataSetColumnsFromGrid(AGrid: TCustomGrid; const AColumns: array of String);
+var
+  LGridLinker: TLinkGridToDataSource;
+  LColumnLinker: TLinkGridToDataSourceColumn;
+  LSource: TBindSourceDB;
+  I, J      : Integer;
+  LExisteS, LExisteL: Boolean;
+begin
+  //mirar si existe o no un linkado previo
+  LExisteS := False;
+  LExisteL := False;
+  for I := 0 to AGrid.ComponentCount - 1 do
+  begin
+    if (AGrid.Components[I] is TBindSourceDB) then
+    begin
+      LExisteS := True;
+      LSource := AGrid.Components[I] as TBindSourceDB;
+      for J := 0 to AGrid.Components[I].ComponentCount - 1 do
+      begin
+        if (AGrid.Components[I].Components[J] is TLinkGridToDataSource) then
+        begin
+          LGridLinker := AGrid.Components[I].Components[J] as TLinkGridToDataSource;
+          LGridLinker.Active := False;
+          LExisteL := True;
+          Break;
+        end;
+      end;
+      if LExisteL then
+        break;
+    end;
+  end;
+  if not LExisteS then
+  begin
+    Exit;
+  end;
+  if not LExisteL then
+  begin
+    Exit;
+  end;
+  for J := Low(AColumns) to High(AColumns) do
+  begin
+    for I := LGridLinker.Columns.Count - 1 downto 0 do
+    begin
+      if LGridLinker.Columns.Items[I].Header = AColumns[J] then
+      begin
+        LGridLinker.Columns.Delete(I);
+        Break;
+      end;
+    end;
+  end;
+  LGridLinker.Active   := True;
 end;
 
 constructor TBinder.TColumnConfig.Create(const ADSField: String; const AGHeader: String; const AReadOnly: Boolean; const AWidth: Integer; const AVisible: Boolean;

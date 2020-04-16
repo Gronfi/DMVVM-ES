@@ -3,7 +3,7 @@ object frmCochesDesktop: TfrmCochesDesktop
   Top = 0
   Caption = 'Desktop'
   ClientHeight = 480
-  ClientWidth = 640
+  ClientWidth = 661
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -12,18 +12,18 @@ object frmCochesDesktop: TfrmCochesDesktop
     Align = Client
     CanFocus = True
     ClipChildren = True
-    Size.Width = 541.000000000000000000
+    Size.Width = 538.000000000000000000
     Size.Height = 480.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 12
     Options = [AlwaysShowEditor, ColumnResize, ColumnMove, ColLines, RowLines, RowSelect, AlwaysShowSelection, Tabs, Header, HeaderClick, AutoDisplacement]
-    Viewport.Width = 537.000000000000000000
-    Viewport.Height = 455.000000000000000000
+    Viewport.Width = 538.000000000000000000
+    Viewport.Height = 480.000000000000000000
   end
   object Layout1: TLayout
     Align = Right
-    Position.X = 541.000000000000000000
-    Size.Width = 99.000000000000000000
+    Position.X = 538.000000000000000000
+    Size.Width = 123.000000000000000000
     Size.Height = 480.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
@@ -59,6 +59,16 @@ object frmCochesDesktop: TfrmCochesDesktop
       Position.Y = 104.000000000000000000
       TabOrder = 3
     end
+  end
+  object Image1: TImage
+    MultiResBitmap = <
+      item
+      end>
+    Position.X = 544.000000000000000000
+    Position.Y = 136.000000000000000000
+    Size.Width = 113.000000000000000000
+    Size.Height = 105.000000000000000000
+    Size.PlatformDefault = False
   end
   object actlst1: TActionList
     Left = 16

@@ -43,13 +43,13 @@ type
     property ViewModel: T read GetViewModel;
   end;
 
-(*
-  IView<T: IViewModel; K: TViewModel> = interface(IView<T>)
+  (*
+    IView<T: IViewModel; K: TViewModel> = interface(IView<T>)
     ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
     function GetVM_AsObject: K;
     property ViewModel_AsObject: K read GetVM_AsObject;
-  end;
-*)
+    end;
+  *)
 
   IViewForm<T: IViewModel> = interface(IView<T>)
     ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']

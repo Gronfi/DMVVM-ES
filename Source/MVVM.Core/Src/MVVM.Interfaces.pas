@@ -16,7 +16,7 @@ uses
   MVVM.Types;
 
 type
-// Platform Services Interfaces
+  // Platform Services Interfaces
 {$REGION 'PLATFORM'}
 {$REGION 'IPlatformServices'}
   IPlatformServices = interface
@@ -48,22 +48,23 @@ type
 
   TPlatformServicesClass = class of TPlatformServicesBase;
 {$ENDREGION 'PLATFORM'}
-
-// Returns the object interface
+  // Returns the object interface
 {$REGION 'IObject'}
+
   IObject = interface
     ['{61A3454D-3B58-4CDE-83AE-4C3E73732977}']
     function GetAsObject: TObject;
   end;
 {$ENDREGION}
 
-// Bindings
+  // Bindings
   IBindingStrategy = interface;
   ICollectionViewProvider = interface;
   IBindableAction = interface;
 
-// Strategy Based Interface
+  // Strategy Based Interface
 {$REGION 'IStrategyBased'}
+
   IStrategyBased = interface
     ['{3F645E49-CD84-430C-982F-2B2ADC128203}']
     function GetBindingStrategy: IBindingStrategy;
@@ -72,10 +73,12 @@ type
     property BindingStrategy: IBindingStrategy read GetBindingStrategy write SetBindingStrategy;
   end;
 {$ENDREGION}
+
   IStrategyEventedObject = interface;
 
-// Strategy and MultiCastEvents Based Interface
+  // Strategy and MultiCastEvents Based Interface
 {$REGION 'IStrategyEventedBased'}
+
   IStrategyEventedBased = interface
     ['{72613457-8EBA-47F0-B277-47F66FD4A427}']
     function GetManager: IStrategyEventedObject;
@@ -84,7 +87,7 @@ type
     property Manager: IStrategyEventedObject read GetManager write SetManager;
   end;
 {$ENDREGION}
-// Free notification interface
+  // Free notification interface
 {$REGION 'INotifyFree'}
 
   TNotifyFreeObjectEvent = procedure(const ASender, AInstance: TObject) of Object;
@@ -232,7 +235,7 @@ type
     property Enabled: Boolean read GetEnabled write SetEnabled;
   end;
 
-  TBindingBase = class abstract(TInterfacedObject, IBinding, IInterface) //TComponent
+  TBindingBase = class abstract(TInterfacedObject, IBinding, IInterface) // TComponent
   const
     ENABLED_STATE                   = 0;
     DISABLED_ACTIONS_APPLY_ON_VALUE = 1;
@@ -285,7 +288,7 @@ type
     property BindingStrategy: IBindingStrategy read GetBindingStrategy;
   end;
 
-  TProcFreeNotify = procedure (AComponent: TComponent) of object;
+  TProcFreeNotify = procedure(AComponent: TComponent) of object;
 
   TFreeProxyComponent = class(TComponent)
   protected
@@ -301,7 +304,8 @@ type
   TBindingDefault = class abstract(TBindingBase, IBindingDefault)
   protected
     FInternalComponent: TFreeProxyComponent;
-    [weak] FBindingStrategy : IBindingStrategy;
+    [weak]
+    FBindingStrategy: IBindingStrategy;
     FTrackedInstances: ISet<Pointer>;
 
     function GetBindingStrategy: IBindingStrategy;
@@ -355,71 +359,6 @@ type
   TBindingCommandClass = class of TBindingCommandBase;
 
 {$ENDREGION}
-  { Abstract base template class that defines the mapping between properties of
-    each item in a collection and the corresponding item in the view.
-    For example, if the collection contains objects of type TCustomer, than you
-    can create a mapping between the customer name and the item title in the
-    view (by overriding the GetTitle method).
-    If the view is a TListBox for example, then the item title will
-    be assigned to the TListBoxItem.Text property.
-
-    You can pass the template to the TgoDataBinder.BindCollection method. }
-{$REGION 'TDataTemplate'}
-
-  TDataTemplate = class abstract
-  public
-    { Must be overridden to return the title of a given object.
-      This title will be used to fill the Text property of items in a TListBox
-      or TListView.
-
-      Parameters:
-      AItem: the object whose title to get. You need to typecast it to the
-      type of the objects in the collection (as passed to
-      TgoDataBinder.BindCollection).
-
-      Returns:
-      The title for this object. Should not be an empty string. }
-    class function GetTitle(const AItem: TObject): String; virtual; abstract;
-
-    { Returns some details of a given object.
-      These details will be used to fill the Details property of items in a
-      TListBox or TListView.
-
-      Parameters:
-      AItem: the object whose details to get. You need to typecast it to the
-      type of the objects in the collection (as passed to
-      TgoDataBinder.BindCollection).
-
-      Returns:
-      The details for this object.
-
-      Returns an empty string by default. }
-    class function GetDetail(const AItem: TObject): String; virtual;
-
-    { Returns the index of an image that represents a given object.
-      This index will be used to fill the ImageIndex property of items in a
-      TListBox or TListView.
-
-      Parameters:
-      AItem: the object whose image index to get. You need to typecast it to
-      the type of the objects in the collection (as passed to
-      TgoDataBinder.BindCollection).
-
-      Returns:
-      The image index for this object, or -1 if there is no image associated
-      with the object.
-
-      Returns -1 by default. }
-    class function GetID(const AItem: TObject): Integer; virtual; abstract;
-    class function GetImageIndex(const AItem: TObject): Integer; virtual;
-    class function GetStyle(const AItem: TObject): string; virtual;
-    class function GetParent(const AItem: TObject): TObject; virtual; abstract;
-    class function GetChildren(const AItem: TObject): TList<TObject>; virtual; abstract;
-  end;
-{$ENDREGION}
-
-  TDataTemplateClass = class of TDataTemplate;
-
   { A view of items in a collection. Is uses by controls that present a
     collection of items, such as TListBox and TListView. These controls will
     implement the IgoCollectionViewProvider interface, that provides an object
@@ -429,6 +368,7 @@ type
     Grijjy.Mvvm.DataBinding.Collections unit as a base for their views. }
 
 {$REGION 'ICollectionViewProvider'}
+
   ICollectionView = interface
     ['{FB28F410-1707-497B-BD1E-67C218E9EB42}']
 {$REGION 'Internal Declarations'}
@@ -464,6 +404,7 @@ type
   end;
 {$ENDREGION}
 {$REGION 'IBindable'}
+
   IBindable = interface
     ['{74F1EA86-FCFC-49AD-AB53-DCEBF476CB3B}']
     function GetBinding: IBinding;
@@ -473,6 +414,7 @@ type
   end;
 {$ENDREGION}
 {$REGION 'IBindableAction'}
+
   IBindableAction = interface(IBindable)
     ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
     procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
@@ -481,6 +423,7 @@ type
   end;
 {$ENDREGION}
 {$REGION 'IBindingStrategy'}
+
   TBindingList = IList<IBinding>;
 
   IBindingStrategy = interface
@@ -505,14 +448,20 @@ type
     function BindsCount: Integer;
     procedure ClearBindings;
 
-    //function GetPlatformBindActionCommandType: TBindingCommandClass;
+    // function GetPlatformBindActionCommandType: TBindingCommandClass;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload;
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
 
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil);
-    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); //basic link
+
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; // basic link
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload;
+
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String); overload;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass); overload;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String); overload;
 
     procedure BindAction(AAction: IBindableAction); overload;
 
@@ -523,10 +472,11 @@ type
   end;
 {$ENDREGION}
 {$REGION 'TBindingStrategyBase'}
+
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   protected
-    FBindings         : TBindingList;
-    FSynchronizer     : IReadWriteSync;
+    FBindings: TBindingList;
+    FSynchronizer: IReadWriteSync;
 
     function GetEnabled: Boolean; virtual; abstract;
     procedure SetEnabled(const AValue: Boolean); virtual; abstract;
@@ -551,15 +501,23 @@ type
     procedure ClearBindings; virtual;
     function BindsCount: Integer; virtual;
 
-    //function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
-
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
+    // function GetPlatformBindActionCommandType: TBindingCommandClass; virtual; abstract;
+    // Bindings
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload; virtual; abstract;
+    // Collections
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass); virtual; abstract;
 
+    // DataSets
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil); virtual; abstract;
-    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); virtual; abstract;
 
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; virtual; abstract;
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload; virtual; abstract;
+
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String); overload; virtual; abstract;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass); overload; virtual; abstract;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String); overload; virtual; abstract;
+    // Actions
     procedure BindAction(AAction: IBindableAction); overload; virtual; abstract;
 
     procedure Unbind(const ASource: TObject); overload; virtual; abstract;
@@ -576,23 +534,6 @@ implementation
 uses
   MVVM.Core,
   MVVM.Utils;
-
-{ TDataTemplate }
-
-class function TDataTemplate.GetDetail(const AItem: TObject): String;
-begin
-  Result := '';
-end;
-
-class function TDataTemplate.GetImageIndex(const AItem: TObject): Integer;
-begin
-  Result := -1;
-end;
-
-class function TDataTemplate.GetStyle(const AItem: TObject): string;
-begin
-  Result := '';
-end;
 
 { TBindingStrategyBase }
 
@@ -640,8 +581,8 @@ end;
 constructor TBindingStrategyBase.Create;
 begin
   inherited;
-  FSynchronizer      := TMREWSync.Create;
-  FBindings          := TCollections.CreateList<IBinding>;
+  FSynchronizer := TMREWSync.Create;
+  FBindings     := TCollections.CreateList<IBinding>;
 end;
 
 destructor TBindingStrategyBase.Destroy;
@@ -680,10 +621,11 @@ begin
   Utils.IdeDebugMsg('<TBindingStrategyBase.RemoveBinding> ID: ' + ABinding.ID);
   AdquireWrite;
   try
-    FBindings.RemoveAll(function (const AABinding: IBinding): Boolean
-                        begin
-                          Result := ABinding.ID = AABinding.ID;
-                        end);
+    FBindings.RemoveAll(
+      function(const AABinding: IBinding): Boolean
+      begin
+        Result := ABinding.ID = AABinding.ID;
+      end);
   finally
     ReleaseWrite
   end;
@@ -820,10 +762,10 @@ end;
 constructor TBindingDefault.Create(ABindingStrategy: IBindingStrategy);
 begin
   inherited Create;
-  FInternalComponent:= TFreeProxyComponent.Create(nil);
+  FInternalComponent                      := TFreeProxyComponent.Create(nil);
   FInternalComponent.DoOnFreeNotification := Notification;
-  FTrackedInstances := TCollections.CreateSet<Pointer>;
-  FBindingStrategy  := ABindingStrategy;
+  FTrackedInstances                       := TCollections.CreateSet<Pointer>;
+  FBindingStrategy                        := ABindingStrategy;
 end;
 
 destructor TBindingDefault.Destroy;
@@ -879,19 +821,19 @@ end;
 
 procedure TBindingDefault.Notification(AComponent: TComponent);
 begin
-//  inherited;
-//  if (Operation = opRemove) then
-//  begin
-//    Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
-    HandleFreeEvent(AComponent, AComponent);
-//  end;
+  // inherited;
+  // if (Operation = opRemove) then
+  // begin
+  // Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
+  HandleFreeEvent(AComponent, AComponent);
+  // end;
 end;
 
 procedure TBindingDefault.RemoveFreeNotification(const AInstance: TObject);
 begin
   if (AInstance is TComponent) then
     FInternalComponent.UnSubscribeFromObject(AInstance);
-    //TComponent(AInstance).RemoveFreeNotification(Self);
+  // TComponent(AInstance).RemoveFreeNotification(Self);
 end;
 
 procedure TBindingDefault.SetFreeNotification(const AInstance: TObject);
@@ -908,7 +850,7 @@ begin
       FSynchronizer.EndWrite;
     end;
     FInternalComponent.SubscribeToObject(AInstance);
-    //TComponent(AInstance).FreeNotification(Self);
+    // TComponent(AInstance).FreeNotification(Self);
   end
   else if Supports(AInstance, INotifyFree, LNotifyFree) then
   begin
@@ -1136,7 +1078,7 @@ begin
   if (Operation = opRemove) then
   begin
     Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
-    Fproc(AComponent);
+    FProc(AComponent);
   end;
 end;
 

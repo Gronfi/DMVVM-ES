@@ -33,14 +33,22 @@ type
     constructor Create; overload; virtual;
     destructor Destroy; override;
 
-    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TBindingValueConverterClass = nil; const ABindingStrategy: String = '';
+    // Bindings
+    procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TValueConverterClass = nil; const ABindingStrategy: String = '';
       const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const ABindingStrategy: String = ''; const AExtraParams: TBindExtraParams = []); overload;
+    // Collections
     procedure BindCollection<T: Class>(const ACollection: TEnumerable<T>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String = '');
+    // DataSets
+    procedure BindDataSet(ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil; const ABindingStrategy: String = '');
 
-    procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil; const ABindingStrategy: String = '');
-    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String = ''); //basic link
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ABindingStrategy: String = ''); overload;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass; const ABindingStrategy: String = ''); overload;
+    procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String; const ABindingStrategy: String); overload;
 
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String = ''); overload; // basic link
+    procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate; const ABindingStrategy: String = ''); overload;
+    // Actions
     procedure BindAction(AAction: IBindableAction; const ABindingStrategy: String = ''); overload;
 
     procedure Notify(const AObject: TObject; const APropertyName: String); overload; virtual;
@@ -62,20 +70,20 @@ uses
 
 { TBindingManager }
 
-procedure TBindingManager.Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection; const AFlags: EBindFlags; const AValueConverterClass: TBindingValueConverterClass; const ABindingStrategy: String; const AExtraParams: TBindExtraParams);
-var
-  LEstrategia: IBindingStrategy;
-begin
-  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
-  LEstrategia.Bind(ASource, ASourcePropertyPath, ATarget, ATargetPropertyPath, ADirection, AFlags, AValueConverterClass, AExtraParams);
-end;
-
 procedure TBindingManager.Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags; const ABindingStrategy: String; const AExtraParams: TBindExtraParams);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.Bind(ASources, ASourceExpresion, ATarget, ATargetAlias, ATargetPropertyPath, AFlags, AExtraParams);
+end;
+
+procedure TBindingManager.Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection; const AFlags: EBindFlags; const AValueConverterClass: TValueConverterClass; const ABindingStrategy: String; const AExtraParams: TBindExtraParams);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.Bind(ASource, ASourcePropertyPath, ATarget, ATargetPropertyPath, ADirection, AFlags, AValueConverterClass, AExtraParams);
 end;
 
 procedure TBindingManager.BindAction(AAction: IBindableAction; const ABindingStrategy: String);
@@ -94,12 +102,44 @@ begin
   LEstrategia.BindCollection(TypeInfo(T), TEnumerable<TObject>(ACollection), ATarget, ATemplate);
 end;
 
-procedure TBindingManager.BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
+procedure TBindingManager.BindDataSet(ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.BindDataSet(ADataSet, ATarget, ATemplate);
+end;
+
+procedure TBindingManager.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath, ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetFieldToProperty(ADataSet, AFieldName, ATarget, ATargetPropertyPath);
+end;
+
+procedure TBindingManager.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetFieldToProperty(ADataSet, AFieldName, ATarget, ATargetPropertyPath, AValueConverterClass);
+end;
+
+procedure TBindingManager.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath, ACustomFormat, ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetFieldToProperty(ADataSet, AFieldName, ATarget, ATargetPropertyPath, ACustomFormat);
+end;
+
+procedure TBindingManager.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToGrid(ADataSet, ATarget, AColumnLinks);
 end;
 
 procedure TBindingManager.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String);
@@ -121,7 +161,7 @@ begin
   Guard.CheckTrue(FDictionaryBindingStrategies.ContainsKey(LMetodo), 'Binding Strategy not registered: ' + LMetodo);
   if not FDictionaryStrategies.TryGetValue(LMetodo, Result) then
   begin
-    Result := FDictionaryBindingStrategies[LMetodo].Create;
+    Result                         := FDictionaryBindingStrategies[LMetodo].Create;
     FDictionaryStrategies[LMetodo] := Result;
   end;
 end;
