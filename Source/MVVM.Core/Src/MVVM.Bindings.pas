@@ -46,6 +46,28 @@ type
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass; const ABindingStrategy: String = ''); overload;
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String; const ABindingStrategy: String); overload;
 
+    // -- ComboBox
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const AOnlyFillValues: Boolean = True; const ABindingStrategy: String = ''); overload;
+// ACustomFormat: %s + ' - ' + DataSet.Category.Text
+//        where ---> %s : the default text of the selected field (AField) in the dataset
+//                   DataSet : references to the dataset
+//                   DataSet.Category : references to the value of that fieldname in the dataset in the selected row
+// AOnlyFillValues --> True: the combobox is only filled with values
+//                     False: the combobox is synchronized with the dataset, if you select a row in the combobox the dataset is moved to the selected row
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomFormat: String; const AOnlyFillValues: Boolean = True; const ABindingStrategy: String = ''); overload;
+
+    // -- ListBox
+    // '%s + '' - '' + DataSet.Category.Text'
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True; const ABindingStrategy: String = ''); overload;
+//    [
+//      TListBoxConversionData.Create('Common_Name', 'Text'),
+//      TListBoxConversionData.Create('Category', TBinder.StyledFieldOfComponent('resolution')),
+//      TListBoxConversionData.Create('Species No', TBinder.StyledFieldOfComponent('depth')),
+//      TListBoxConversionData.Create('Graphic', 'Bitmap')
+//    ]
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True; const ABindingStrategy: String = ''); overload;
+
+    // -- Grid
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String = ''); overload; // basic link
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate; const ABindingStrategy: String = ''); overload;
     // Actions
@@ -134,12 +156,44 @@ begin
   LEstrategia.BindDataSetFieldToProperty(ADataSet, AFieldName, ATarget, ATargetPropertyPath, ACustomFormat);
 end;
 
+procedure TBindingManager.BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomFormat: String; const AOnlyFillValues: Boolean; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToCombobox(ADataSet, ATarget, AField, ACustomFormat, AOnlyFillValues);
+end;
+
+procedure TBindingManager.BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const AOnlyFillValues: Boolean; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToCombobox(ADataSet, ATarget, AField, AOnlyFillValues);
+end;
+
 procedure TBindingManager.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate; const ABindingStrategy: String);
 var
   LEstrategia: IBindingStrategy;
 begin
   LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
   LEstrategia.BindDataSetToGrid(ADataSet, ATarget, AColumnLinks);
+end;
+
+procedure TBindingManager.BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToListBox(ADataSet, ATarget, ALinks, AOnlyFillValues);
+end;
+
+procedure TBindingManager.BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField, ACustomDisplayExpression: String; const AOnlyFillValues: Boolean; const ABindingStrategy: String);
+var
+  LEstrategia: IBindingStrategy;
+begin
+  LEstrategia := GetSelectedBindingOrDefault(ABindingStrategy);
+  LEstrategia.BindDataSetToListBox(ADataSet, ATarget, AField, ACustomDisplayExpression, AOnlyFillValues);
 end;
 
 procedure TBindingManager.BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const ABindingStrategy: String);

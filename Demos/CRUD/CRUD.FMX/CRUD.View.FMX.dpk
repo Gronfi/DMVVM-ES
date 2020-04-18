@@ -37,6 +37,7 @@ contains
   Update.Persona.View.Desktop in 'Src\Update.Persona.View.Desktop.pas' {frmUpdatePersona},
   Coches.View.Desktop in 'Src\Coches.View.Desktop.pas' {frmCochesDesktop},
   New.Coche.View.Desktop in 'Src\New.Coche.View.Desktop.pas' {frmNewCoche},
-  Update.Coche.View.Desktop in 'Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche};
+  Update.Coche.View.Desktop in 'Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},
+  Coches.View.Desktop.V2 in 'Src\Coches.View.Desktop.V2.pas' {frmCochesMainLB};
 
 end.

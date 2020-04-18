@@ -473,8 +473,8 @@ type
       read GetOnPropertyChangedEvent;
   end;
 {$ENDREGION 'FMX.NumberBox'}
-{$REGION 'FMX.ListBox'}
 
+{$REGION 'FMX.ListBox'}
 type
   { TListBox with support for light-weight two-way data binding.
     Supports property changed notifications for: ItemIndex, Selected, SelectedItem.
@@ -1624,7 +1624,6 @@ begin
 end;
 
 { TListBox }
-
 procedure TListBox.Clear;
 begin
   if (Count > 0) then
@@ -1718,7 +1717,6 @@ begin
 end;
 
 { TListBoxCollectionView }
-
 procedure TListBoxCollectionView.AddItemToView(const AItem: TObject);
 var
   ListBox: TListBox;
@@ -1825,7 +1823,6 @@ begin
   AListBoxItem.Data := AItem;
   AListBoxItem.StyleLookup := Template.GetStyle(AItem);
 end;
-
 { TListView }
 
 destructor TListView.Destroy;

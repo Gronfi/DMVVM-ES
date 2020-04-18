@@ -2,7 +2,7 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Menu'
-  ClientHeight = 101
+  ClientHeight = 124
   ClientWidth = 223
   FormFactor.Width = 320
   FormFactor.Height = 480
@@ -12,7 +12,7 @@ object frmMain: TfrmMain
   object Layout1: TLayout
     Align = Client
     Size.Width = 223.000000000000000000
-    Size.Height = 101.000000000000000000
+    Size.Height = 124.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
     object Rectangle1: TRectangle
@@ -43,7 +43,7 @@ object frmMain: TfrmMain
       Position.X = 136.000000000000000000
       Position.Y = 64.000000000000000000
       TabOrder = 2
-      Text = 'Coches'
+      Text = 'Coches (G)'
       OnClick = Button2Click
     end
     object ShadowEffect1: TShadowEffect
@@ -53,6 +53,13 @@ object frmMain: TfrmMain
       Opacity = 0.600000023841857900
       ShadowColor = claBlack
     end
+  end
+  object Button3: TButton
+    Position.X = 136.000000000000000000
+    Position.Y = 96.000000000000000000
+    TabOrder = 10
+    Text = 'Coches (LB)'
+    OnClick = Button3Click
   end
   object FDConnection1: TFDConnection
     Params.Strings = (

@@ -109,6 +109,10 @@
             <Form>frmUpdateCoche</Form>
             <FormType>fmx</FormType>
         </DCCReference>
+        <DCCReference Include="Src\Coches.View.Desktop.V2.pas">
+            <Form>frmCochesMainLB</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

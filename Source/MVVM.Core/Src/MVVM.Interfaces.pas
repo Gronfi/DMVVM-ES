@@ -453,12 +453,18 @@ type
     procedure Bind(const ASource: TObject; const ASourcePropertyPath: String; const ATarget: TObject; const ATargetPropertyPath: String; const ADirection: EBindDirection = EBindDirection.OneWay; const AFlags: EBindFlags = []; const AValueConverterClass: TValueConverterClass = nil; const AExtraParams: TBindExtraParams = []); overload;
     procedure Bind(const ASources: TSourcePairArray; const ASourceExpresion: String; const ATarget: TObject; const ATargetAlias: String; const ATargetPropertyPath: String; const AFlags: EBindFlags = []; const AExtraParams: TBindExtraParams = []); overload;
     procedure BindCollection(AServiceType: PTypeInfo; const ACollection: TEnumerable<TObject>; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass);
-
+    // DataSet
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil);
-
+    // -- Combobox
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const AOnlyFillValues: Boolean = True); overload;
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomFormat: String; const AOnlyFillValues: Boolean = True); overload;
+    // -- ListBox
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True); overload;
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True); overload;
+    // -- Grid
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; // basic link
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload;
-
+    // -- Component
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String); overload;
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass); overload;
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String); overload;
@@ -511,9 +517,16 @@ type
     // DataSets
     procedure BindDataSet(const ADataSet: TDataSet; const ATarget: ICollectionViewProvider; const ATemplate: TDataTemplateClass = nil); virtual; abstract;
 
+    // -- Combobox
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    procedure BindDataSetToCombobox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomFormat: String; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    // -- ListBox
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    // -- Grid
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; virtual; abstract;
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload; virtual; abstract;
-
+    // -- Component
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String); overload; virtual; abstract;
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const AValueConverterClass: TValueConverterClass); overload; virtual; abstract;
     procedure BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String; const ACustomFormat: String); overload; virtual; abstract;

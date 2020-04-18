@@ -16,7 +16,7 @@ uses
   MVVM.Views.Platform.FMX, FMX.Objects;
 
 type
-  [View_For_ViewModel('CochesMain', IDataSet_ViewModel, 'WINDOWS_DESKTOP')]
+  [View_For_ViewModel('CochesMain.Grid', IDataSet_ViewModel, 'WINDOWS_DESKTOP')]
   TfrmCochesDesktop = class(TFormView<IDataSet_ViewModel>)
     actlst1: TActionList;
     actGet: TAction;

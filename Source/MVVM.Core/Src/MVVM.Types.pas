@@ -239,8 +239,17 @@ type
 
   TDataTemplateClass = class of TDataTemplate;
 {$ENDREGION}
-{$REGION 'TGridColumnTemplate'}
+{$REGION 'TListBoxConversionData'}
+  TListBoxConversionData = record
+  public
+    DataSetField: String;
+    ListBoxField: String;
+    CustomFormat: String;
 
+    constructor Create(const ADataSetField: String; const AListBoxField: String; const ACustomFormat: String = '');
+  end;
+{$ENDREGION}
+{$REGION 'TGridColumnTemplate'}
   TGridColumnTemplate = record
   public
     DataSetField: String;
@@ -253,7 +262,7 @@ type
 
     constructor Create(const ADataSetField: String; const AHeaderText: String; const AReadOnly: boolean; const AWidth: Integer; const ACustomFormat: String; const ACustomParse: String; const AColumnStyle: String);
   end;
-{$REGION}
+{$ENDREGION}
 
 implementation
 
@@ -302,6 +311,14 @@ begin
   CustomFormat := ACustomFormat;
   CustomParse  := ACustomParse;
   ColumnStyle  := AColumnStyle;
+end;
+
+{ TListBoxConversionData }
+constructor TListBoxConversionData.Create(const ADataSetField, AListBoxField, ACustomFormat: String);
+begin
+  DataSetField := ADataSetField;
+  ListBoxField := AListBoxField;
+  CustomFormat := ACustomFormat;
 end;
 
 end.

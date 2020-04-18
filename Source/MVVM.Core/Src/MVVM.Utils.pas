@@ -35,7 +35,7 @@ type
     class procedure ShowView(AView: IView); overload; static;
     class function ShowModalView<I: IViewModel>(AViewModel: I; const AViewName: string; const AResultProc: TProc<TModalResult>; const APlatform: String = ''; const AOwner: TComponent = nil): IView<I>; overload; static;
     class procedure ShowModalView(AView: IView; const AResultProc: TProc<TModalResult>); overload; static;
-    // MVVMCore.DefaultViewPlatform, ICSVFile_View_NAME, nil, VistaModelo);
+    class function StyledFieldOfComponent(const AField: String): String; static;
   end;
 
 implementation
@@ -120,6 +120,14 @@ begin
     Result := AResult_False;
 end;
 
+class function Utils.iif<T>(const ACondition: Boolean; AResult_True, AResult_False: T): T;
+begin
+  if ACondition then
+    Result := AResult_True
+  else
+    Result := AResult_False;
+end;
+
 class function Utils.InterfaceToCaseSelect(Selector: IInterface; const CaseList: array of TGUID): integer;
 var
   LCnt: integer;
@@ -184,12 +192,9 @@ begin
   end;
 end;
 
-class function Utils.iif<T>(const ACondition: Boolean; AResult_True, AResult_False: T): T;
+class function Utils.StyledFieldOfComponent(const AField: String): String;
 begin
-  if ACondition then
-    Result := AResult_True
-  else
-    Result := AResult_False;
+  Result := 'StylesData[''' + AField + ''']';
 end;
 
 end.

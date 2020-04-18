@@ -25,9 +25,11 @@ type
     Text3: TText;
     ShadowEffect1: TShadowEffect;
     Layout1: TLayout;
+    Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
     procedure InitializateResources;
@@ -63,7 +65,16 @@ end;
 
 procedure TfrmMain.Button2Click(Sender: TObject);
 begin
-  VistaTabla := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'CochesMain', nil, VistaModelo);
+  VistaTabla := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'CochesMain.Grid', nil, VistaModelo);
+  Utils.ShowModalView(VistaTabla, procedure (AResult: TModalResult)
+                                     begin
+                                       //
+                                     end);
+end;
+
+procedure TfrmMain.Button3Click(Sender: TObject);
+begin
+  VistaTabla := MVVMCore.ViewsProvider.CreateView<IDataSet_ViewModel>(MVVMCore.DefaultViewPlatform, 'CochesMain.ListBox', nil, VistaModelo);
   Utils.ShowModalView(VistaTabla, procedure (AResult: TModalResult)
                                      begin
                                        //

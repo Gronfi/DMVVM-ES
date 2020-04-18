@@ -99,6 +99,7 @@ end;
 initialization
 
 {$REGION 'TListBox'}
+(*
   TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListBox,
   procedure(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
   var
@@ -147,6 +148,7 @@ TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
     LSource.DataSource := LDS;
     LLink.SourceComponent := LSource;
   end);
+*)
 {$ENDREGION}
 
 {$REGION 'TListView'}
