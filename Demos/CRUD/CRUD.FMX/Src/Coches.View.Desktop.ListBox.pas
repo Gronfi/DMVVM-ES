@@ -1,4 +1,4 @@
-unit Coches.View.Desktop.V2;
+unit Coches.View.Desktop.ListBox;
 
 interface
 
@@ -30,7 +30,6 @@ type
     Button4: TButton;
     ListBox1: TListBox;
     StyleBook1: TStyleBook;
-    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -52,12 +51,6 @@ uses
 
 { TfrmCochesMainLB }
 
-procedure TfrmCochesMainLB.FormCreate(Sender: TObject);
-begin
-  ListBox1.DefaultItemStyles.ItemStyle := 'CustomItem';
-  ListBox1.ItemHeight                  := 64;
-end;
-
 procedure TfrmCochesMainLB.SetupView;
 begin
   inherited;
@@ -67,25 +60,13 @@ begin
   ViewModel.NewRowView    := 'New.Coche';
   ViewModel.UpdateRowView := 'Update.Coche';
   // actions binding
-  actGet.Bind(procedure
-              begin
-                ViewModel.MakeGetRows;
-              end);
-  actNew.Bind(procedure
-              begin
-                ViewModel.MakeAppend;
-              end);
-  actUpdate.Bind(procedure
-                 begin
-                   ViewModel.MakeUpdate;
-                 end);
-  actDelete.Bind(procedure
-                 begin
-                   ViewModel.DeleteActiveRow;
-                 end);
+  actGet.Bind(ViewModel.DoMakeGetRows);
+  actNew.Bind(ViewModel.DoMakeAppend, ViewModel.IsOpen);
+  actUpdate.Bind(ViewModel.DoMakeUpdate, ViewModel.IsOpen);
+  actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
 
   // Dataset binding
-  ViewModel.MakeGetRows;
+  ViewModel.DoMakeGetRows; //open the dataset and get rows
 
   ListBox1.DefaultItemStyles.ItemStyle := 'CustomItem';
   ListBox1.ItemHeight                  := 64;

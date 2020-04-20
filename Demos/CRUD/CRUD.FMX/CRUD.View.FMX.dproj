@@ -85,6 +85,7 @@
         </DelphiCompile>
         <DCCReference Include="CRUD.Core.dcp"/>
         <DCCReference Include="MVVM.Platform.FMX.dcp"/>
+        <DCCReference Include="MVVM.Binding.LiveBindings.FMX.dcp"/>
         <DCCReference Include="Src\Personas.View.Desktop.pas">
             <Form>frmPersonasDesktop</Form>
             <FormType>fmx</FormType>
@@ -97,7 +98,7 @@
             <Form>frmUpdatePersona</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="Src\Coches.View.Desktop.pas">
+        <DCCReference Include="Src\Coches.View.Desktop.Grid.pas">
             <Form>frmCochesDesktop</Form>
             <FormType>fmx</FormType>
         </DCCReference>
@@ -109,7 +110,7 @@
             <Form>frmUpdateCoche</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="Src\Coches.View.Desktop.V2.pas">
+        <DCCReference Include="Src\Coches.View.Desktop.ListBox.pas">
             <Form>frmCochesMainLB</Form>
             <FormType>fmx</FormType>
         </DCCReference>

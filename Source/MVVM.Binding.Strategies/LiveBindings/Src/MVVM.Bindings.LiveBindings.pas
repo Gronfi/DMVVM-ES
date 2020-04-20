@@ -92,6 +92,11 @@ type
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True); overload; override;
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True); overload; override;
 
+    // -- ListView
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: String; const AOnlyFillValues: Boolean = True); overload; override;
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListViewConversionData; const AOnlyFillValues: Boolean = True); overload; override;
+    procedure BindDataSetAppendFieldToListView(ADataSet: TDataSet; ATarget: TComponent; const ALink: TListViewConversionData; const AOnlyFillValues: Boolean = True); overload; override;
+
     // -- Grids
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; override;
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload; override;
@@ -266,6 +271,66 @@ begin
 
   if not InternalBindDataSet(ADataSet, LView.Component) then
     raise EBindError.CreateFmt('Component %s has not registered a binder', [TObject(ATarget).QualifiedClassName]);
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetAppendFieldToListView(ADataSet: TDataSet; ATarget: TComponent; const ALink: TListViewConversionData; const AOnlyFillValues: Boolean);
+var
+  LFiller: TLinkFillControlToField;
+  LLinker: TLinkListControlToField;
+  LSource: TBindSourceDB;
+  I, J   : Integer;
+  LFound : Boolean;
+  LItem  : TCollectionItem;
+  LItem1: TFormatExpressionItem;
+begin
+  //si hay link lo usamos
+  LFiller := nil;
+  LLinker := nil;
+  LFound := False;
+  for I := 0 to ATarget.ComponentCount - 1 do
+  begin
+    if (ATarget.Components[I] is TBindSourceDB) then
+    begin
+      for J := 0 to ATarget.Components[I].ComponentCount - 1 do
+      begin
+        if (ATarget.Components[I].Components[J] is TLinkFillControlToField) then
+        begin
+          LFiller := ATarget.Components[I].Components[J] as TLinkFillControlToField;
+          LFiller.Active := False;
+          LFound := True;
+          Break;
+        end;
+        if (ATarget.Components[I].Components[J] is TLinkListControlToField) then
+        begin
+          LLinker := ATarget.Components[I].Components[J] as TLinkListControlToField;
+          LLinker.Active := False;
+          LFound := True;
+          Break;
+        end;
+      end;
+      if LFound then
+        break;
+    end;
+  end;
+  if Assigned(LFiller) then
+  begin
+    LItem1 := LFiller.FillExpressions.AddExpression;
+    LItem1.SourceMemberName  := ALink.DataSetField;
+    LItem1.ControlMemberName := ALink.ListViewField;
+    if not ALink.CustomFormat.IsEmpty then
+      LItem1.CustomFormat := ALink.CustomFormat;
+    LFiller.Active := True;
+    Exit;
+  end;
+  if Assigned(LLinker) then
+  begin
+    LItem1 := LLinker.FillExpressions.AddExpression;
+    LItem1.SourceMemberName  := ALink.DataSetField;
+    LItem1.ControlMemberName := ALink.ListViewField;
+    if not ALink.CustomFormat.IsEmpty then
+      LItem1.CustomFormat := ALink.CustomFormat;
+    LLinker.Active := True;
+  end;
 end;
 
 procedure TStrategy_LiveBindings.BindDataSetFieldToProperty(ADataSet: TDataSet; const AFieldName: String; const ATarget: TComponent; const ATargetPropertyPath: String);
@@ -501,6 +566,111 @@ begin
            if not ALinks[I].CustomFormat.IsEmpty then
              LItem1.CustomFormat := ALinks[I].CustomFormat;
          end;
+         LLinker.Active   := True;
+       end;
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const AField, ACustomDisplayExpression: String; const AOnlyFillValues: Boolean);
+var
+  LFiller: TLinkFillControlToField;
+  LLinker: TLinkListControlToField;
+  LSource: TBindSourceDB;
+  I      : Integer;
+begin
+  ClearDataSetBindingFromComponent(ATarget);
+  LSource          := TBindSourceDB.Create(ATarget);
+  LSource.DataSet  := ADataSet;
+  if AOnlyFillValues then
+  begin
+    LFiller          := TLinkFillControlToField.Create(LSource);
+    LFiller.Category := 'Quick Bindings';
+    LFiller.Control  := ATarget;
+    LFiller.Track    := True;
+
+    LFiller.FillDataSource := LSource;
+    LFiller.FillDisplayFieldName := AField;
+    if not ACustomDisplayExpression.IsEmpty then
+      LFiller.FillDisplayCustomFormat := ACustomDisplayExpression;
+    LFiller.AutoFill := True;
+    LFiller.Active   := True;
+  end
+  else begin
+         LLinker          := TLinkListControlToField.Create(LSource);
+         LLinker.Category := 'Quick Bindings';
+         LLinker.Control  := ATarget;
+
+         LLinker.DataSource := LSource;
+         LLinker.FieldName  := AField;
+         if not ACustomDisplayExpression.IsEmpty then
+           LLinker.CustomFormat := ACustomDisplayExpression;
+         LLinker.Active   := True;
+       end;
+end;
+
+procedure TStrategy_LiveBindings.BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListViewConversionData; const AOnlyFillValues: Boolean);
+var
+  LFiller: TLinkFillControlToField;
+  LLinker: TLinkListControlToField;
+  LSource: TBindSourceDB;
+  I      : Integer;
+  LItem  : TCollectionItem;
+  LItem1: TFormatExpressionItem;
+begin
+  ClearDataSetBindingFromComponent(ATarget);
+
+  LSource          := TBindSourceDB.Create(ATarget);
+  LSource.DataSet  := ADataSet;
+  if AOnlyFillValues then
+  begin
+    LFiller          := TLinkFillControlToField.Create(LSource);
+    LFiller.Category := 'Quick Bindings';
+    LFiller.Control  := ATarget;
+    LFiller.Track    := True;
+
+    LFiller.FillDataSource := LSource;
+
+    for I := Low(ALinks) to High(ALinks) do
+    begin
+      LItem1 := LFiller.FillExpressions.AddExpression;
+      LItem1.SourceMemberName  := ALinks[I].DataSetField;
+      LItem1.ControlMemberName := ALinks[I].ListViewField;
+      if not ALinks[I].CustomFormat.IsEmpty then
+        LItem1.CustomFormat := ALinks[I].CustomFormat;
+    end;
+
+    LFiller.AutoFill := True;
+    LFiller.Active   := True;
+  end
+  else begin
+         LLinker          := TLinkListControlToField.Create(LSource);
+         LLinker.Category := 'Quick Bindings';
+         LLinker.DataSource := LSource;
+
+         for I := Low(ALinks) to High(ALinks) do
+         begin
+           if ALinks[I].IsKeyField then
+           begin
+             LLinker.FieldName := ALinks[I].DataSetField;
+             Break;
+           end
+         end;
+         LLinker.Control  := ATarget;
+         for I := Low(ALinks) to High(ALinks) do
+         begin
+//           if not ALinks[I].IsKeyField then
+//           begin
+//             LLinker.FieldName  := ALinks[I].DataSetField;
+//             LSource.ResetNeeded;
+//           end
+//           else begin
+                  LItem1 := LLinker.FillExpressions.AddExpression;
+                  LItem1.SourceMemberName  := ALinks[I].DataSetField;
+                  LItem1.ControlMemberName := ALinks[I].ListViewField;
+                  if not ALinks[I].CustomFormat.IsEmpty then
+                    LItem1.CustomFormat := ALinks[I].CustomFormat;
+//                end;
+         end;
+
          LLinker.Active   := True;
        end;
 end;

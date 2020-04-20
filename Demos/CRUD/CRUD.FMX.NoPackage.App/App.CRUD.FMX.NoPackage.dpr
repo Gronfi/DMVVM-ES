@@ -26,7 +26,7 @@ uses
   Personas.View.Desktop in '..\CRUD.FMX\Src\Personas.View.Desktop.pas' {frmPersonasDesktop},
   CRUD.Resources.Common in '..\CRUD.Resources.Common\CRUD.Resources.Common.pas',
   uMain in '..\CRUD.FMX.App\Src\uMain.pas' {frmMain},
-  Coches.View.Desktop in '..\CRUD.FMX\Src\Coches.View.Desktop.pas' {frmCochesDesktop},
+  Coches.View.Desktop.Grid in '..\CRUD.FMX\Src\Coches.View.Desktop.Grid.pas' {frmCochesDesktop},
   New.Coche.View.Desktop in '..\CRUD.FMX\Src\New.Coche.View.Desktop.pas' {frmNewCoche},
   New.Persona.View.Desktop in '..\CRUD.FMX\Src\New.Persona.View.Desktop.pas' {frmNewPersona},
   Update.Coche.View.Desktop in '..\CRUD.FMX\Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},

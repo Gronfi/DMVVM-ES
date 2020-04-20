@@ -249,6 +249,17 @@ type
     constructor Create(const ADataSetField: String; const AListBoxField: String; const ACustomFormat: String = '');
   end;
 {$ENDREGION}
+{$REGION 'TListViewConversionData'}
+  TListViewConversionData = record
+  public
+    DataSetField : String;
+    ListViewField: String;
+    CustomFormat : String;
+    IsKeyField   : Boolean;
+
+    constructor Create(const ADataSetField: String; const AListViewField: String; const ACustomFormat: String = ''; const AIsKeyField: Boolean = False);
+  end;
+{$ENDREGION}
 {$REGION 'TGridColumnTemplate'}
   TGridColumnTemplate = record
   public
@@ -319,6 +330,16 @@ begin
   DataSetField := ADataSetField;
   ListBoxField := AListBoxField;
   CustomFormat := ACustomFormat;
+end;
+
+{ TListViewConversionData }
+
+constructor TListViewConversionData.Create(const ADataSetField, AListViewField, ACustomFormat: String; const AIsKeyField: Boolean);
+begin
+  DataSetField  := ADataSetField;
+  ListViewField := AListViewField;
+  CustomFormat  := ACustomFormat;
+  IsKeyField    := AIsKeyField;
 end;
 
 end.

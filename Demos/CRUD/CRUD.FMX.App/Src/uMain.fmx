@@ -2,8 +2,8 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'Menu'
-  ClientHeight = 124
-  ClientWidth = 223
+  ClientHeight = 158
+  ClientWidth = 257
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -11,19 +11,19 @@ object frmMain: TfrmMain
   DesignerMasterStyle = 0
   object Layout1: TLayout
     Align = Client
-    Size.Width = 223.000000000000000000
-    Size.Height = 124.000000000000000000
+    Size.Width = 257.000000000000000000
+    Size.Height = 158.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
     object Rectangle1: TRectangle
       Align = Top
       Fill.Color = claCrimson
-      Size.Width = 223.000000000000000000
+      Size.Width = 257.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
       object Text3: TText
         Align = Client
-        Size.Width = 223.000000000000000000
+        Size.Width = 257.000000000000000000
         Size.Height = 50.000000000000000000
         Size.PlatformDefault = False
         Text = 'Tablas'
@@ -42,8 +42,11 @@ object frmMain: TfrmMain
     object Button2: TButton
       Position.X = 136.000000000000000000
       Position.Y = 64.000000000000000000
+      Size.Width = 113.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 2
-      Text = 'Coches (G)'
+      Text = 'Coches (Grid)'
       OnClick = Button2Click
     end
     object ShadowEffect1: TShadowEffect
@@ -53,12 +56,26 @@ object frmMain: TfrmMain
       Opacity = 0.600000023841857900
       ShadowColor = claBlack
     end
+    object Button4: TButton
+      Enabled = False
+      Position.X = 136.000000000000000000
+      Position.Y = 128.000000000000000000
+      Size.Width = 113.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 3
+      Text = 'Coches (ListView)'
+      OnClick = Button4Click
+    end
   end
   object Button3: TButton
     Position.X = 136.000000000000000000
     Position.Y = 96.000000000000000000
+    Size.Width = 113.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 10
-    Text = 'Coches (LB)'
+    Text = 'Coches (ListBox)'
     OnClick = Button3Click
   end
   object FDConnection1: TFDConnection

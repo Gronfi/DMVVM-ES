@@ -9,8 +9,9 @@ uses
 type
   TFieldToGet = record
     FieldName: string;
-    IsBitmap : Boolean;
+    IsBitmap: Boolean;
   end;
+
   TFieldsToGet = array of TFieldToGet;
 
   TFieldsToGetHelper = record helper for TFieldsToGet
@@ -19,7 +20,7 @@ type
   end;
 
   TFieldConverter = record
-    FieldName : string;
+    FieldName: string;
     FieldValue: TValue;
   end;
 
@@ -40,7 +41,7 @@ var
 begin
   LCnt := Length(Self);
   SetLength(Self, LCnt + 1);
-  Self[LCnt].FieldName  := AFieldNAme;
+  Self[LCnt].FieldName  := AFieldName;
   Self[LCnt].FieldValue := AValue;
 end;
 
@@ -52,7 +53,7 @@ var
 begin
   LCnt := Length(Self);
   SetLength(Self, LCnt + 1);
-  Self[LCnt].FieldName := AFieldNAme;
+  Self[LCnt].FieldName := AFieldName;
   Self[LCnt].IsBitmap  := AIsBitmap;
 end;
 

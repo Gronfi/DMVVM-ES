@@ -78,25 +78,13 @@ begin
   ViewModel.NewRowView    := 'New.Persona';
   ViewModel.UpdateRowView := 'Update.Persona';
   // actions binding
-  actGet.Bind(procedure
-              begin
-                ViewModel.MakeGetRows;
-              end);
-  actNew.Bind(procedure
-              begin
-                ViewModel.MakeAppend;
-              end);
-  actUpdate.Bind(procedure
-                 begin
-                   ViewModel.MakeUpdate;
-                 end);
-  actDelete.Bind(procedure
-                 begin
-                   ViewModel.DeleteActiveRow;
-                 end);
+  actGet.Bind(ViewModel.DoMakeGetRows);
+  actNew.Bind(ViewModel.DoMakeAppend, ViewModel.IsOpen);
+  actUpdate.Bind(ViewModel.DoMakeUpdate, ViewModel.IsOpen);
+  actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
 
   // Dataset binding
-  ViewModel.MakeGetRows;
+  ViewModel.DoMakeGetRows; //open the dataset and get rows
 
   Binder.BindDataSetToGrid(ViewModel.DataSet, Grid1);
 end;

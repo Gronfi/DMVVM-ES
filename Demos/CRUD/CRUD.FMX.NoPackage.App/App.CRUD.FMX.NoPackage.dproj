@@ -161,7 +161,7 @@
             <Form>frmMain</Form>
             <FormType>fmx</FormType>
         </DCCReference>
-        <DCCReference Include="..\CRUD.FMX\Src\Coches.View.Desktop.pas">
+        <DCCReference Include="..\CRUD.FMX\Src\Coches.View.Desktop.Grid.pas">
             <Form>frmCochesDesktop</Form>
             <FormType>fmx</FormType>
         </DCCReference>

@@ -461,6 +461,10 @@ type
     // -- ListBox
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True); overload;
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True); overload;
+    // -- ListView
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: String; const AOnlyFillValues: Boolean = True); overload;
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListViewConversionData; const AOnlyFillValues: Boolean = True); overload;
+    procedure BindDataSetAppendFieldToListView(ADataSet: TDataSet; ATarget: TComponent; const ALink: TListViewConversionData; const AOnlyFillValues: Boolean = True); overload;
     // -- Grid
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; // basic link
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload;
@@ -523,6 +527,10 @@ type
     // -- ListBox
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: string; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
     procedure BindDataSetToListBox(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListBoxConversionData; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    // -- ListView
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const AField: String; const ACustomDisplayExpression: String; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    procedure BindDataSetToListView(ADataSet: TDataSet; ATarget: TComponent; const ALinks: array of TListViewConversionData; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
+    procedure BindDataSetAppendFieldToListView(ADataSet: TDataSet; ATarget: TComponent; const ALink: TListViewConversionData; const AOnlyFillValues: Boolean = True); overload; virtual; abstract;
     // -- Grid
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent); overload; virtual; abstract;
     procedure BindDataSetToGrid(ADataSet: TDataSet; ATarget: TComponent; const AColumnLinks: array of TGridColumnTemplate); overload; virtual; abstract;

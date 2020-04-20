@@ -1824,7 +1824,6 @@ begin
   AListBoxItem.StyleLookup := Template.GetStyle(AItem);
 end;
 { TListView }
-
 destructor TListView.Destroy;
 begin
   FView := nil;
@@ -2008,7 +2007,6 @@ begin
   AListViewItem.ImageIndex := Template.GetImageIndex(AItem);
   AListViewItem.Tag := NativeInt(AItem);
 end;
-
 { TImage }
 
 procedure TImage.DoChanged;

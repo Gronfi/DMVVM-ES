@@ -6,14 +6,16 @@ uses
   System.SysUtils, Data.DB,
 
   FireDac.DApt,
-  FireDAC.Comp.Client,
+  FireDac.Comp.Client,
 
   DataSet.Types;
+
 type
   TDataSet_Model = class
   private
     { Private declarations }
     FTableName: string;
+    FTableIndex: string;
     FDTable1: TFDTable;
   protected
     function GetDataSet: TDataSet;
@@ -22,6 +24,7 @@ type
 
     procedure SetTableName(const ATableName: String);
     procedure SetConnection(AConnection: TFDConnection);
+    procedure SetTableIndex(const ATableIndex: string);
   public
     { Public declarations }
     constructor Create; overload;
@@ -42,6 +45,7 @@ type
     procedure Delete;
 
     property RowCount: Integer read GetRowCount;
+    property TableIndex: string read FTableIndex write SetTableIndex;
     property Connection: TFDConnection write SetConnection;
     property TableName: string read FTableName write SetTableName;
     property IsOpen: Boolean read GetIsOpen;
@@ -71,7 +75,7 @@ begin
     end;
     FDTable1.Post;
   except
-    on E:Exception do
+    on E: Exception do
     begin
       FDTable1.Cancel;
       raise;
@@ -95,13 +99,13 @@ begin
   Create;
   if Assigned(AConnection) then
     FDTable1.Connection := AConnection;
-  TableName := ATableName;
+  TableName             := ATableName;
 end;
 
 constructor TDataSet_Model.Create;
 begin
   inherited Create;
-  FDTable1 := TFDTable.Create(nil);
+  FDTable1           := TFDTable.Create(nil);
   FDTable1.TableName := '';
 end;
 
@@ -140,7 +144,7 @@ end;
 
 function TDataSet_Model.GetRows(const AFields: TFieldsToGet): TFieldConverters;
 var
-  I      : Integer;
+  I: Integer;
   LObject: TObject;
 begin
   Spring.Guard.CheckTrue(FDTable1.State in [TDataSetState.dsBrowse], 'Wrong state for GetRows');
@@ -148,35 +152,36 @@ begin
   begin
     case FDTable1.FieldByName(AFields[I].FieldName).DataType of
       ftGuid:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsGuid);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsGuid);
       ftString, ftFixedChar, ftWideString, ftFixedWideChar:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsString);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsString);
       ftAutoInc, ftInteger:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
       ftLongWord:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsLongWord);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsLongWord);
       ftShortint:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
       ftByte:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
       ftSmallInt:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
       ftWord:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsInteger);
       ftBoolean:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsBoolean);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsBoolean);
       ftFloat, ftCurrency:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsFloat);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsFloat);
       ftMemo, ftWideMemo:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsWideString);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsWideString);
       ftBlob:
         begin
           if AFields[I].isBitmap then
           begin
             LObject := MVVMCore.PlatformServices.LoadBitmap(DataSet.FieldByName(AFields[I].FieldName).AsBytes);
-            Result.AddData(AFields[I].FieldNAme, LObject);
+            Result.AddData(AFields[I].FieldName, LObject);
           end
-          else Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsWideString);
+          else
+            Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsWideString);
         end;
       ftInterface:
         begin
@@ -186,15 +191,15 @@ begin
         begin
           //
         end;
-      ftGraphic: //por validar
+      ftGraphic: // por validar
         begin
           LObject := MVVMCore.PlatformServices.LoadBitmap(DataSet.FieldByName(AFields[I].FieldName).AsBytes);
-          Result.AddData(AFields[I].FieldNAme, LObject);
+          Result.AddData(AFields[I].FieldName, LObject);
         end;
       ftVariant:
-        Result.AddData(AFields[I].FieldNAme, TValue.FromVariant(FDTable1.FieldByName(AFields[I].FieldName).AsVariant));
+        Result.AddData(AFields[I].FieldName, TValue.FromVariant(FDTable1.FieldByName(AFields[I].FieldName).AsVariant));
       ftDate, ftTime, ftDateTime:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsDateTime);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsDateTime);
       ftFMTBCD:
         begin
           //
@@ -208,7 +213,7 @@ begin
           //
         end;
       ftLargeInt:
-        Result.AddData(AFields[I].FieldNAme, FDTable1.FieldByName(AFields[I].FieldName).AsLargeInt);
+        Result.AddData(AFields[I].FieldName, FDTable1.FieldByName(AFields[I].FieldName).AsLargeInt);
     end;
   end;
 end;
@@ -229,6 +234,11 @@ begin
   FDTable1.Connection := AConnection;
 end;
 
+procedure TDataSet_Model.SetTableIndex(const ATableIndex: string);
+begin
+  FDTable1.IndexFieldNames := ATableIndex;
+end;
+
 procedure TDataSet_Model.SetTableName(const ATableName: String);
 var
   LWasOpen: Boolean;
@@ -238,7 +248,7 @@ begin
     LWasOpen := IsOpen;
     if LWasOpen then
       Close;
-    FTableName := ATableName;
+    FTableName         := ATableName;
     FDTable1.TableName := FTableName;
     if LWasOpen then
       Open;
@@ -258,7 +268,7 @@ begin
     end;
     FDTable1.Post;
   except
-    on E:Exception do
+    on E: Exception do
     begin
       FDTable1.Cancel;
       raise;

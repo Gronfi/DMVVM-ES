@@ -29,15 +29,16 @@ package CRUD.View.FMX;
 
 requires
   CRUD.Core,
-  MVVM.Platform.FMX;
+  MVVM.Platform.FMX,
+  MVVM.Binding.LiveBindings.FMX;
 
 contains
   Personas.View.Desktop in 'Src\Personas.View.Desktop.pas' {frmPersonasDesktop},
   New.Persona.View.Desktop in 'Src\New.Persona.View.Desktop.pas' {frmNewPersona},
   Update.Persona.View.Desktop in 'Src\Update.Persona.View.Desktop.pas' {frmUpdatePersona},
-  Coches.View.Desktop in 'Src\Coches.View.Desktop.pas' {frmCochesDesktop},
+  Coches.View.Desktop.Grid in 'Src\Coches.View.Desktop.Grid.pas' {frmCochesDesktop},
   New.Coche.View.Desktop in 'Src\New.Coche.View.Desktop.pas' {frmNewCoche},
   Update.Coche.View.Desktop in 'Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},
-  Coches.View.Desktop.V2 in 'Src\Coches.View.Desktop.V2.pas' {frmCochesMainLB};
+  Coches.View.Desktop.ListBox in 'Src\Coches.View.Desktop.ListBox.pas' {frmCochesMainLB};
 
 end.

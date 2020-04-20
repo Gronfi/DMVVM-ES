@@ -3,6 +3,7 @@ unit DataSet.ViewModel;
 interface
 
 uses
+  System.SysUtils,
   System.Classes,
   Data.DB,
 
@@ -13,20 +14,28 @@ uses
   DataSet.Model,
   DataSet.Types,
 
+  MVVM.Types,
   MVVM.Attributes,
   MVVM.Interfaces,
   MVVM.Interfaces.Architectural,
   MVVM.Bindings;
 
 type
+
   [ViewModel_Implements(IDataSet_ViewModel)]
   TDataSet_ViewModel = class(TViewModel, IDataSet_ViewModel)
   private
     FModel: TDataSet_Model;
-    FTableName: String;
+    FTableName: string;
+    FTableIndex: string;
     FNewRowView: string;
     FUpdateRowView: string;
   protected
+    function GetProcMakeGetRows:  TExecuteMethod;
+    function GetProcDeleteActiveRow:  TExecuteMethod;
+    function GetProcMakeAppend:  TExecuteMethod;
+    function GetProcMakeUpdate:  TExecuteMethod;
+
     function GetModel: TDataSet_Model;
 
     function GetDataSet: TDataSet;
@@ -34,14 +43,22 @@ type
     function GetTableName: String;
     procedure SetTableName(const ATableName: string);
 
+    function GetTableIndex: string;
+    procedure SetTableIndex(const ATableIndex: string);
+
     function GetNewRowView: string;
     procedure SetNewRowView(const AViewName: string);
 
     function GetUpdateRowView: string;
     procedure SetUpdateRowView(const AViewName: string);
 
-    function GetIsOpen: Boolean;
+    function GetIsOpen: TCanExecuteMethod;
+    function IsDataSetOpen: Boolean;
 
+    procedure MakeGetRows;
+    procedure DeleteActiveRow;
+    procedure MakeAppend;
+    procedure MakeUpdate;
   public
     procedure SetupViewModel; override;
 
@@ -50,34 +67,35 @@ type
     procedure CloseDataSet;
     procedure OpenDataSet;
 
-    procedure MakeGetRows;
     function GetRows(const AFields: TFieldsToGet): TFieldConverters;
-    procedure DeleteActiveRow;
-    procedure MakeAppend;
     procedure AppendRow(const AFields: TFieldConverters);
-    procedure MakeUpdate;
     procedure UpdateActiveRow(const AFields: TFieldConverters);
 
     property NewRowView: string read GetNewRowView write SetNewRowView;
     property UpdateRowView: string read GetUpdateRowView write SetUpdateRowView;
     property TableName: string read GetTableName write SetTableName;
-    property IsOpen: Boolean read GetIsOpen;
+    property TableIndex: string read GetTableIndex write SetTableIndex;
     property DataSet: TDataSet read GetDataSet;
     property Model: TDataSet_Model read GetModel;
+
+    property IsOpen: TCanExecuteMethod read GetIsOpen;
+
+    property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
+    property DoDeleteActiveRow: TExecuteMethod read GetProcDeleteActiveRow;
+    property DoMakeAppend: TExecuteMethod read GetProcMakeAppend;
+    property DoMakeUpdate: TExecuteMethod read GetProcMakeUpdate;
   end;
 
 implementation
 
 uses
   System.Rtti,
-  System.SysUtils,
   System.Threading,
   System.Diagnostics,
   System.UITypes,
 
   MVVM.Utils,
-  MVVM.Core,
-  MVVM.Types;
+  MVVM.Core;
 
 { TDataSetFile_ViewModel }
 
@@ -113,9 +131,9 @@ begin
   Result := FModel.DataSet;
 end;
 
-function TDataSet_ViewModel.GetIsOpen: Boolean;
+function TDataSet_ViewModel.GetIsOpen: TCanExecuteMethod;
 begin
-  Result := FModel.IsOpen
+  Result := IsDataSetOpen;
 end;
 
 function TDataSet_ViewModel.GetModel: TDataSet_Model;
@@ -128,9 +146,34 @@ begin
   Result := FNewRowView
 end;
 
+function TDataSet_ViewModel.GetProcDeleteActiveRow: TExecuteMethod;
+begin
+  Result := DeleteActiveRow;
+end;
+
+function TDataSet_ViewModel.GetProcMakeAppend: TExecuteMethod;
+begin
+  Result := MakeAppend
+end;
+
+function TDataSet_ViewModel.GetProcMakeGetRows: TExecuteMethod;
+begin
+  Result := MakeGetRows;
+end;
+
+function TDataSet_ViewModel.GetProcMakeUpdate: TExecuteMethod;
+begin
+  Result := MakeUpdate
+end;
+
 function TDataSet_ViewModel.GetRows(const AFields: TFieldsToGet): TFieldConverters;
 begin
   Result := FModel.GetRows(AFields);
+end;
+
+function TDataSet_ViewModel.GetTableIndex: string;
+begin
+  Result := FTableIndex
 end;
 
 function TDataSet_ViewModel.GetTableName: String;
@@ -143,23 +186,29 @@ begin
   Result := FUpdateRowView
 end;
 
+function TDataSet_ViewModel.IsDataSetOpen: Boolean;
+begin
+  Result := FModel.IsOpen
+end;
+
 procedure TDataSet_ViewModel.MakeAppend;
 var
   LView: IView<IDataSet_ViewModel>;
 begin
   OpenDataSet;
 
-  LView := Utils.ShowModalView<IDataSet_ViewModel>(Self, FNewRowView, procedure (AResult: TModalResult)
-                                                   begin
-                                                     ;
-                                                   end, MVVMCore.DefaultViewPlatform);
+  LView := Utils.ShowModalView<IDataSet_ViewModel>(Self, FNewRowView,
+    procedure(AResult: TModalResult)
+    begin;
+    end, MVVMCore.DefaultViewPlatform);
 end;
 
 procedure TDataSet_ViewModel.MakeGetRows;
 begin
   if not FModel.IsOpen then
     FModel.Open
-  else FModel.DataSet.Refresh;
+  else
+    FModel.DataSet.Refresh;
 end;
 
 procedure TDataSet_ViewModel.MakeUpdate;
@@ -172,10 +221,10 @@ begin
     Exit;
   end;
 
-  LView := Utils.ShowModalView<IDataSet_ViewModel>(Self, FUpdateRowView, procedure (AResult: TModalResult)
-                                                   begin
-                                                     ;
-                                                   end, MVVMCore.DefaultViewPlatform);
+  LView := Utils.ShowModalView<IDataSet_ViewModel>(Self, FUpdateRowView,
+    procedure(AResult: TModalResult)
+    begin;
+    end, MVVMCore.DefaultViewPlatform);
 end;
 
 procedure TDataSet_ViewModel.SetModel(AModel: TDataSet_Model);
@@ -190,6 +239,15 @@ end;
 procedure TDataSet_ViewModel.SetNewRowView(const AViewName: string);
 begin
   FNewRowView := AViewName
+end;
+
+procedure TDataSet_ViewModel.SetTableIndex(const ATableIndex: string);
+begin
+  if FTableIndex <> ATableIndex then
+  begin
+    FTableIndex       := ATableIndex;
+    FModel.TableIndex := FTableIndex;
+  end;
 end;
 
 procedure TDataSet_ViewModel.SetTableName(const ATableName: string);
@@ -210,7 +268,8 @@ procedure TDataSet_ViewModel.SetupViewModel;
 begin
   if not FTableName.IsEmpty then
   begin
-    FModel.TableName := FTableName;
+    FModel.TableName  := FTableName;
+    FModel.TableIndex := FTableIndex;
     FModel.Open;
   end;
 end;
@@ -221,6 +280,7 @@ begin
 end;
 
 initialization
-  TDataSet_ViewModel.ClassName; //as there should be no implicit create, we must do this so the rtti info of the class is included in the final exe
+
+TDataSet_ViewModel.ClassName; // as there should be no implicit create, we must do this so the rtti info of the class is included in the final exe
 
 end.
