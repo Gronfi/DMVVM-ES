@@ -108,7 +108,7 @@ begin
   Modelo := TDataSet_Model.Create;
   Modelo.Connection := FDConnection1;
 
-  VistaModelo := MVVMCore.ViewModelProvider<IDataSet_ViewModel>;
+  VistaModelo := MVVMCore.IoC.ViewModelProvider<IDataSet_ViewModel>;
   VistaModelo.SetModel(Modelo);
 end;
 

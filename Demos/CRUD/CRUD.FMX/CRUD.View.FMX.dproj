@@ -5,7 +5,7 @@
         <ProjectVersion>18.8</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Package</AppType>
@@ -112,6 +112,10 @@
         </DCCReference>
         <DCCReference Include="Src\Coches.View.Desktop.ListBox.pas">
             <Form>frmCochesMainLB</Form>
+            <FormType>fmx</FormType>
+        </DCCReference>
+        <DCCReference Include="Src\Coches.View.Desktop.ListView.pas">
+            <Form>frmViewCochesLV</Form>
             <FormType>fmx</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">

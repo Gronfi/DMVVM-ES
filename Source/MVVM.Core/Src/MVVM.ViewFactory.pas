@@ -7,7 +7,8 @@ uses
   System.UITypes,
   System.Classes,
   System.SysUtils,
-  System.Generics.Collections,
+
+  Spring.Collections,
 
   MVVM.Interfaces.Architectural;
 
@@ -17,7 +18,7 @@ type
   TViewFactory = class
 {$REGION 'Internal Declarations'}
   private
-    class var FRegisteredViews: TDictionary<String, TRttiInstanceType>;
+    class var FRegisteredViews: IDictionary<String, TRttiInstanceType>;
   public
     class destructor Destroy;
 {$ENDREGION 'Internal Declarations'}
@@ -57,6 +58,43 @@ type
   protected
     function GetViewModel: TVM;
     { IView }
+    procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
+  protected
+    { IView<TVM> }
+    procedure InitView(AViewModel: TVM);
+{$ENDREGION 'Internal Declarations'}
+  public
+    constructor Create(AActualView: IView<TVM>);
+    destructor Destroy; override;
+
+    function GetAsObject: TObject;
+
+    procedure SetupView;
+    property ViewModel: TVM read GetViewModel;
+  end;
+
+  TDummyFormViewProxy<TVM: IViewModel> = class(TInterfacedObject, IView, IView<TVM>, IViewForm<TVM>)
+{$REGION 'Internal Declarations'}
+  private type
+    TViewFreeListener = class(TComponent)
+    strict private
+      FActualView: IView<TVM>;
+      [unsafe]
+      FActualViewObject: TComponent;
+    protected
+      procedure Notification(AComponent: TComponent; Operation: TOperation); override;
+    public
+      constructor Create(AView: IView<TVM>); reintroduce;
+      destructor Destroy; override;
+
+      property ActualView: IView<TVM> read FActualView;
+    end;
+  private
+    FViewFreeListener: TViewFreeListener;
+  protected
+    function GetViewModel: TVM;
+    { IViewForm }
+    procedure Execute;
     procedure ExecuteModal(const AResultProc: TProc<TModalResult>);
   protected
     { IView<TVM> }
@@ -221,8 +259,10 @@ var
   LName: string;
   LParams: array of TValue;
   LViewModel: TVM;
+  LIsForm   : Boolean;
 begin
-  LName := APlatform + '.' + AViewName;
+  LIsForm  := False;
+  LName    := APlatform + '.' + AViewName;
   try
     LViewClass := nil;
     if Assigned(FRegisteredViews) then
@@ -234,7 +274,8 @@ begin
     LViewComp  := Utils.CreateComponent_From_RttiInstance(LViewClass, LParams);
     if Supports(LViewComp, IViewForm<TVM>, LViewForm) then
     begin
-      Result := TFormViewProxy<TVM>.Create(LViewForm);
+      LIsForm := True;
+      Result  := TFormViewProxy<TVM>.Create(LViewForm);
     end
     else
     begin
@@ -243,8 +284,19 @@ begin
     end;
     LViewModel := AViewModel;
     if LViewModel = nil then
-      LViewModel := MVVMCore.ViewModelProvider<TVM>;
-    Result.InitView(LViewModel)
+      LViewModel := MVVMCore.IoC.ViewModelProvider<TVM>;
+    if AOwner <> nil then
+    begin
+      AOwner.InsertComponent(Result as TComponent);
+      MVVMCore.PlatformServices.AssignParent(Result as TComponent, AOwner);
+    end
+    else begin
+           if not LIsform then
+           begin
+             MVVMCore.PlatformServices.CreatePlatformEmptyForm
+           end;
+         end;
+    Result.InitView(LViewModel);
   except
     AViewModel := nil;
     raise;
@@ -352,7 +404,7 @@ end;
 
 class destructor TViewFactory.Destroy;
 begin
-  FreeAndNil(FRegisteredViews);
+  FRegisteredViews := nil;
 end;
 
 class procedure TViewFactory.Register(const AViewClass: TRttiInstanceType; const AViewName: String; const APlatform: String);
@@ -367,11 +419,110 @@ begin
     raise EInvalidOperation.CreateFmt('View class %s must have a ViewName not empty', [AViewClass.MetaclassType.QualifiedClassName]);
 
   if (FRegisteredViews = nil) then
-    FRegisteredViews := TDictionary<String, TRttiInstanceType>.Create(TIStringComparer.Ordinal);
+    FRegisteredViews := TCollections.CreateDictionary<String, TRttiInstanceType>;
 
   LAlias := Utils.iif<String>(APlatform.IsEmpty, AViewName, APlatform + '.' + AViewName);
 
   FRegisteredViews.AddOrSetValue(LAlias, AViewClass);
+end;
+
+{ TDummyFormViewProxy<TVM>.TViewFreeListener }
+
+constructor TDummyFormViewProxy<TVM>.TViewFreeListener.Create(AView: IView<TVM>);
+var
+  Instance: TObject;
+begin
+  inherited Create(nil);
+  FActualView := AView;
+  Instance    := TObject(AView);
+  if (Instance is TComponent) then
+  begin
+    FActualViewObject := TComponent(Instance);
+    FActualViewObject.FreeNotification(Self);
+  end;
+end;
+
+destructor TDummyFormViewProxy<TVM>.TViewFreeListener.Destroy;
+begin
+  if (FActualViewObject <> nil) then
+    FActualViewObject.RemoveFreeNotification(Self);
+  inherited;
+end;
+
+procedure TDummyFormViewProxy<TVM>.TViewFreeListener.Notification(AComponent: TComponent; Operation: TOperation);
+begin
+  inherited;
+  if (AComponent = FActualViewObject) and (Operation = opRemove) then
+  begin
+    FActualView       := nil;
+    FActualViewObject := nil;
+  end;
+end;
+
+{ TDummyFormViewProxy<TVM> }
+
+constructor TDummyFormViewProxy<TVM>.Create(AActualView: IView<TVM>);
+begin
+  Assert(Assigned(AActualView));
+  inherited Create;
+  { Executing a view may free it (for example, when the view is a form and its
+    CloseAction is set to caFree). When that happens, the IView interface
+    will contain an invalid reference, and you may get an access violation when
+    it goes out of scope. To avoid this, we use a view proxy. This proxy
+    subscribes to a free notification of the view, so it can set the IView
+    interface to nil BEFORE the view is destroyed. }
+  FViewFreeListener := TViewFreeListener.Create(AActualView);
+end;
+
+destructor TDummyFormViewProxy<TVM>.Destroy;
+begin
+  FViewFreeListener.Free;
+  inherited;
+end;
+
+procedure TDummyFormViewProxy<TVM>.Execute;
+begin
+  MVVMCore.PlatformServices.ShowFormView(FViewFreeListener.ActualView as TComponent);
+end;
+
+procedure TDummyFormViewProxy<TVM>.ExecuteModal(const AResultProc: TProc<TModalResult>);
+var
+  [weak]
+  LViewForm: IViewForm<TVM>;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+  begin
+    if Supports(FViewFreeListener.ActualView, IViewForm<TVM>, LViewForm) then
+      LViewForm.ExecuteModal(AResultProc);
+  end;
+end;
+
+function TDummyFormViewProxy<TVM>.GetAsObject: TObject;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    Result := FViewFreeListener.ActualView.GetAsObject
+  else
+    Result := nil;
+end;
+
+function TDummyFormViewProxy<TVM>.GetViewModel: TVM;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    Result := FViewFreeListener.ActualView.ViewModel
+  else
+    Result := nil;
+end;
+
+procedure TDummyFormViewProxy<TVM>.InitView(AViewModel: TVM);
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    FViewFreeListener.ActualView.InitView(AViewModel);
+end;
+
+procedure TDummyFormViewProxy<TVM>.SetupView;
+begin
+  if Assigned(FViewFreeListener.ActualView) then
+    FViewFreeListener.ActualView.SetupView;
 end;
 
 end.

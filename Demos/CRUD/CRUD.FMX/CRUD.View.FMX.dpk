@@ -39,6 +39,7 @@ contains
   Coches.View.Desktop.Grid in 'Src\Coches.View.Desktop.Grid.pas' {frmCochesDesktop},
   New.Coche.View.Desktop in 'Src\New.Coche.View.Desktop.pas' {frmNewCoche},
   Update.Coche.View.Desktop in 'Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},
-  Coches.View.Desktop.ListBox in 'Src\Coches.View.Desktop.ListBox.pas' {frmCochesMainLB};
+  Coches.View.Desktop.ListBox in 'Src\Coches.View.Desktop.ListBox.pas' {frmCochesMainLB},
+  Coches.View.Desktop.ListView in 'Src\Coches.View.Desktop.ListView.pas' {frmViewCochesLV};
 
 end.

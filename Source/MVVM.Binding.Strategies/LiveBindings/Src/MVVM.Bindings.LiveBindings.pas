@@ -650,25 +650,22 @@ begin
          begin
            if ALinks[I].IsKeyField then
            begin
-             LLinker.FieldName := ALinks[I].DataSetField;
+             LLinker.FieldName    := ALinks[I].DataSetField;
+             LLinker.CustomFormat := ALinks[I].CustomFormat;
              Break;
            end
          end;
-         LLinker.Control  := ATarget;
+         LLinker.Control := ATarget;
          for I := Low(ALinks) to High(ALinks) do
          begin
-//           if not ALinks[I].IsKeyField then
-//           begin
-//             LLinker.FieldName  := ALinks[I].DataSetField;
-//             LSource.ResetNeeded;
-//           end
-//           else begin
-                  LItem1 := LLinker.FillExpressions.AddExpression;
-                  LItem1.SourceMemberName  := ALinks[I].DataSetField;
-                  LItem1.ControlMemberName := ALinks[I].ListViewField;
-                  if not ALinks[I].CustomFormat.IsEmpty then
-                    LItem1.CustomFormat := ALinks[I].CustomFormat;
-//                end;
+           if not ALinks[I].IsKeyField then
+           begin
+             LItem1 := LLinker.FillExpressions.AddExpression;
+             LItem1.SourceMemberName  := ALinks[I].DataSetField;
+             LItem1.ControlMemberName := ALinks[I].ListViewField;
+             if not ALinks[I].CustomFormat.IsEmpty then
+               LItem1.CustomFormat := ALinks[I].CustomFormat;
+          end;
          end;
 
          LLinker.Active   := True;

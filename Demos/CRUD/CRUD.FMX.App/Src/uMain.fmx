@@ -57,7 +57,6 @@ object frmMain: TfrmMain
       ShadowColor = claBlack
     end
     object Button4: TButton
-      Enabled = False
       Position.X = 136.000000000000000000
       Position.Y = 128.000000000000000000
       Size.Width = 113.000000000000000000

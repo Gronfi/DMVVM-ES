@@ -3,7 +3,7 @@
         <ProjectGuid>{25F0D1D4-23C7-4350-A17F-67AE14842F76}</ProjectGuid>
         <MainSource>Spring.Extensions.dpk</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Debug</Config>
+        <Config Condition="'$(Config)'==''">Release</Config>
         <TargetedPlatforms>131</TargetedPlatforms>
         <AppType>Package</AppType>
         <FrameworkType>None</FrameworkType>

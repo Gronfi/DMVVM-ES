@@ -9,21 +9,21 @@ package MVVM.Core;
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
-{$LOCALSYMBOLS ON}
+{$LOCALSYMBOLS OFF}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION OFF}
+{$OPTIMIZATION ON}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
-{$REFERENCEINFO ON}
+{$REFERENCEINFO OFF}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES ON}
+{$STACKFRAMES OFF}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE DEBUG}
+{$DEFINE RELEASE}
 {$ENDIF IMPLICITBUILDING}
 {$IMPLICITBUILD ON}
 
@@ -44,6 +44,7 @@ contains
   MVVM.ViewFactory in 'Src\MVVM.ViewFactory.pas',
   MVVM.Bindings.Commands in 'Src\MVVM.Bindings.Commands.pas',
   MVVM.Attributes in 'Src\MVVM.Attributes.pas',
-  MVVM.Interfaces.Architectural in 'Src\MVVM.Interfaces.Architectural.pas';
+  MVVM.Interfaces.Architectural in 'Src\MVVM.Interfaces.Architectural.pas',
+  MVVM.CommandFactory in 'Src\MVVM.CommandFactory.pas';
 
 end.

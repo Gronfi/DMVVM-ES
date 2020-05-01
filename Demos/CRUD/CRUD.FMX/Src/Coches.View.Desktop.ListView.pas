@@ -4,20 +4,22 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
 
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts,
   FMX.ListView.Types, FMX.ListView.Appearances, FMX.ListView.Adapters.Base, FMX.ListView,
 
-  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Layouts,
+  //Fmx.Bind.Navigator,
+
   System.Actions, FMX.ActnList,
 
-  Fmx.Bind.Editors, Data.Bind.EngExt, Fmx.Bind.DBEngExt,
+  Fmx.Bind.Editors, Fmx.Bind.DBEngExt,
+
+  Data.Bind.EngExt,
 
   //
   System.Bindings.Expression, System.Bindings.Helper, System.Bindings.Outputs,
   Data.Bind.Components, Data.Bind.DBScope, Data.Bind.Controls,
-
-  Fmx.Bind.Navigator,
   //
 
 
@@ -82,9 +84,9 @@ begin
 
   Binder.BindDataSetToListView(ViewModel.DataSet, ListView1,
                                [
-                                 TListViewConversionData.Create('ID', 'Text', '', True),
-                                 TListViewConversionData.Create('NOMBRE', 'Detail'),
-                                 TListViewConversionData.Create('IMAGEN', 'Bitmap')
+                                 TListViewConversionData.Create('ID', 'Item.Text', '', True),
+                                 TListViewConversionData.Create('NOMBRE', 'Item.Detail'),
+                                 TListViewConversionData.Create('IMAGEN', 'Item.Bitmap')
                                ],
                                False);
 end;

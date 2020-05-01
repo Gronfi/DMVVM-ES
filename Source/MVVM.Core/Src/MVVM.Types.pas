@@ -60,13 +60,32 @@ type
 
   TBindExtraParams = TArray<TPair<String, String>>;
 
-  { Acciones Bindables } // DAVID: no me gusta como queda por las interfaces
-
+// Commands-Actions
   { The type of method to invoke when an IBindableAction is executed. }
   TExecuteRttiMethod = TRttiMethod;
   TExecuteAnonymous = TProc;
   TExecuteMethod = procedure of object;
-  // TExecuteMethod = procedure of Object;
+  TExecuteMethod<T> = procedure(const AArg: T) of object;
+  TCanExecuteRttiMethod = TRttiMethod;
+
+  TParam<T> = function: T of Object;
+  TParamRtti = TRttiMethod;
+
+  //Action members
+  EActionMemberType = (OnExecute, OnUpdate, OnAsyncExecutionFinished, OnParams);
+
+  ExceptionActionMemberTypeDuplicated = class(Exception);
+  ExceptionActionMemberTypeError = class(Exception);
+  ExceptionActionMemberNotFound = class(Exception);
+  ExceptionActionMemberNameCannotBeEmpty = class(Exception);
+
+  RActionMember = record
+    public
+      Name: String;
+      Caption: String;
+      MemberType: EActionMemberType;
+      Method: TRttiMethod;
+  end;
 
   { The type of method to invoke to check whether an IBindableAction can be
     executed. The Enabled property of the action will be set to the result of

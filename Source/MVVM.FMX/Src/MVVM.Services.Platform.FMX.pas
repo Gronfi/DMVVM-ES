@@ -13,6 +13,8 @@ uses
 type
   TFMXPlatformServices = class(TPlatformServicesBase)
   public
+    function CreatePlatformEmptyForm: TComponent; override;
+    procedure AssignParent(AChild, AParent: TComponent); override;
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; override;
     procedure ShowFormView(AComponent: TComponent); override;
     procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>); override;
@@ -29,12 +31,25 @@ implementation
 
 uses
   FMX.Forms,
+  FMX.Controls,
   FMX.Dialogs,
   FMX.Graphics,
 
   MVVM.Core;
 
 { TFMXServicioDialogo }
+
+procedure TFMXPlatformServices.AssignParent(AChild, AParent: TComponent);
+begin
+  if AParent is TForm then
+    TControl(AChild).Parent := TForm(AParent)
+  else TControl(AChild).Parent := TControl(AParent)
+end;
+
+function TFMXPlatformServices.CreatePlatformEmptyForm: TComponent;
+begin
+  Result := TForm.Create(nil);
+end;
 
 function TFMXPlatformServices.IsMainThreadUI: Boolean;
 begin

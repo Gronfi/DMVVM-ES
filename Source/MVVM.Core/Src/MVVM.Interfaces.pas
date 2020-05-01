@@ -21,6 +21,8 @@ type
 {$REGION 'IPlatformServices'}
   IPlatformServices = interface
     ['{95F9A402-2D01-48E5-A38B-9A6202FF5F59}']
+    function CreatePlatformEmptyForm: TComponent;
+    procedure AssignParent(AChild, AParent: TComponent);
     function MessageDlg(const ATitle: string; const AText: String): Boolean;
     procedure ShowFormView(AComponent: TComponent);
     procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>);
@@ -35,6 +37,8 @@ type
 
   TPlatformServicesBase = class abstract(TInterfacedObject, IPlatformServices)
   public
+    function CreatePlatformEmptyForm: TComponent; virtual; abstract;
+    procedure AssignParent(AChild, AParent: TComponent); virtual; abstract;
     function MessageDlg(const ATitulo: string; const ATexto: String): Boolean; virtual; abstract;
     procedure ShowFormView(AComponent: TComponent); virtual; abstract;
     procedure ShowModalFormView(AComponent: TComponent; const AResultProc: TProc<TModalResult>); virtual; abstract;
@@ -414,12 +418,25 @@ type
   end;
 {$ENDREGION}
 {$REGION 'IBindableAction'}
+  TCanExecuteChangedEvent = procedure(const ASender: TObject; const AEnabled: Boolean) of Object;
+  ICanExecuteChangedEvent = IEvent<TCanExecuteChangedEvent>;
 
   IBindableAction = interface(IBindable)
     ['{43A86FDB-96E2-47E4-B636-933430EFDD81}']
-    procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
-    procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
-    procedure Bind(const AExecute: TExecuteRttiMethod; const ACanExecute: TCanExecuteMethod = nil; const ABindingStrategy: String = ''); overload;
+     function GetCanExecuteChanged: ICanExecuteChangedEvent;
+
+     function GetAsyncExecution: Boolean;
+     procedure SetAsyncExecution(const AValue: Boolean);
+
+     procedure CancelAsyncExecution;
+
+     procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil); overload;
+     procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil); overload;
+     procedure Bind(const AExecute: TExecuteRttiMethod; const AExecuteObj: TObject;
+                    const ACanExecute: TCanExecuteRttiMethod = nil; const ACanExecuteObj: TObject = nil); overload;
+
+     property OnCanExecuteChanged: ICanExecuteChangedEvent read GetCanExecuteChanged;
+     property AsyncExecution: Boolean read GetAsyncExecution write SetAsyncExecution;
   end;
 {$ENDREGION}
 {$REGION 'IBindingStrategy'}

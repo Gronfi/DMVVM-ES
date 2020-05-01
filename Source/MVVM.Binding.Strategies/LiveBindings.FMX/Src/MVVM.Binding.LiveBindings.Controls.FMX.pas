@@ -152,6 +152,7 @@ TStrategy_LiveBindings.RegisterClassDataSetCollectionBinder(TListBox,
 {$ENDREGION}
 
 {$REGION 'TListView'}
+(*
 TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TListView,
   procedure(AServiceType: PTypeInfo; AComponent: TComponent; ACollection: TEnumerable<TObject>)
   var
@@ -225,6 +226,7 @@ TStrategy_LiveBindings.RegisterClassObjectListCollectionBinder(TGrid,
     LSource.Adapter := TListBindSourceAdapter.Create(AComponent, ACollection as TList<TObject>, GetTypeData(PTypeInfo(AServiceType))^.ClassType, True);
     LLink.SourceComponent := LSource;
   end);
+*)
 {$ENDREGION}
 
 end.

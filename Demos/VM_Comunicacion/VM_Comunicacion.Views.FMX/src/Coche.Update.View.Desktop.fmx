@@ -1,0 +1,92 @@
+object frmUpdateCoche: TfrmUpdateCoche
+  Left = 0
+  Top = 0
+  Caption = 'Update Coche'
+  ClientHeight = 269
+  ClientWidth = 288
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Button1: TButton
+    Action = actUpdate
+    Enabled = True
+    ImageIndex = -1
+    Position.X = 8.000000000000000000
+    Position.Y = 232.000000000000000000
+    Size.Width = 89.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+  end
+  object Button2: TButton
+    ModalResult = 1
+    Position.X = 200.000000000000000000
+    Position.Y = 232.000000000000000000
+    Size.Width = 80.000000000000000000
+    Size.Height = 33.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Close'
+  end
+  object edtID: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 2
+    ReadOnly = True
+    Position.X = 176.000000000000000000
+    Position.Y = 56.000000000000000000
+  end
+  object edtNombre: TEdit
+    Touch.InteractiveGestures = [LongTap, DoubleTap]
+    TabOrder = 3
+    Position.X = 176.000000000000000000
+    Position.Y = 96.000000000000000000
+  end
+  object Label1: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 96.000000000000000000
+    Text = 'Nombre'
+    TabOrder = 5
+  end
+  object Label2: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 120.000000000000000000
+    Text = 'Imagen'
+    TabOrder = 6
+  end
+  object Label5: TLabel
+    Position.X = 8.000000000000000000
+    Position.Y = 56.000000000000000000
+    Text = 'ID'
+    TabOrder = 4
+  end
+  object Rectangle1: TRectangle
+    Align = Top
+    Fill.Color = claCornflowerblue
+    Size.Width = 288.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    object Text3: TText
+      Align = Client
+      Size.Width = 288.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Update.Coche'
+      TextSettings.Font.Size = 16.000000000000000000
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
+      TextSettings.FontColor = claWhite
+    end
+  end
+  object ImageControl1: TImageControl
+    Position.X = 176.000000000000000000
+    Position.Y = 128.000000000000000000
+    TabOrder = 8
+  end
+  object ActionList1: TActionList
+    Left = 128
+    Top = 224
+    object actUpdate: TAction
+      Text = 'Update'
+    end
+  end
+end

@@ -37,6 +37,37 @@ type
     property InstanceType: EInstanceType read FInstanceType;
   end;
 
+  // Commands
+  // - Action Member
+  ActionMember = class(TMVVMCustomAttribute)
+  private
+    FName: String;
+    FCaption: String;
+    FEvent: EActionMemberType;
+  public
+    constructor Create(const AName, ACaption: String; const AMemberType: EActionMemberType); overload;
+    constructor Create(const AName: String; const AMemberType: EActionMemberType); overload;
+
+    property Name: String read FName;
+    property Caption: String read FCaption;
+    property MemberType: EActionMemberType read FEvent;
+  end;
+
+  // - Standard command
+  Command = class(TMVVMCustomAttribute)
+  private
+    FExecuteName: String;
+    FCanExecuteName: String;
+    FParamsName: String;
+  public
+    constructor Create(const AExecuteName: string; const ACanExecuteName: String = ''); overload;
+    constructor Create(const AExecuteName, ACanExecuteName: String; const AParamsName: string); overload;
+
+    property ExecuteName: String read FExecuteName;
+    property CanExecuteName: String read FCanExecuteName;
+    property ParamsName: String read FParamsName;
+  end;
+
 implementation
 
 { ViewForVM }
@@ -54,6 +85,38 @@ constructor ViewModel_Implements.Create(AVMInterfaceID: TGUID; const AInstanceTy
 begin
   FVMInterface  := AVMInterfaceID;
   FInstanceType := AInstanceType;
+end;
+
+{ ActionMember }
+
+constructor ActionMember.Create(const AName: String; const AMemberType: EActionMemberType);
+begin
+  FName   := AName;
+  FCaption:= '';
+  FEvent  := AMemberType;
+end;
+
+constructor ActionMember.Create(const AName, ACaption: String; const AMemberType: EActionMemberType);
+begin
+  FName   := AName;
+  FCaption:= ACaption;
+  FEvent  := AMemberType;
+end;
+
+{ Command }
+
+constructor Command.Create(const AExecuteName, ACanExecuteName, AParamsName: string);
+begin
+  FExecuteName := AExecuteName;
+  FCanExecuteName:= ACanExecuteName;
+  FParamsName:= AParamsName;
+end;
+
+constructor Command.Create(const AExecuteName, ACanExecuteName: String);
+begin
+  FExecuteName := AExecuteName;
+  FCanExecuteName:= ACanExecuteName;
+  FParamsName:= '';
 end;
 
 end.
