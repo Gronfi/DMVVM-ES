@@ -14,24 +14,6 @@ uses
 
   System.Actions, FMX.ActnList,
 
-(*
-  System.Bindings.Outputs,
-  Fmx.Bind.GenData,
-  Fmx.Bind.Editors,
-  Fmx.Bind.DBEngExt,
-  Fmx.Bind.Navigator,
-  Fmx.Bind.Grid,
-
-  Data.Bind.GenData,
-  Data.Bind.Components,
-  Data.Bind.ObjectScope,
-  Data.Bind.EngExt,
-  Data.Bind.DBScope,
-  Data.Bind.Controls,
-  Data.Bind.Grid,
-  Data.Bind.DBLinks,
-*)
-
   DataSet.Interfaces,
 
   MVVM.Attributes,
@@ -49,10 +31,13 @@ type
     Button4: TButton;
     Grid1: TGrid;
     ActionList1: TActionList;
+    [Command(GET_ROWS)]
     actGet: TAction;
+    [Command(APPEND_ROW, DATASET_IS_OPEN)]
     actNew: TAction;
     [Command(DELETE_ROW, DATASET_IS_OPEN)]
     actDelete: TAction;
+    [Command(UPDATE_ROW, DATASET_IS_OPEN)]
     actUpdate: TAction;
     Button5: TButton;
     Button6: TButton;
@@ -94,12 +79,10 @@ begin
   ViewModel.NewRowView    := 'New.Persona';
   ViewModel.UpdateRowView := 'Update.Persona';
   // actions binding
-  actGet.Bind(ViewModel.DoMakeGetRows);
-  actNew.Bind(ViewModel.DoMakeAppend, ViewModel.IsOpen);
-  actUpdate.Bind(ViewModel.DoMakeUpdate, ViewModel.IsOpen);
-
-
-//  actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
+  //actGet.Bind(ViewModel.DoMakeGetRows);
+  //actNew.Bind(ViewModel.DoMakeAppend, ViewModel.IsOpen);
+  //actUpdate.Bind(ViewModel.DoMakeUpdate, ViewModel.IsOpen);
+  //actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
 
   // Dataset binding
   ViewModel.DoMakeGetRows; //open the dataset and get rows

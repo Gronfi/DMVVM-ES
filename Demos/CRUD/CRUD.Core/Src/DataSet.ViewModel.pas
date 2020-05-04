@@ -33,10 +33,10 @@ type
     FNewRowView: string;
     FUpdateRowView: string;
   protected
-//    function GetProcMakeGetRows:  TExecuteMethod;
-//    function GetProcDeleteActiveRow:  TExecuteMethod;
-//    function GetProcMakeAppend:  TExecuteMethod;
-//    function GetProcMakeUpdate:  TExecuteMethod;
+    function GetProcMakeGetRows:  TExecuteMethod;
+    function GetProcDeleteActiveRow:  TExecuteMethod;
+    function GetProcMakeAppend:  TExecuteMethod;
+    function GetProcMakeUpdate:  TExecuteMethod;
 
     function GetModel: TDataSet_Model;
 
@@ -56,12 +56,11 @@ type
 
     function GetIsOpen: TCanExecuteMethod;
 
-//    procedure MakeGetRows;
-//    procedure DeleteActiveRow;
-//    procedure MakeAppend;
-//    procedure MakeUpdate;
+    procedure MakeGetRows;
+    procedure DeleteActiveRow;
+    procedure MakeAppend;
+    procedure MakeUpdate;
   public
-    [ActionMember(DATASET_IS_OPEN, OnUpdate, '')]
     function IsDataSetOpen: Boolean;
     procedure SetupViewModel; override;
 
@@ -81,22 +80,16 @@ type
     property DataSet: TDataSet read GetDataSet;
     property Model: TDataSet_Model read GetModel;
 
+    [ActionMember(DATASET_IS_OPEN, OnUpdate, '')]
     property IsOpen: TCanExecuteMethod read GetIsOpen;
 
-    function GetProcMakeGetRows:  TExecuteMethod;
-
-    function GetProcDeleteActiveRow:  TExecuteMethod;
-    function GetProcMakeAppend:  TExecuteMethod;
-    function GetProcMakeUpdate:  TExecuteMethod;
-
-    procedure MakeGetRows;
-    procedure DeleteActiveRow;
-    procedure MakeAppend;
-    procedure MakeUpdate;
+    [ActionMember(GET_ROWS, OnExecute, '')]
     property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
     [ActionMember(DELETE_ROW, OnExecute, '')]
     property DoDeleteActiveRow: TExecuteMethod read GetProcDeleteActiveRow;
+    [ActionMember(APPEND_ROW, OnExecute, '')]
     property DoMakeAppend: TExecuteMethod read GetProcMakeAppend;
+    [ActionMember(UPDATE_ROW, OnExecute, '')]
     property DoMakeUpdate: TExecuteMethod read GetProcMakeUpdate;
   end;
 

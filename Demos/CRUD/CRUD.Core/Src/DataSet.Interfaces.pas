@@ -18,7 +18,11 @@ uses
   DataSet.Model;
 
 const
+  GET_ROWS        = 'GetRows';
+  APPEND_ROW      = 'AppendRow';
   DELETE_ROW      = 'DeleteActiveRow';
+  UPDATE_ROW      = 'UpdateRow';
+
   DATASET_IS_OPEN = 'DataSetIsOpen';
 
 type
