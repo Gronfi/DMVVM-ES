@@ -41,8 +41,10 @@ type
     actUpdate: TAction;
     Button5: TButton;
     Button6: TButton;
-    procedure Button5Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
+    [Command(CLOSE_DATASET, DATASET_IS_OPEN)]
+    actCloseDataSet: TAction;
+    [Command(OPEN_DATASET, DATASET_IS_CLOSED)]
+    actOpenDataSet: TAction;
   protected
     { Private declarations }
     procedure SetupView; override;
@@ -59,16 +61,6 @@ uses
   MVVM.Types;
 
 {$R *.fmx}
-
-procedure TfrmPersonasDesktop.Button5Click(Sender: TObject);
-begin
-  ViewModel.CloseDataSet
-end;
-
-procedure TfrmPersonasDesktop.Button6Click(Sender: TObject);
-begin
-  ViewModel.OpenDataSet
-end;
 
 procedure TfrmPersonasDesktop.SetupView;
 begin

@@ -23,7 +23,11 @@ const
   DELETE_ROW      = 'DeleteActiveRow';
   UPDATE_ROW      = 'UpdateRow';
 
-  DATASET_IS_OPEN = 'DataSetIsOpen';
+  CLOSE_DATASET = 'CloseDataSet';
+  OPEN_DATASET  = 'OpenDataSet';
+
+  DATASET_IS_CLOSED = 'DataSetIsClosed';
+  DATASET_IS_OPEN   = 'DataSetIsOpen';
 
 type
   IDataSet_ViewModel = Interface(IViewModel)
@@ -36,6 +40,7 @@ type
     function GetProcMakeUpdate:  TExecuteMethod;
 
     function GetIsOpen: TCanExecuteMethod;
+    function GetIsClosed: TCanExecuteMethod;
 
     function GetTableName: String;
     procedure SetTableName(const ATableName: string);
@@ -54,12 +59,8 @@ type
     procedure CloseDataSet;
     procedure OpenDataSet;
 
-    //procedure MakeGetRows;
     function GetRows(const AFields: TFieldsToGet): TFieldConverters;
-    //procedure DeleteActiveRow;
-    //procedure MakeAppend;
     procedure AppendRow(const AFields: TFieldConverters);
-    //procedure MakeUpdate;
     procedure UpdateActiveRow(const AFields: TFieldConverters);
 
     property NewRowView: string read GetNewRowView write SetNewRowView;
@@ -69,6 +70,7 @@ type
     property DataSet: TDataSet read GetDataSet;
 
     property IsOpen: TCanExecuteMethod read GetIsOpen;
+    property IsClosed: TCanExecuteMethod read GetIsClosed;
 
     property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
     property DoDeleteActiveRow: TExecuteMethod read GetProcDeleteActiveRow;

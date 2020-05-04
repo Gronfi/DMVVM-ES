@@ -55,6 +55,7 @@ type
     procedure SetUpdateRowView(const AViewName: string);
 
     function GetIsOpen: TCanExecuteMethod;
+    function GetIsClosed: TCanExecuteMethod;
 
     procedure MakeGetRows;
     procedure DeleteActiveRow;
@@ -62,11 +63,16 @@ type
     procedure MakeUpdate;
   public
     function IsDataSetOpen: Boolean;
+    function IsDataSetClosed: Boolean;
+
     procedure SetupViewModel; override;
 
     procedure SetModel(AModel: TDataSet_Model);
 
+    [ActionMember(CLOSE_DATASET, OnExecute, '')]
     procedure CloseDataSet;
+
+    [ActionMember(OPEN_DATASET, OnExecute, '')]
     procedure OpenDataSet;
 
     function GetRows(const AFields: TFieldsToGet): TFieldConverters;
@@ -82,6 +88,8 @@ type
 
     [ActionMember(DATASET_IS_OPEN, OnUpdate, '')]
     property IsOpen: TCanExecuteMethod read GetIsOpen;
+    [ActionMember(DATASET_IS_CLOSED, OnUpdate, '')]
+    property IsClosed: TCanExecuteMethod read GetIsClosed;
 
     [ActionMember(GET_ROWS, OnExecute, '')]
     property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
@@ -138,6 +146,11 @@ begin
   Result := FModel.DataSet;
 end;
 
+function TDataSet_ViewModel.GetIsClosed: TCanExecuteMethod;
+begin
+  Result := IsDataSetClosed;
+end;
+
 function TDataSet_ViewModel.GetIsOpen: TCanExecuteMethod;
 begin
   Result := IsDataSetOpen;
@@ -191,6 +204,11 @@ end;
 function TDataSet_ViewModel.GetUpdateRowView: string;
 begin
   Result := FUpdateRowView
+end;
+
+function TDataSet_ViewModel.IsDataSetClosed: Boolean;
+begin
+  Result := not IsDataSetOpen
 end;
 
 function TDataSet_ViewModel.IsDataSetOpen: Boolean;

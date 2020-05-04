@@ -48,18 +48,26 @@ object frmPersonasDesktop: TfrmPersonasDesktop
       TabOrder = 3
     end
     object Button5: TButton
+      Action = actCloseDataSet
+      Enabled = True
+      ImageIndex = -1
       Position.X = 8.000000000000000000
       Position.Y = 176.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 4
-      Text = 'Close'
-      OnClick = Button5Click
     end
     object Button6: TButton
+      Action = actOpenDataSet
+      Enabled = True
+      ImageIndex = -1
       Position.X = 8.000000000000000000
       Position.Y = 200.000000000000000000
+      Size.Width = 89.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 5
-      Text = 'Open'
-      OnClick = Button6Click
     end
   end
   object Grid1: TGrid
@@ -88,6 +96,12 @@ object frmPersonasDesktop: TfrmPersonasDesktop
     end
     object actUpdate: TAction
       Text = 'Update'
+    end
+    object actCloseDataSet: TAction
+      Text = 'Close DataSet'
+    end
+    object actOpenDataSet: TAction
+      Text = 'Open DataSet'
     end
   end
 end
