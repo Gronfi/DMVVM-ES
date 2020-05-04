@@ -17,6 +17,10 @@ uses
   DataSet.Types,
   DataSet.Model;
 
+const
+  DELETE_ROW      = 'DeleteActiveRow';
+  DATASET_IS_OPEN = 'DataSetIsOpen';
+
 type
   IDataSet_ViewModel = Interface(IViewModel)
     ['{452FF42A-9FE0-49D0-A3D1-DE6422E1202B}']

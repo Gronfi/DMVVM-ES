@@ -61,7 +61,7 @@ type
 //    procedure MakeAppend;
 //    procedure MakeUpdate;
   public
-    [ActionMember('DataSetIsOpen', OnUpdate, '')]
+    [ActionMember(DATASET_IS_OPEN, OnUpdate, '')]
     function IsDataSetOpen: Boolean;
     procedure SetupViewModel; override;
 
@@ -94,7 +94,7 @@ type
     procedure MakeAppend;
     procedure MakeUpdate;
     property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
-    [ActionMember('DeleteActiveRow', OnExecute, '')]
+    [ActionMember(DELETE_ROW, OnExecute, '')]
     property DoDeleteActiveRow: TExecuteMethod read GetProcDeleteActiveRow;
     property DoMakeAppend: TExecuteMethod read GetProcMakeAppend;
     property DoMakeUpdate: TExecuteMethod read GetProcMakeUpdate;

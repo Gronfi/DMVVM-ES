@@ -51,7 +51,7 @@ type
     ActionList1: TActionList;
     actGet: TAction;
     actNew: TAction;
-    [Command('DeleteActiveRow', 'DataSetIsOpen')]
+    [Command(DELETE_ROW, DATASET_IS_OPEN)]
     actDelete: TAction;
     actUpdate: TAction;
     Button5: TButton;
