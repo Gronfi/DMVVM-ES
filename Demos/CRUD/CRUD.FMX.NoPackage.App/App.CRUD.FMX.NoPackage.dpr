@@ -31,7 +31,8 @@ uses
   New.Persona.View.Desktop in '..\CRUD.FMX\Src\New.Persona.View.Desktop.pas' {frmNewPersona},
   Update.Coche.View.Desktop in '..\CRUD.FMX\Src\Update.Coche.View.Desktop.pas' {frmUpdateCoche},
   Update.Persona.View.Desktop in '..\CRUD.FMX\Src\Update.Persona.View.Desktop.pas' {frmUpdatePersona},
-  DataSet.Types in '..\CRUD.Core\Src\DataSet.Types.pas';
+  DataSet.Types in '..\CRUD.Core\Src\DataSet.Types.pas',
+  MVVM.CommandFactory in '..\..\..\Source\MVVM.Core\Src\MVVM.CommandFactory.pas';
 
 {$R *.res}
 

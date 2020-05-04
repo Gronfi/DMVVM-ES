@@ -3,9 +3,11 @@ unit MVVM.Interfaces.Architectural;
 interface
 
 uses
+  System.Classes,
   System.SysUtils,
   System.UITypes,
 
+  MVVM.CommandFactory,
   MVVM.Interfaces,
   MVVM.Observable;
 
@@ -17,11 +19,20 @@ type
 
   IViewModel = interface(IObject)
     ['{37E13CBF-FDB2-4C6B-948A-7D5F7A6D0AC5}']
+    procedure BindCommands(const AView: TComponent);
     procedure SetupViewModel;
   end;
 
   TViewModel = class abstract(TObservable, IViewModel, INotifyChangedProperty, INotifyFree)
+  private
+    FCommandsFactory: TCommandsFactory;
+  protected
+    procedure AfterConstruction; override;
   public
+    constructor Create; reintroduce;
+    destructor Destroy; override;
+
+    procedure BindCommands(const AView: TComponent);
     procedure SetupViewModel; virtual; abstract;
 
     function GetAsObject: TObject;
@@ -43,14 +54,6 @@ type
     property ViewModel: T read GetViewModel;
   end;
 
-  (*
-    IView<T: IViewModel; K: TViewModel> = interface(IView<T>)
-    ['{BF036A8C-6302-482C-BD7B-DED350D255F9}']
-    function GetVM_AsObject: K;
-    property ViewModel_AsObject: K read GetVM_AsObject;
-    end;
-  *)
-
   IViewForm<T: IViewModel> = interface(IView<T>)
     ['{16407011-00BD-4BCA-9453-1D3F4E1C5DE1}']
     procedure Execute;
@@ -60,11 +63,40 @@ type
 
 implementation
 
+uses
+  MVVM.Utils;
+
 { TViewModel }
+
+procedure TViewModel.BindCommands(const AView: TComponent);
+begin
+  Utils.IdeDebugMsg('<TViewModel.BindCommands>');
+  FCommandsFactory.LoadCommandsAndActionsFrom(AView);
+  FCommandsFactory.BindView(AView);
+end;
+
+constructor TViewModel.Create;
+begin
+  Utils.IdeDebugMsg('<TViewModel.Create>');
+  inherited;
+  FCommandsFactory := TCommandsFactory.Create;
+end;
+
+destructor TViewModel.Destroy;
+begin
+  FCommandsFactory.Free;
+  inherited;
+end;
 
 function TViewModel.GetAsObject: TObject;
 begin
   Result := Self
+end;
+
+procedure TViewModel.AfterConstruction;
+begin
+  inherited;
+  FCommandsFactory.LoadCommandsAndActionsFrom(Self);
 end;
 
 end.

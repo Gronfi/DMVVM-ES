@@ -43,14 +43,15 @@ type
   private
     FName: String;
     FCaption: String;
-    FEvent: EActionMemberType;
+    FMemberType: EActionMemberType;
   public
-    constructor Create(const AName, ACaption: String; const AMemberType: EActionMemberType); overload;
+    constructor Create(const AName: String; const AMemberType: EActionMemberType; const ACaption: String = ''); overload;
     constructor Create(const AName: String; const AMemberType: EActionMemberType); overload;
+    constructor Create(const AMemberType: EActionMemberType; const ACaption: String = ''); overload;
 
     property Name: String read FName;
     property Caption: String read FCaption;
-    property MemberType: EActionMemberType read FEvent;
+    property MemberType: EActionMemberType read FMemberType;
   end;
 
   // - Standard command
@@ -93,14 +94,21 @@ constructor ActionMember.Create(const AName: String; const AMemberType: EActionM
 begin
   FName   := AName;
   FCaption:= '';
-  FEvent  := AMemberType;
+  FMemberType  := AMemberType;
 end;
 
-constructor ActionMember.Create(const AName, ACaption: String; const AMemberType: EActionMemberType);
+constructor ActionMember.Create(const AName: String; const AMemberType: EActionMemberType; const ACaption: String = '');
 begin
   FName   := AName;
   FCaption:= ACaption;
-  FEvent  := AMemberType;
+  FMemberType  := AMemberType;
+end;
+
+constructor ActionMember.Create(const AMemberType: EActionMemberType; const ACaption: String);
+begin
+  FName := '';
+  FCaption:= ACaption;
+  FMemberType  := AMemberType;
 end;
 
 { Command }

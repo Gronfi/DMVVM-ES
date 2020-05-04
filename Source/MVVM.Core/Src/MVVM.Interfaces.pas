@@ -433,7 +433,8 @@ type
      procedure Bind(const AExecute: TExecuteMethod; const ACanExecute: TCanExecuteMethod = nil); overload;
      procedure Bind(const AExecute: TExecuteAnonymous; const ACanExecute: TCanExecuteMethod = nil); overload;
      procedure Bind(const AExecute: TExecuteRttiMethod; const AExecuteObj: TObject;
-                    const ACanExecute: TCanExecuteRttiMethod = nil; const ACanExecuteObj: TObject = nil); overload;
+                   const ACanExecute: TCanExecuteRttiMethod = nil; const ACanExecuteObj: TObject = nil;
+                   const AParams: TParamRtti = nil; const AParamObj: TObject = nil); overload;
 
      property OnCanExecuteChanged: ICanExecuteChangedEvent read GetCanExecuteChanged;
      property AsyncExecution: Boolean read GetAsyncExecution write SetAsyncExecution;

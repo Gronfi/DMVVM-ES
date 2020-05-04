@@ -6,7 +6,7 @@ uses
 {$IFDEF MSWINDOWS}
   Winapi.Windows,
 {$ENDIF}
-  System.Rtti,
+  //System.Rtti,
   System.SysUtils,
   System.Classes,
   System.UITypes,
@@ -29,8 +29,6 @@ type
     class function StringToCaseSelect(const Selector: string; const CaseList: array of string): integer; static;
     class function InterfaceToCaseSelect(Selector: IInterface; const CaseList: array of TGUID): integer; static;
     class function AttributeToCaseSelect(Selector: TCustomAttribute; const CaseList: array of TCustomAttributeClass): integer; static;
-    class function GetInterfaceTypeInfo(const GUID: TGUID): PTypeInfo; static;
-    class function CreateComponent_From_RttiInstance(ARttiInstance: TRttiInstanceType; const ACreateParams: array of TValue): TComponent; static;
     class function ShowView<I: IViewModel>(AViewModel: I; const AViewName: string; const APlatform: String = ''; const AOwner: TComponent = nil): IView<I>; overload; static;
     class procedure ShowView(AView: IView); overload; static;
     class function ShowModalView<I: IViewModel>(AViewModel: I; const AViewName: string; const AResultProc: TProc<TModalResult>; const APlatform: String = ''; const AOwner: TComponent = nil): IView<I>; overload; static;
@@ -61,48 +59,11 @@ begin
   end;
 end;
 
-class function Utils.CreateComponent_From_RttiInstance(ARttiInstance: TRttiInstanceType; const ACreateParams: array of TValue): TComponent;
-var
-  LCreateMethod: TRttiMethod;
-begin
-  // Loop for all methods
-  LCreateMethod := nil;
-  for LCreateMethod in ARttiInstance.GetMethods do
-  begin
-    if (LCreateMethod.HasExtendedInfo) and (LCreateMethod.IsConstructor) and (Length(LCreateMethod.GetParameters) = Length(ACreateParams)) then
-    begin
-      break;
-    end;
-  end;
-  if not Assigned(LCreateMethod) then
-    raise Exception.Create('Constructor not found for class: ' + ARttiInstance.QualifiedClassName);
-  Result := LCreateMethod.Invoke(ARttiInstance.MetaclassType, ACreateParams).AsObject as TComponent;
-end;
-
 class function Utils.CreateEvent<T>: IEvent<T>;
 var
   E: Event<T>;
 begin
   Result := E;
-end;
-
-class function Utils.GetInterfaceTypeInfo(const GUID: TGUID): PTypeInfo;
-var
-  Ctx: TRttiContext;
-  AType: TRttiType;
-begin
-  Result := nil;
-  Ctx    := TRttiContext.Create;
-  try
-    for AType in Ctx.GetTypes do
-      if (AType.TypeKind = tkInterface) and IsEqualGUID(GetTypeData(AType.Handle)^.GUID, GUID) then
-      begin
-        Result := PTypeInfo(AType); // .Handle;
-        break;
-      end;
-  finally
-    Ctx.Free;
-  end;
 end;
 
 class procedure Utils.IdeDebugMsg(const AMsg: String);

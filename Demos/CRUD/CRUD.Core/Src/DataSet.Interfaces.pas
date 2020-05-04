@@ -43,6 +43,9 @@ type
 
     procedure SetModel(AModel: TDataSet_Model);
 
+    procedure CloseDataSet;
+    procedure OpenDataSet;
+
     //procedure MakeGetRows;
     function GetRows(const AFields: TFieldsToGet): TFieldConverters;
     //procedure DeleteActiveRow;

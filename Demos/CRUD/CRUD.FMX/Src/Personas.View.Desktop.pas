@@ -51,8 +51,13 @@ type
     ActionList1: TActionList;
     actGet: TAction;
     actNew: TAction;
+    [Command('DeleteActiveRow', 'DataSetIsOpen')]
     actDelete: TAction;
     actUpdate: TAction;
+    Button5: TButton;
+    Button6: TButton;
+    procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
   protected
     { Private declarations }
     procedure SetupView; override;
@@ -70,8 +75,19 @@ uses
 
 {$R *.fmx}
 
+procedure TfrmPersonasDesktop.Button5Click(Sender: TObject);
+begin
+  ViewModel.CloseDataSet
+end;
+
+procedure TfrmPersonasDesktop.Button6Click(Sender: TObject);
+begin
+  ViewModel.OpenDataSet
+end;
+
 procedure TfrmPersonasDesktop.SetupView;
 begin
+  inherited;
   // dataset configuration
   ViewModel.TableName     := 'Personas';
   // views configuration
@@ -81,7 +97,9 @@ begin
   actGet.Bind(ViewModel.DoMakeGetRows);
   actNew.Bind(ViewModel.DoMakeAppend, ViewModel.IsOpen);
   actUpdate.Bind(ViewModel.DoMakeUpdate, ViewModel.IsOpen);
-  actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
+
+
+//  actDelete.Bind(ViewModel.DoDeleteActiveRow, ViewModel.IsOpen);
 
   // Dataset binding
   ViewModel.DoMakeGetRows; //open the dataset and get rows

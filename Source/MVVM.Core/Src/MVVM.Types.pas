@@ -71,6 +71,11 @@ type
   TParam<T> = function: T of Object;
   TParamRtti = TRttiMethod;
 
+  { The type of method to invoke to check whether an IBindableAction can be
+    executed. The Enabled property of the action will be set to the result of
+    this function. }
+  TCanExecuteMethod = function: boolean of object;
+
   //Action members
   EActionMemberType = (OnExecute, OnUpdate, OnAsyncExecutionFinished, OnParams);
 
@@ -85,13 +90,17 @@ type
       Caption: String;
       MemberType: EActionMemberType;
       Method: TRttiMethod;
+      Owner: TObject;
   end;
 
-  { The type of method to invoke to check whether an IBindableAction can be
-    executed. The Enabled property of the action will be set to the result of
-    this function. }
-  TCanExecuteMethod = function: boolean of object;
-  // TCanExecuteMethod = function:Boolean of object;
+  RCommand = record
+    public
+      ExecuteName: String;
+      CanExecuteName: String;
+      ParamsName: String;
+      Field: TRttiField;
+      Owner: TObject;
+  end;
 
   TCollectionChangedAction = (
     { An item was added or inserted into the collection.

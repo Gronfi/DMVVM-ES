@@ -27,11 +27,13 @@ type
     Layout1: TLayout;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     { Private declarations }
     procedure InitializateResources;
@@ -90,6 +92,11 @@ begin
                                      begin
                                        //
                                      end);
+end;
+
+procedure TfrmMain.Button5Click(Sender: TObject);
+begin
+  FDConnection1.Connected := not FDConnection1.Connected
 end;
 
 procedure TfrmMain.ConnectToBD;

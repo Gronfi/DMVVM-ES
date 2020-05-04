@@ -52,7 +52,7 @@ type
     class procedure InitializationDone; static;
 
     class function ViewsProvider: TViewFactoryClass; static;
-    class procedure DetectCommandsAndPrepare(AView: TComponent); static;
+    //class procedure DetectCommandsAndPrepare(AView: TComponent); static;
 
     class procedure DelegateExecution(AProc: TProc; AExecutionMode: EDelegatedExecutionMode); overload; static;
     class procedure DelegateExecution<T>(AData: T; AProc: TProc<T>; AExecutionMode: EDelegatedExecutionMode); overload; static;
@@ -106,7 +106,6 @@ var
   LAttr: TCustomAttribute;
   LVMA: View_For_ViewModel;
   LVMI: ViewModel_Implements;
-  LActionMember: ActionMember;
   LInstanceType: TRttiInstanceType;
   LInterfaces: TArray<TRttiInterfaceType>;
   I: Integer;
@@ -161,77 +160,62 @@ begin
             end;
         end;
       end;
-      // Loop for class Method attributes
-      for LMethod in Typ.GetMethods do
-      begin
-        for LAttr in LMethod.GetAttributes do
-        begin
-          // Utils.IdeDebugMsg('Atributo: ' + LAttr.QualifiedClassName);
-          case Utils.AttributeToCaseSelect(LAttr, [ActionMember]) of
-            0: // ActionMember
-              begin
-                LActionMember := LAttr as ActionMember;
-                TCommandFactory.RegisterActionMember(LActionMember.Name, LActionMember.Caption, LActionMember.MemberType, LMethod);
-              end;
-          end;
-        end;
-      end;
     end;
   finally
     Ctx.Free;
   end;
 end;
 
-class procedure MVVMCore.DetectCommandsAndPrepare(AView: TComponent);
-var
-  Ctx: TRttiContext;
-  Typ: TRttiType;
-  LAttr: TCustomAttribute;
-  LVMA: View_For_ViewModel;
-  LVMI: ViewModel_Implements;
-  LInstanceType: TRttiInstanceType;
-  LInterfaces: TArray<TRttiInterfaceType>;
-  I: Integer;
-  LField: TRttiField;
-  LCommand: Command;
-  LTypeData: PTypeData;
-  LExecute: RActionMember;
-  LCanExecute: RActionMember;
-  LParams: RActionMember;
-  LBindable: IBindableAction;
-begin
-  if not Supports(AView, IBindableAction, LBindable) then
-    Exit;
-  Ctx := TRttiContext.Create;
-  try
-    Typ           := ctx.GetType(AView.ClassType);
-    LInstanceType := ctx.GetType(AView.ClassType) as TRttiInstanceType;
-    // Loop the Fields
-    for LField in Typ.GetFields do
-    begin
-      if (LField.FieldType.TypeKind = tkClass) then
-      begin
-        LTypeData := GetTypeData(LField.FieldType.Handle);
-        if (not LTypeData^.ClassType.InheritsFrom(TContainedAction)) then //only an action is allowed
-          Continue;
-        // Loop for attributes
-        for LAttr in Typ.GetAttributes do
-        begin
-          case Utils.AttributeToCaseSelect(LAttr, [Command]) of
-            0:
-              begin
-                LCommand := LAttr as Command;
-                LExecute := TCommandFactory.GetActionMember(LCommand.ExecuteName);
-                //LBindable.Bind(LExecute.Method.Invoke(AView, []) as TExecuteMethod);
-              end;
-          end;
-        end;
-      end;
-    end;
-  finally
-
-  end;
-end;
+//class procedure MVVMCore.DetectCommandsAndPrepare(AView: TComponent);
+//var
+//  Ctx: TRttiContext;
+//  Typ: TRttiType;
+//  LAttr: TCustomAttribute;
+//  LVMA: View_For_ViewModel;
+//  LVMI: ViewModel_Implements;
+//  LInstanceType: TRttiInstanceType;
+//  LInterfaces: TArray<TRttiInterfaceType>;
+//  I: Integer;
+//  LField: TRttiField;
+//  LCommand: Command;
+//  LTypeData: PTypeData;
+//  LExecute: RActionMember;
+//  LCanExecute: RActionMember;
+//  LParams: RActionMember;
+//  LBindable: IBindableAction;
+//begin
+//  if not Supports(AView, IBindableAction, LBindable) then
+//    Exit;
+//  Ctx := TRttiContext.Create;
+//  try
+//    Typ           := ctx.GetType(AView.ClassType);
+//    LInstanceType := ctx.GetType(AView.ClassType) as TRttiInstanceType;
+//    // Loop the Fields
+//    for LField in Typ.GetFields do
+//    begin
+//      if (LField.FieldType.TypeKind = tkClass) then
+//      begin
+//        LTypeData := GetTypeData(LField.FieldType.Handle);
+//        if (not LTypeData^.ClassType.InheritsFrom(TContainedAction)) then //only an action is allowed
+//          Continue;
+//        // Loop for attributes
+//        for LAttr in Typ.GetAttributes do
+//        begin
+//          case Utils.AttributeToCaseSelect(LAttr, [Command]) of
+//            0:
+//              begin
+//                LCommand := LAttr as Command;
+//                LExecute := TCommandsFactory.GetActionMember(LCommand.ExecuteName);
+//                //LBindable.Bind(LExecute.Method.Invoke(AView, []) as TExecuteMethod);
+//              end;
+//          end;
+//        end;
+//      end;
+//    end;
+//  finally
+//
+//  end;
+//end;
 
 class function MVVMCore.IoC: TContainer;
 begin

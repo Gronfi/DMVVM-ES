@@ -123,6 +123,8 @@ type
     FRttiExecuteObj       : TObject;
     FRttiCanExecute       : TCanExecuteRttiMethod;
     FRttiCanExecuteObj    : TObject;
+    FRttiParam            : TParamRtti;
+    FRttiParamObj         : TObject;
     FRttiAfterExecuteDo   : TCanExecuteRttiMethod;
     FRttiAfterExecuteDoObj: TObject;
 
@@ -157,7 +159,8 @@ type
     procedure Bind(const AExecute: TExecuteAnonymous;
                    const ACanExecute: TCanExecuteMethod = nil); overload;
     procedure Bind(const AExecute: TExecuteRttiMethod; const AExecuteObj: TObject;
-                   const ACanExecute: TCanExecuteRttiMethod = nil; const ACanExecuteObj: TObject = nil); overload;
+                   const ACanExecute: TCanExecuteRttiMethod = nil; const ACanExecuteObj: TObject = nil;
+                   const AParams: TParamRtti = nil; const AParamObj: TObject = nil); overload;
 
     procedure BindAsync(const AExecute: TExecuteMethod;
                         const ACanExecute: TCanExecuteMethod = nil;
@@ -857,13 +860,16 @@ begin
 end;
 
 procedure TAction.Bind(const AExecute: TExecuteRttiMethod; const AExecuteObj: TObject;
-                       const ACanExecute: TCanExecuteRttiMethod; const ACanExecuteObj: TObject);
+                       const ACanExecute: TCanExecuteRttiMethod; const ACanExecuteObj: TObject;
+                       const AParams: TParamRtti; const AParamObj: TObject);
 begin
   FExecute           := DoExecuteRtti;
   FRttiExecuteObj    := AExecuteObj;
   FRttiExecute       := AExecute;
   FRttiCanExecuteObj := ACanExecuteObj;
   FRttiCanExecute    := ACanExecute;
+  FRttiParam         := AParams;
+  FRttiParamObj      := AParamObj;
   FRttiUsage         := True;
 end;
 
@@ -947,9 +953,24 @@ begin
 end;
 
 procedure TAction.DoExecuteRtti;
+var
+  LProc: TExecuteMethod;
+  LValue: TValue;
+  LRes: Boolean;
 begin
   if Assigned(FRttiExecute) then
-    FRttiExecute.Invoke(fRttiExecuteObj, []);
+  begin
+    if Assigned(FRttiParam) then
+      FRttiExecute.Invoke(fRttiExecuteObj, [FRttiParam.Invoke(FRttiParamObj, [])])
+    else begin
+           LValue := FRttiExecute.Invoke(fRttiExecuteObj, []);
+           if not LValue.IsObject then
+           begin
+             LProc  := LValue.AsType<TExecuteMethod>();
+             LProc;
+           end;
+         end;
+  end;
 end;
 
 function TAction.Execute: Boolean;
@@ -1014,13 +1035,33 @@ begin
 end;
 
 function TAction.Update: Boolean;
+var
+  LFunc : TCanExecuteMethod;
+  LValue: TValue;
+  LEnabled: Boolean;
 begin
   Result := inherited Update;
-  if (Supported) and Assigned(FCanExecute) then
+  if (Supported) then
   begin
     case FRttiUsage of
-      True: Enabled := FRttiCanExecute.Invoke(FRttiCanExecuteObj, []).AsBoolean;
-      False: Enabled := FCanExecute();
+      True:
+        begin
+         if Assigned(FRttiCanExecute) then
+         begin
+           LValue := FRttiCanExecute.Invoke(FRttiCanExecuteObj, []);
+           if not LValue.TryAsType<Boolean>(LEnabled) then
+           begin
+             LFunc  := LValue.AsType<TCanExecuteMethod>();
+             Enabled:= LFunc;
+           end
+           else Enabled := LEnabled;
+         end;
+        end;
+      False:
+        begin
+          if Assigned(FCanExecute) then
+            Enabled := FCanExecute();
+        end;
     end;
   end;
   if Enabled <> FLastCanExecute then

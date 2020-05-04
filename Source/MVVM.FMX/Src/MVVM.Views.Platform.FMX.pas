@@ -73,7 +73,9 @@ implementation
 uses
   FMX.Graphics,
 
-  Spring;
+  Spring,
+
+  MVVM.Utils;
 
 { TFormView<T> }
 
@@ -165,7 +167,9 @@ end;
 
 procedure TFormView<T>.SetupView;
 begin
-  //
+  Utils.IdeDebugMsg('<TFormView<T>.SetupView>');
+  if Assigned(FViewModel) then
+    FViewModel.BindCommands(Self);
 end;
 
 { TFrameView<T> }
@@ -202,7 +206,9 @@ end;
 
 procedure TFrameView<T>.SetupView;
 begin
-  //
+  Utils.IdeDebugMsg('<TFrameView<T>.SetupView>');
+  if Assigned(FViewModel) then
+    FViewModel.BindCommands(Self);
 end;
 
 end.

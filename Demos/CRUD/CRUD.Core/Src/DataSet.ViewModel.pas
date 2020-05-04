@@ -22,6 +22,8 @@ uses
 
 type
 
+{$RTTI EXPLICIT METHODS([vcPublic, vcProtected])}
+
   [ViewModel_Implements(IDataSet_ViewModel)]
   TDataSet_ViewModel = class(TViewModel, IDataSet_ViewModel)
   private
@@ -31,10 +33,10 @@ type
     FNewRowView: string;
     FUpdateRowView: string;
   protected
-    function GetProcMakeGetRows:  TExecuteMethod;
-    function GetProcDeleteActiveRow:  TExecuteMethod;
-    function GetProcMakeAppend:  TExecuteMethod;
-    function GetProcMakeUpdate:  TExecuteMethod;
+//    function GetProcMakeGetRows:  TExecuteMethod;
+//    function GetProcDeleteActiveRow:  TExecuteMethod;
+//    function GetProcMakeAppend:  TExecuteMethod;
+//    function GetProcMakeUpdate:  TExecuteMethod;
 
     function GetModel: TDataSet_Model;
 
@@ -53,13 +55,14 @@ type
     procedure SetUpdateRowView(const AViewName: string);
 
     function GetIsOpen: TCanExecuteMethod;
-    function IsDataSetOpen: Boolean;
 
-    procedure MakeGetRows;
-    procedure DeleteActiveRow;
-    procedure MakeAppend;
-    procedure MakeUpdate;
+//    procedure MakeGetRows;
+//    procedure DeleteActiveRow;
+//    procedure MakeAppend;
+//    procedure MakeUpdate;
   public
+    [ActionMember('DataSetIsOpen', OnUpdate, '')]
+    function IsDataSetOpen: Boolean;
     procedure SetupViewModel; override;
 
     procedure SetModel(AModel: TDataSet_Model);
@@ -80,7 +83,18 @@ type
 
     property IsOpen: TCanExecuteMethod read GetIsOpen;
 
+    function GetProcMakeGetRows:  TExecuteMethod;
+
+    function GetProcDeleteActiveRow:  TExecuteMethod;
+    function GetProcMakeAppend:  TExecuteMethod;
+    function GetProcMakeUpdate:  TExecuteMethod;
+
+    procedure MakeGetRows;
+    procedure DeleteActiveRow;
+    procedure MakeAppend;
+    procedure MakeUpdate;
     property DoMakeGetRows: TExecuteMethod read GetProcMakeGetRows;
+    [ActionMember('DeleteActiveRow', OnExecute, '')]
     property DoDeleteActiveRow: TExecuteMethod read GetProcDeleteActiveRow;
     property DoMakeAppend: TExecuteMethod read GetProcMakeAppend;
     property DoMakeUpdate: TExecuteMethod read GetProcMakeUpdate;

@@ -153,6 +153,7 @@ uses
   System.Generics.Defaults,
 
   MVVM.Core,
+  MVVM.Rtti,
   MVVM.Utils;
 
 { TViewProxy<TVM> }
@@ -261,6 +262,7 @@ var
   LViewModel: TVM;
   LIsForm   : Boolean;
 begin
+  Utils.IdeDebugMsg('<TViewFactory.CreateView<TVM>> ' + AViewName);
   LIsForm  := False;
   LName    := APlatform + '.' + AViewName;
   try
@@ -271,7 +273,7 @@ begin
       raise EListError.CreateFmt('Cannot create view. View "%s" is not registered.', [LName]);
     SetLength(LParams, 1);
     LParams[0] := AOwner;
-    LViewComp  := Utils.CreateComponent_From_RttiInstance(LViewClass, LParams);
+    LViewComp  := RttiUtils.CreateComponent_From_RttiInstance(LViewClass, LParams);
     if Supports(LViewComp, IViewForm<TVM>, LViewForm) then
     begin
       LIsForm := True;

@@ -66,6 +66,13 @@ object frmMain: TfrmMain
       Text = 'Coches (ListView)'
       OnClick = Button4Click
     end
+    object Button5: TButton
+      Position.X = 8.000000000000000000
+      Position.Y = 120.000000000000000000
+      TabOrder = 4
+      Text = 'Coonection'
+      OnClick = Button5Click
+    end
   end
   object Button3: TButton
     Position.X = 136.000000000000000000
@@ -86,7 +93,7 @@ object frmMain: TfrmMain
   end
   object FDPhysSQLiteDriverLink1: TFDPhysSQLiteDriverLink
     Left = 96
-    Top = 48
+    Top = 24
   end
   object FDGUIxWaitCursor1: TFDGUIxWaitCursor
     Provider = 'FMX'
