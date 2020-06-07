@@ -26,7 +26,7 @@ package Spring.Core;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'Spring4D Core package'}
-{$LIBSUFFIX '.Delphi10Rio'}
+{$LIBSUFFIX '.Delphi10Sydney'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 

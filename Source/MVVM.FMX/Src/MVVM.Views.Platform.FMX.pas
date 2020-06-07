@@ -53,6 +53,7 @@ type
 {$ENDREGION 'Internal Declarations'}
   protected
     procedure SetupView; virtual;
+    procedure Loaded; override;
   public
     procedure InitView(AViewModel: T);
     procedure Execute;
@@ -165,9 +166,15 @@ begin
   SetupView;
 end;
 
+procedure TFormView<T>.Loaded;
+begin
+  inherited;
+  FBinder.
+end;
+
 procedure TFormView<T>.SetupView;
 begin
-  Utils.IdeDebugMsg('<TFormView<T>.SetupView>');
+  //Utils.IdeDebugMsg('<TFormView<T>.SetupView>');
   if Assigned(FViewModel) then
     FViewModel.BindCommands(Self);
 end;
@@ -206,7 +213,7 @@ end;
 
 procedure TFrameView<T>.SetupView;
 begin
-  Utils.IdeDebugMsg('<TFrameView<T>.SetupView>');
+  //Utils.IdeDebugMsg('<TFrameView<T>.SetupView>');
   if Assigned(FViewModel) then
     FViewModel.BindCommands(Self);
 end;

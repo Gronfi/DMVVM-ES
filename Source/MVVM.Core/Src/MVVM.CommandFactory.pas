@@ -1,7 +1,5 @@
 unit MVVM.CommandFactory;
 
-{$RTTI EXPLICIT METHODS([vcPrivate])}
-
 interface
 
 uses
@@ -240,7 +238,7 @@ var
   LData: RActionMember;
 begin
   LName := AName.ToUpper;
-  Utils.IdeDebugMsg('<TCommandsFactory.RegisterActionMember> ' + AName);
+  //Utils.IdeDebugMsg('<TCommandsFactory.RegisterActionMember> ' + AName);
   if LName.IsEmpty then
   begin
     LName := AMethod.Name.ToUpper; // For future uses

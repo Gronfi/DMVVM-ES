@@ -580,7 +580,7 @@ procedure TBindingStrategyBase.AddBinding(ABinding: IBinding);
 begin
   AdquireWrite;
   try
-    Utils.IdeDebugMsg('<TBindingStrategyBase.AddBinding> ID: ' + ABinding.ID);
+    //Utils.IdeDebugMsg('<TBindingStrategyBase.AddBinding> ID: ' + ABinding.ID);
     FBindings.Add(ABinding);
   finally
     ReleaseWrite
@@ -657,7 +657,7 @@ end;
 
 procedure TBindingStrategyBase.RemoveBinding(ABinding: IBinding);
 begin
-  Utils.IdeDebugMsg('<TBindingStrategyBase.RemoveBinding> ID: ' + ABinding.ID);
+  //Utils.IdeDebugMsg('<TBindingStrategyBase.RemoveBinding> ID: ' + ABinding.ID);
   AdquireWrite;
   try
     FBindings.RemoveAll(
@@ -1116,7 +1116,7 @@ begin
   inherited;
   if (Operation = opRemove) then
   begin
-    Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
+    //Utils.IdeDebugMsg('<TBindingDefault.Notification> Name: ' + AComponent.Name);
     FProc(AComponent);
   end;
 end;

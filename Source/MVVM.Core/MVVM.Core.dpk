@@ -46,6 +46,7 @@ contains
   MVVM.Attributes in 'Src\MVVM.Attributes.pas',
   MVVM.Interfaces.Architectural in 'Src\MVVM.Interfaces.Architectural.pas',
   MVVM.CommandFactory in 'Src\MVVM.CommandFactory.pas',
-  MVVM.Rtti in 'Src\MVVM.Rtti.pas';
+  MVVM.Rtti in 'Src\MVVM.Rtti.pas',
+  MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas';
 
 end.

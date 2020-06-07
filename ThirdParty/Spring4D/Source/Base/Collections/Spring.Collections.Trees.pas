@@ -43,9 +43,12 @@ const
 type
   TNodeColor = (Black, Red);
 
-  TBlockAllocatedArray<T: record> = record
+  TBlockAllocatedArray<T> = record
   strict private type
     PT = ^T;
+  strict private const
+    BlockSizeBits = 6;
+    BlockSize = 1 shl BlockSizeBits;
   strict private
     fItems: TArray<TArray<T>>;
     function GetItem(index: Integer): PT; inline;
@@ -363,7 +366,7 @@ type
     function Add(const key: T): Boolean;
     function Delete(const key: T): Boolean;
     function Exists(const key: T): Boolean;
-    function Find(const key: T; out value: T): Boolean;
+    function Find(const key: T; var value: T): Boolean;
     procedure Clear;
 
     function GetEnumerator: IEnumerator<T>;
@@ -382,7 +385,7 @@ type
     function AddOrSet(const key: TKey; const value: TValue): Boolean;
     function Delete(const key: TKey): Boolean;
     function Exists(const key: TKey): Boolean;
-    function Find(const key: TKey; out foundValue: TValue): Boolean;
+    function Find(const key: TKey; var foundValue: TValue): Boolean;
     procedure Clear;
 
     function GetEnumerator: IEnumerator<TPair<TKey, TValue>>;
@@ -440,7 +443,7 @@ type
     function Add(const key: T): Boolean;
     function Delete(const key: T): Boolean;
     function Exists(const key: T): Boolean;
-    function Find(const key: T; out value: T): Boolean;
+    function Find(const key: T; var value: T): Boolean;
   {$ENDREGION}
 
     procedure TrimExcess;
@@ -490,7 +493,7 @@ type
     function AddOrSet(const key: TKey; const value: TValue): Boolean;
     function Delete(const key: TKey): Boolean;
     function Exists(const key: TKey): Boolean;
-    function Find(const key: TKey; out foundValue: TValue): Boolean;
+    function Find(const key: TKey; var foundValue: TValue): Boolean;
   {$ENDREGION}
 
     procedure TrimExcess;
@@ -506,46 +509,38 @@ implementation
 uses
   Math;
 
-const
-  BucketSize = 64;
-
-
 {$REGION 'TBlockAllocatedArray<T>'}
 
 function TBlockAllocatedArray<T>.GetCapacity: Integer;
 begin
-  Result := Length(fItems) * BucketSize;
+  Result := Length(fItems) * BlockSize;
 end;
 
 function TBlockAllocatedArray<T>.GetItem(index: Integer): PT;
-var
-  row, col: Integer;
 begin
-  row := index div BucketSize;
-  col := index mod BucketSize;
-  Result := @fItems[row, col];
+  Result := @fItems[index shr BlockSizeBits, index and (BlockSize - 1)];
 end;
 
 procedure TBlockAllocatedArray<T>.Grow;
+var
+  n: Integer;
 begin
-  SetLength(fItems, Length(fItems) + 1);
-  SetLength(fItems[High(fItems)], BucketSize);
+  n := Length(fItems);
+  SetLength(fItems, n + 1);
+  SetLength(fItems[n], BlockSize);
 end;
 
 procedure TBlockAllocatedArray<T>.SetCapacity(const value: Integer);
 var
-  oldLength: Integer;
-  row, col: Integer;
-  i: Integer;
+  oldLength, newLength, i: Integer;
 begin
   oldLength := Length(fItems);
-  row := value div BucketSize;
-  col := value mod BucketSize;
-  if col > 0 then
-    Inc(row);
-  SetLength(fItems, row);
-  for i := oldLength to High(fItems) do
-    SetLength(fItems[i], BucketSize);
+  newLength := value shr BlockSizeBits;
+  if value and (BlockSize - 1) > 0 then
+    Inc(newLength);
+  SetLength(fItems, newLength);
+  for i := oldLength to newLength - 1 do
+    SetLength(fItems[i], BlockSize);
 end;
 
 {$ENDREGION}
@@ -1503,7 +1498,7 @@ begin
   Result := (fCount > 0) and Assigned(FindNode(key));
 end;
 
-function TRedBlackTree<T>.Find(const key: T; out value: T): Boolean;
+function TRedBlackTree<T>.Find(const key: T; var value: T): Boolean;
 var
   node: PNode;
 begin
@@ -1720,7 +1715,7 @@ begin
 end;
 
 function TRedBlackTree<TKey, TValue>.Find(const key: TKey;
-  out foundValue: TValue): Boolean;
+  var foundValue: TValue): Boolean;
 var
   node: PNode;
 begin

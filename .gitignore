@@ -496,3 +496,9 @@
 /Demos/VM_Comunicacion/App.VM_Comunicacion.FMX.exe/App.VM_Comunicacion.FMX.res
 /Demos/VM_Comunicacion/VM_Comunicacion.Core/VM_Comunicacion.Core.res
 /Demos/VM_Comunicacion/VM_Comunicacion.Views.FMX/VM_Comunicacion.Views.FMX.res
+/ThirdParty/Spring4D/Packages/Delphi10Sydney/*.res
+*.res
+/ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Data.Designtime.res
+/ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Data.res
+/ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Extensions.res
+/ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Persistence.res

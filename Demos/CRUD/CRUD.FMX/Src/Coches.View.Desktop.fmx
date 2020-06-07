@@ -17,8 +17,8 @@ object frmCochesDesktop: TfrmCochesDesktop
     Size.PlatformDefault = False
     TabOrder = 12
     Options = [AlwaysShowEditor, ColumnResize, ColumnMove, ColLines, RowLines, RowSelect, AlwaysShowSelection, Tabs, Header, HeaderClick, AutoDisplacement]
-    Viewport.Width = 538.000000000000000000
-    Viewport.Height = 480.000000000000000000
+    Viewport.Width = 534.000000000000000000
+    Viewport.Height = 455.000000000000000000
   end
   object Layout1: TLayout
     Align = Right

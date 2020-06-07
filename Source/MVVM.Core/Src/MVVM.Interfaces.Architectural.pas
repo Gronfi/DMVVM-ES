@@ -70,14 +70,14 @@ uses
 
 procedure TViewModel.BindCommands(const AView: TComponent);
 begin
-  Utils.IdeDebugMsg('<TViewModel.BindCommands>');
+  //Utils.IdeDebugMsg('<TViewModel.BindCommands>');
   FCommandsFactory.LoadCommandsAndActionsFrom(AView);
   FCommandsFactory.BindView(AView);
 end;
 
 constructor TViewModel.Create;
 begin
-  Utils.IdeDebugMsg('<TViewModel.Create>');
+  //Utils.IdeDebugMsg('<TViewModel.Create>');
   inherited;
   FCommandsFactory := TCommandsFactory.Create;
 end;

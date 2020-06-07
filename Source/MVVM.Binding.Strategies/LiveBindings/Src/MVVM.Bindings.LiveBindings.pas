@@ -927,7 +927,7 @@ end;
 
 destructor TStrategy_LiveBindings.TInternalBindindExpression.Destroy;
 begin
-  Utils.IdeDebugMsg('<TStrategy_LiveBindings.TInternalBindindExpression.Destroy> ID: ' + ID);
+  //Utils.IdeDebugMsg('<TStrategy_LiveBindings.TInternalBindindExpression.Destroy> ID: ' + ID);
   TBindings.RemoveBinding(FExpression);
   // FExpression.Free;
   inherited;

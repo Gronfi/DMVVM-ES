@@ -262,7 +262,7 @@ var
   LViewModel: TVM;
   LIsForm   : Boolean;
 begin
-  Utils.IdeDebugMsg('<TViewFactory.CreateView<TVM>> ' + AViewName);
+  //Utils.IdeDebugMsg('<TViewFactory.CreateView<TVM>> ' + AViewName);
   LIsForm  := False;
   LName    := APlatform + '.' + AViewName;
   try

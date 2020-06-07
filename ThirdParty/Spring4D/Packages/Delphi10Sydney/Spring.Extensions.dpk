@@ -26,7 +26,7 @@ package Spring.Extensions;
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'Spring4D Extensions package'}
-{$LIBSUFFIX '.Delphi10Rio'}
+{$LIBSUFFIX '.Delphi10Sydney'}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 

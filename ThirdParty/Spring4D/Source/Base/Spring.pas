@@ -657,6 +657,8 @@ type
     /// </summary>
     function IsString: Boolean;
 
+    function IsType(ATypeInfo: PTypeInfo): Boolean; overload;
+
     /// <summary>
     ///   Checks whether the stored value is a <c>Variant</c>.
     /// </summary>
@@ -668,6 +670,8 @@ type
     procedure SetNullableValue(const value: TValue);
 
     function TryAsType(typeInfo: PTypeInfo; out target): Boolean; overload;
+
+    function TryCast(ATypeInfo: PTypeInfo; out AResult: TValue): Boolean;
 
     /// <summary>
     ///   Tries to convert the stored value. Returns false when the conversion
@@ -1450,8 +1454,10 @@ type
 
   Nullable = record
   private
-    const HasValue = 'True';
+    class var HasValue: string;
     type Null = interface end;
+  public
+    class constructor Create;
   end;
 
   /// <summary>
@@ -4702,7 +4708,7 @@ end;
 
 procedure TInitTable.TManagedObjectField.FinalizeValue(instance: Pointer);
 begin
-  FreeAndNil(Pointer(PByte(instance) + fOffset)^);
+  FreeAndNil(PObject(PByte(instance) + fOffset)^);
 end;
 
 procedure TInitTable.TManagedObjectField.InitializeValue(instance: Pointer);
@@ -5740,6 +5746,13 @@ begin
   Result := Kind in StringKinds;
 end;
 
+function TValueHelper.IsType(ATypeInfo: PTypeInfo): Boolean;
+var
+  unused: TValue;
+begin
+  Result := TryCast(ATypeInfo, unused);
+end;
+
 function TValueHelper.IsVariant: Boolean;
 begin
   Result := TypeInfo = System.TypeInfo(Variant);
@@ -6034,6 +6047,32 @@ begin
     value.ExtractRawData(@target);
 end;
 
+function TValueHelper.TryCast(ATypeInfo: PTypeInfo;
+  out AResult: TValue): Boolean;
+begin
+  // fix wrong logic in RTL:
+  // typecasting a TValue that contains a reference type that is nil succeeds
+  // in all cases which clearly is against the otherwise strict type cast rules
+
+  if not ((TValueData(Self).FTypeInfo = nil) or (TValueData(Self).FValueData = nil)) then
+    if IsEmpty and Assigned(ATypeInfo) and (Kind <> ATypeInfo.Kind) then
+      case Kind of
+        tkClass:
+          if not (ATypeInfo.Kind in [tkVariant, tkInterface, tkPointer]) then
+            Exit(False);
+        tkInterface:
+          if not (ATypeInfo.Kind in [tkVariant, tkPointer]) then
+            Exit(False);
+        tkDynArray:
+          if TValueData(Self).FTypeInfo <> ATypeInfo then
+            Exit(False);
+        tkPointer:;
+      else
+        Exit(False);
+      end;
+  Result := TValueHack(Self).TryCast(ATypeInfo, AResult);
+end;
+
 
 {$REGION 'Conversion functions'}
 type
@@ -6205,6 +6244,45 @@ begin
   TValue.MakeWithoutCopy(@p, typeInfo, result);
 end;
 
+function SplitString(const s, delimiter: string): TStringDynArray;
+
+  function ScanChar(const s: string; var index: Integer): Boolean;
+  var
+    level: Integer;
+  begin
+    Result := False;
+    level := 0;
+    while index <= Length(s) do
+    begin
+      case s[index] of
+        '[': Inc(level);
+        ']': Dec(level);
+      else
+        if Copy(s, index, Length(delimiter)) = delimiter then
+          if level = 0 then
+            Exit(True);
+      end;
+      Inc(index);
+      Result := level = 0;
+    end;
+  end;
+
+var
+  startPos, index, len: Integer;
+begin
+  Result := nil;
+  startPos := 1;
+  index := 1;
+  while ScanChar(s, index) do
+  begin
+    len := Length(Result);
+    SetLength(Result, len + 1);
+    Result[len] := Copy(s, startPos, index - startPos);
+    Inc(index);
+    startPos := index;
+  end;
+end;
+
 function ConvStr2DynArray(const source: TValue; target: PTypeInfo;
   out value: TValue; const formatSettings: TFormatSettings): Boolean;
 var
@@ -6222,7 +6300,16 @@ begin
   elType := target.TypeData.DynArrElType^;
   for i := 0 to High(values) do
   begin
-    v1 := TValue.From(Trim(values[i]));
+    case elType.Kind of
+      tkString, tkLString, tkWString, tkUString: ;
+      tkChar, tkWChar:
+        if Length(values[i]) > 1 then
+          values[i] := Trim(values[i]);
+    else
+      values[i] := Trim(values[i]);
+    end;
+
+    v1 := TValue.From(values[i]);
     if not v1.TryConvert(elType, v2) then
       Exit(False);
     res.SetArrayElement(i, v2);
@@ -6255,7 +6342,16 @@ begin
   TValue.Make(nil, target, res);
   for i := 0 to arrData.ElCount - 1 do
   begin
-    v1 := TValue.From(Trim(values[i]));
+    case elType.Kind of
+      tkString, tkLString, tkWString, tkUString: ;
+      tkChar, tkWChar:
+        if Length(values[i]) > 1 then
+          values[i] := Trim(values[i]);
+    else
+      values[i] := Trim(values[i]);
+    end;
+
+    v1 := TValue.From(values[i]);
     if not v1.TryConvert(elType, v2) then
       Exit(False);
     res.SetArrayElement(i, v2);
@@ -7477,6 +7573,12 @@ end;
 
 {$REGION 'Nullable<T>'}
 
+class constructor Nullable.Create;
+begin
+  HasValue := 'True';
+  UniqueString(HasValue);
+end;
+
 constructor Nullable<T>.Create(const value: T);
 begin
   fValue := value;
@@ -7863,7 +7965,7 @@ begin
 {$IFNDEF AUTOREFCOUNT}
   if TType.Kind<T> = tkClass then
     if fOwnsObject then
-      FreeAndNil(fValue);
+      FreeAndNil(PObject(@fValue)^);
 {$ENDIF}
 end;
 
