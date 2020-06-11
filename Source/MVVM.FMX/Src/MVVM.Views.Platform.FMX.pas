@@ -169,7 +169,7 @@ end;
 procedure TFormView<T>.Loaded;
 begin
   inherited;
-  FBinder.
+  //FBinder.
 end;
 
 procedure TFormView<T>.SetupView;
