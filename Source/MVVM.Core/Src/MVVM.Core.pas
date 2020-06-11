@@ -6,6 +6,8 @@ uses
   System.SysUtils,
   System.Classes,
 
+  MonitorWaitStackFix,
+
   Spring,
   Spring.Container,
 

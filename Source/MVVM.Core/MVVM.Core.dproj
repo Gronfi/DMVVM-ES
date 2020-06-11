@@ -111,6 +111,7 @@
         <DCCReference Include="Src\MVVM.CommandFactory.pas"/>
         <DCCReference Include="Src\MVVM.Rtti.pas"/>
         <DCCReference Include="Src\MVVM.Messages.Engine.pas"/>
+        <DCCReference Include="Src\MonitorWaitStackFix.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

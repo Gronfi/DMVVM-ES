@@ -47,6 +47,7 @@ contains
   MVVM.Interfaces.Architectural in 'Src\MVVM.Interfaces.Architectural.pas',
   MVVM.CommandFactory in 'Src\MVVM.CommandFactory.pas',
   MVVM.Rtti in 'Src\MVVM.Rtti.pas',
-  MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas';
+  MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
+  MonitorWaitStackFix in 'Src\MonitorWaitStackFix.pas';
 
 end.
