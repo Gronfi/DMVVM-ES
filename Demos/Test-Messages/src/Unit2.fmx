@@ -15,7 +15,7 @@ object Form2: TForm2
     Size.Width = 97.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Send Integer'
+    Text = 'Publish Integer'
     OnClick = Button1Click
   end
   object Memo1: TMemo
@@ -35,7 +35,16 @@ object Form2: TForm2
     Size.Width = 97.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    Text = 'Send String'
+    Text = 'Publish String'
     OnClick = Button2Click
+  end
+  object Button3: TButton
+    Position.X = 216.000000000000000000
+    Position.Y = 8.000000000000000000
+    Size.Width = 137.000000000000000000
+    Size.Height = 22.000000000000000000
+    Size.PlatformDefault = False
+    Text = 'Publish Generic Integer'
+    OnClick = Button3Click
   end
 end

@@ -77,6 +77,7 @@ type
     FSender          : TObject;
   protected
     function GetCreationDateTime: TDateTime;
+    function GetSender: TObject;
   public
     constructor Create; reintroduce; overload;
     constructor Create(ASender: TObject); overload;
@@ -84,8 +85,6 @@ type
 
     procedure Queue; virtual;
     function GetAsObject: TObject;
-
-    function GetSender: TObject;
 
     property CreationDateTime: TDateTime read GetCreationDateTime;
     property Sender: TObject read GetSender;
@@ -157,14 +156,6 @@ type
     function GetMessajeClass: TClass; override; final;
 
     property OnMessage: IEvent<TNotifyMessage> read GetOnMessage;
-  end;
-
-  TMessageListenerViewModel<T: TMessage; K: IViewModel> = class(TMessageListener<T>)
-  private
-    FViewModel: IViewModel;
-  public
-    constructor Create(AViewModel: IViewModel; const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
-      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
   end;
 
 {$ENDREGION}
@@ -286,8 +277,8 @@ type
   end;
 {$ENDREGION}
 
-  TMessageChannel_Main                   = class(TMessageChannel<TThreadMessageHandler>);
-  TMessageChannel_GENERAL_SingleThreaded = class(TMessageChannel<TThreadMessageHandler>);
+  TMessageChannel_Main                = class(TMessageChannel<TThreadMessageHandler>);
+  TMessageChannel_Main_SingleThreaded = class(TMessageChannel<TThreadMessageHandler>);
 
 {$REGION 'Messages'}
 
@@ -315,7 +306,19 @@ type
     Data: T;
   end;
 
-  TMessageListener_Generic<T> = class(TMessageListener < TMessage_Generic < T >> );
+{$ENDREGION}
+{$REGION 'TMessage_Base_ViewModel'}
+
+  TMessageListenerViewModel<T: TMessage> = class(TMessageListener<T>)
+  private
+    FViewModel: IViewModel;
+  protected
+    function GetConditionsMatch(AMessage: IMessage): Boolean; override;
+  public
+    constructor Create(AViewModel: IViewModel; const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
+      const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
+  end;
+
 {$ENDREGION}
 
 implementation
@@ -358,7 +361,7 @@ end;
 
 function TMessage.GetSender: TObject;
 begin
-
+  Result := FSender;
 end;
 
 procedure TMessage.Queue;
@@ -380,7 +383,8 @@ begin
   begin
     FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
   end
-  else FChannel := AChannel;
+  else
+    FChannel := AChannel;
   inherited Create;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
   FFilterCondition               := AFilterCondition;
@@ -643,7 +647,7 @@ begin
   FinalizeListeners;
   FListeners := nil;
 
-  FSynchronizerListeners := nil;
+  FSynchronizerListene.rs := nil;
   inherited Destroy;
 end;
 
@@ -909,7 +913,7 @@ end;
 
 procedure TMessageChannel.PoolMessage(AMessage: IMessage);
 var
-  LSelected : TThreadMessageHandler;
+  LSelected: TThreadMessageHandler;
 begin
   AdquireRead;
   try
@@ -1013,14 +1017,21 @@ begin
   Result := T;
 end;
 {$ENDREGION}
-{$REGION 'TMessageListenerViewModel<T, K>'}
+{$REGION 'TMessageListenerViewModel<T>'}
 
-constructor TMessageListenerViewModel<T, K>.Create(AViewModel: IViewModel; const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListenerViewModel<T>.Create(AViewModel: IViewModel; const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
 begin
   FViewModel := AViewModel;
   Create(AChannel, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
 end;
 {$ENDREGION}
+
+function TMessageListenerViewModel<T>.GetConditionsMatch(AMessage: IMessage): Boolean;
+begin
+  if (AMessage.Sender <> FViewModel.GetAsObject) then
+    Exit(False);
+  Result := inherited GetConditionsMatch(AMessage)
+end;
 
 initialization
 
@@ -1030,10 +1041,10 @@ MVVMCore.IoC.RegisterType<TMessageChannel_Main>(
     Result := TMessageChannel_Main.Create(Utils.iif<Integer>((TThread.ProcessorCount > 2), 2, TThread.ProcessorCount));
   end).AsSingleton;
 
-MVVMCore.IoC.RegisterType<TMessageChannel_GENERAL_SingleThreaded>(
-  function: TMessageChannel_GENERAL_SingleThreaded
+MVVMCore.IoC.RegisterType<TMessageChannel_Main_SingleThreaded>(
+  function: TMessageChannel_Main_SingleThreaded
   begin
-    Result := TMessageChannel_GENERAL_SingleThreaded.Create(1)
+    Result := TMessageChannel_Main_SingleThreaded.Create(1)
   end).AsSingleton;
 
 MessageBus.CreateIni;

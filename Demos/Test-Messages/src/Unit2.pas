@@ -23,23 +23,31 @@ type
     constructor Create(const AValue: String); overload;
   end;
 
+  TTestMessageGeneric_Integer = class(TMessage_Generic<Integer>);
+
+
   TForm2 = class(TForm)
     Button1: TButton;
     Memo1: TMemo;
     Button2: TButton;
+    Button3: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     { Private declarations }
     FValor            : Integer;
     FListenerInteger  : IMessageListener<TTestMessageInteger>;
     FListenerString1  : IMessageListener<TTestMessageString>;
     FListenerString2  : IMessageListener<TTestMessageString>;
+
+    FListenerGeneric  : IMessageListener<TTestMessageGeneric_Integer>;
   protected
     procedure OnTestMessageInteger(AMsg: IMessage);
     procedure OnTestMessageString1(AMsg: IMessage);
     procedure OnTestMessageString2(AMsg: IMessage);
+    procedure OnTestMessageGeneric_Integer(AMsg: IMessage);
   public
     { Public declarations }
   end;
@@ -74,6 +82,16 @@ begin
   LMsg.Queue;
 end;
 
+procedure TForm2.Button3Click(Sender: TObject);
+var
+  LMsg: IMessage;
+begin
+  LMsg := TTestMessageGeneric_Integer.Create;
+  TTestMessageGeneric_Integer(LMsg).Data := FValor;
+  LMsg.Queue;
+  Inc(FValor);
+end;
+
 procedure TForm2.FormCreate(Sender: TObject);
 begin
   MVVMCore.InitializationDone;
@@ -90,7 +108,16 @@ begin
   FListenerString2.IsCodeToExecuteInUIMainThread := True;
   FListenerString2.OnMessage.Add(OnTestMessageString2);
 
+  FListenerGeneric  := TMessageListener<TTestMessageGeneric_Integer>.Create;
+  FListenerGeneric.IsCodeToExecuteInUIMainThread := True;
+  FListenerGeneric.OnMessage.Add(OnTestMessageGeneric_Integer);
+
   FValor := 1;
+end;
+
+procedure TForm2.OnTestMessageGeneric_Integer(AMsg: IMessage);
+begin
+  Memo1.Lines.Add('Generic-Integer: ' + TMessage_Generic<Integer>(AMsg).Data.ToString)
 end;
 
 procedure TForm2.OnTestMessageInteger(AMsg: IMessage);

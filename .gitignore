@@ -519,3 +519,5 @@
 /Demos/Test-Messages/__history
 /Demos/Test-Messages/src/Obj
 /Demos/Test-Messages/src/*.local
+/Demos/Test-Messages/src/__history
+/Source/MVVM.Core/Src/__recovery
