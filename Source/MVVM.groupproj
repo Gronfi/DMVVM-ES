@@ -84,7 +84,7 @@
         <Projects Include="D:\998.Test.Programacion\RTTI.Property\Sample.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\Demos\Test-Events\src\Test_Messages.dproj">
+        <Projects Include="..\Demos\Test-Messages\src\Test_Messages.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -339,13 +339,13 @@
         <MSBuild Projects="D:\998.Test.Programacion\RTTI.Property\Sample.dproj" Targets="Make"/>
     </Target>
     <Target Name="Test_Messages">
-        <MSBuild Projects="..\Demos\Test-Events\src\Test_Messages.dproj"/>
+        <MSBuild Projects="..\Demos\Test-Messages\src\Test_Messages.dproj"/>
     </Target>
     <Target Name="Test_Messages:Clean">
-        <MSBuild Projects="..\Demos\Test-Events\src\Test_Messages.dproj" Targets="Clean"/>
+        <MSBuild Projects="..\Demos\Test-Messages\src\Test_Messages.dproj" Targets="Clean"/>
     </Target>
     <Target Name="Test_Messages:Make">
-        <MSBuild Projects="..\Demos\Test-Events\src\Test_Messages.dproj" Targets="Make"/>
+        <MSBuild Projects="..\Demos\Test-Messages\src\Test_Messages.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="Spring_Base;Spring_Core;Spring_Extensions;MVVM_Core;MVVM_Binding_LiveBindings;MVVM_Platform_FMX;MVVM_Binding_LiveBindings_FMX;CSV_Core;CSV_View_FMX;App_CSV_FMX;CRUD_Core;CRUD_View_FMX;App_CRUD_FMX;App_CRUD_FMX_NoPackage;VM_Comunicacion_Core;VM_Comunicacion_Views_FMX;App_VM_Comunicacion_FMX;DataSet_Core;App_CSV_FMX_NoPackages;DataSet_View_FMX;App_DataSet_FMX;MyTunesFMX;MVVM_Platform_VCL;CSV_Core_DUnitX;CSV_View_VCL;App_CSV_VCL;Sample;Test_Messages"/>

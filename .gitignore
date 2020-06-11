@@ -515,3 +515,7 @@
 /ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Core.identcache
 /ThirdParty/Spring4D/Packages/Delphi10Sydney/Spring.Extensions.identcache
 /Source/MVVM.Core/Src/Tmp
+/Demos/Test-Messages/Obj
+/Demos/Test-Messages/__history
+/Demos/Test-Messages/src/Obj
+/Demos/Test-Messages/src/*.local
