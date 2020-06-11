@@ -47,6 +47,9 @@ type
     function GetListenerFilter: TListenerFilter;
     procedure SetListenerFilter(const AFilter: TListenerFilter);
 
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
+
     function GetMessajeClass: TClass;
 
     function GetConditionsMatch(AMessage: IMessage): Boolean;
@@ -59,6 +62,7 @@ type
     property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
     property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
     property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
+    property Enabled        : Boolean read GetEnabled write SetEnabled;
   end;
 {$ENDREGION}
 
@@ -99,6 +103,7 @@ type
     FChannel                      : TMessageChannel;
     FTypeRestriction              : EMessageTypeRestriction;
     FFilterCondition              : TListenerFilter;
+    FEnabled                      : Boolean;
 
     function GetIsCodeToExecuteInUIMainThread: Boolean;
     procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
@@ -109,8 +114,12 @@ type
     function GetListenerFilter: TListenerFilter;
     procedure SetListenerFilter(const AFilter: TListenerFilter);
 
+    function GetEnabled: Boolean;
+    procedure SetEnabled(const AValue: Boolean);
+
   protected
     function GetDefaultTypeRestriction: EMessageTypeRestriction; virtual;
+    function GetDefaultEnabled: Boolean; virtual;
   public
     procedure AfterConstruction; override;
 
@@ -133,6 +142,7 @@ type
     property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
     property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
     property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
+    property Enabled        : Boolean read GetEnabled write SetEnabled;
   end;
 
   IMessageListener<T: TMessage> = interface(IMessageListener)
@@ -386,6 +396,7 @@ begin
   else
     FChannel := AChannel;
   inherited Create;
+  FEnabled                       := GetDefaultEnabled;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
   FFilterCondition               := AFilterCondition;
 end;
@@ -414,9 +425,19 @@ begin
     Result := True
 end;
 
+function TMessageListener.GetDefaultEnabled: Boolean;
+begin
+  Result := True;
+end;
+
 function TMessageListener.GetDefaultTypeRestriction: EMessageTypeRestriction;
 begin
   Result := mtrAllowDescendants;
+end;
+
+function TMessageListener.GetEnabled: Boolean;
+begin
+  Result := FEnabled;
 end;
 
 function TMessageListener.GetListenerFilter: TListenerFilter;
@@ -437,6 +458,11 @@ end;
 procedure TMessageListener.Register;
 begin
   FChannel.RegisterListener(Self);
+end;
+
+procedure TMessageListener.SetEnabled(const AValue: Boolean);
+begin
+  FEnabled := AValue;
 end;
 
 procedure TMessageListener.SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
@@ -647,7 +673,7 @@ begin
   FinalizeListeners;
   FListeners := nil;
 
-  FSynchronizerListene.rs := nil;
+  FSynchronizerListeners := nil;
   inherited Destroy;
 end;
 
@@ -695,7 +721,7 @@ begin
   try
     for I := 0 to FListeners.Count - 1 do
     begin
-      if (((FListeners[I].TypeRestriction = mtrAllowDescendants) and (AMessage is FListeners[I].GetMessajeClass)) or ((FListeners[I].GetTypeRestriction = mtrDefinedTypeOnly) and (AMessage.GetAsObject.ClassType = FListeners[I].GetMessajeClass))) and
+      if (FListeners[I].Enabled) and (((FListeners[I].TypeRestriction = mtrAllowDescendants) and (AMessage is FListeners[I].GetMessajeClass)) or ((FListeners[I].GetTypeRestriction = mtrDefinedTypeOnly) and (AMessage.GetAsObject.ClassType = FListeners[I].GetMessajeClass))) and
         (FListeners[I].GetConditionsMatch(AMessage)) then
       begin
         try
