@@ -3,7 +3,7 @@ object Form2: TForm2
   Top = 0
   Caption = 'Form2'
   ClientHeight = 455
-  ClientWidth = 834
+  ClientWidth = 1256
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -13,26 +13,27 @@ object Form2: TForm2
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Left
-    Position.Y = 65.000000000000000000
+    Position.Y = 105.000000000000000000
     Size.Width = 417.000000000000000000
-    Size.Height = 390.000000000000000000
+    Size.Height = 350.000000000000000000
     Size.PlatformDefault = False
     Viewport.Width = 413.000000000000000000
-    Viewport.Height = 386.000000000000000000
+    Viewport.Height = 346.000000000000000000
   end
   object Memo2: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
     DataDetectorTypes = []
     Align = Client
     Margins.Left = 5.000000000000000000
-    Size.Width = 412.000000000000000000
-    Size.Height = 390.000000000000000000
+    Size.Width = 410.000000000000000000
+    Size.Height = 350.000000000000000000
     Size.PlatformDefault = False
-    Viewport.Width = 408.000000000000000000
-    Viewport.Height = 386.000000000000000000
+    Viewport.Width = 406.000000000000000000
+    Viewport.Height = 346.000000000000000000
   end
   object ToolBar1: TToolBar
-    Size.Width = 834.000000000000000000
+    Position.Y = 40.000000000000000000
+    Size.Width = 1256.000000000000000000
     Size.Height = 65.000000000000000000
     Size.PlatformDefault = False
     object Button1: TButton
@@ -84,9 +85,10 @@ object Form2: TForm2
       Position.X = 680.000000000000000000
       Position.Y = 8.000000000000000000
       Size.Width = 145.000000000000000000
-      Size.Height = 22.000000000000000000
+      Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
-      Text = 'Start Publishing (1000)'
+      Text = 'Start Publishing (1000) Background Thread'
+      TextSettings.WordWrap = True
       OnClick = Button6Click
     end
     object CheckBox1: TCheckBox
@@ -129,5 +131,92 @@ object Form2: TForm2
       Text = 'Subscriber 2'
       OnChange = CheckBox4Change
     end
+    object Label1: TLabel
+      StyledSettings = [Family, Size, Style]
+      Position.X = 272.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 144.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claBlue
+      Text = 'default messaging pooling'
+    end
+    object Label2: TLabel
+      StyledSettings = [Family, Size, Style]
+      Position.X = 680.000000000000000000
+      Position.Y = 48.000000000000000000
+      Size.Width = 144.000000000000000000
+      Size.Height = 17.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claBlue
+      Text = 'custom messaging pooling'
+    end
+    object Button7: TButton
+      Anchors = [akTop, akRight]
+      Position.X = 835.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 161.000000000000000000
+      Size.Height = 25.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Filtered Test - Subscribers'
+      OnClick = Button7Click
+    end
+    object Button8: TButton
+      Anchors = [akTop, akRight]
+      Position.X = 835.000000000000000000
+      Position.Y = 40.000000000000000000
+      Size.Width = 161.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Filtered Test - Publish'
+      OnClick = Button8Click
+    end
+    object Button9: TButton
+      Position.X = 1016.000000000000000000
+      Position.Y = 8.000000000000000000
+      Text = 'Button9'
+      OnClick = Button9Click
+    end
+    object Button10: TButton
+      Position.X = 1016.000000000000000000
+      Position.Y = 32.000000000000000000
+      Text = 'Button10'
+      OnClick = Button10Click
+    end
+  end
+  object ToolBar2: TToolBar
+    Align = MostTop
+    Size.Width = 1256.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    object Rectangle1: TRectangle
+      Align = Client
+      Fill.Color = claBurlywood
+      Size.Width = 1256.000000000000000000
+      Size.Height = 40.000000000000000000
+      Size.PlatformDefault = False
+    end
+    object cbPooled: TCheckBox
+      IsChecked = True
+      Position.X = 8.000000000000000000
+      Position.Y = 8.000000000000000000
+      Size.Width = 169.000000000000000000
+      Size.Height = 19.000000000000000000
+      Size.PlatformDefault = False
+      Text = 'Pooled default messaging'
+      OnChange = cbPooledChange
+    end
+  end
+  object Memo3: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Align = Right
+    Position.X = 832.000000000000000000
+    Position.Y = 105.000000000000000000
+    Size.Width = 424.000000000000000000
+    Size.Height = 350.000000000000000000
+    Size.PlatformDefault = False
+    Viewport.Width = 420.000000000000000000
+    Viewport.Height = 346.000000000000000000
   end
 end

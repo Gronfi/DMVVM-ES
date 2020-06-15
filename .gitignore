@@ -521,3 +521,4 @@
 /Demos/Test-Messages/src/*.local
 /Demos/Test-Messages/src/__history
 /Source/MVVM.Core/Src/__recovery
+/Demos/Test-Messages/src/*.identcache

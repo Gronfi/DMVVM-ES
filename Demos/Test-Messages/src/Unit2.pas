@@ -4,9 +4,14 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  MVVM.Messages.Engine, FMX.Controls.Presentation, FMX.StdCtrls, FMX.Memo.Types,
-  FMX.ScrollBox, FMX.Memo;
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Memo.Types,
+  FMX.ScrollBox, FMX.Memo, FMX.Objects,
+
+  Spring, Spring.Collections,
+
+  MVVM.Messages.Engine, MVVM.Types;
 
 type
   TThreadPublisher = class(TThread)
@@ -30,6 +35,35 @@ type
 
   TTestMessageGeneric_Integer = class(TMessage_Generic<Integer>);
 
+  TTestMessageInteger_Filter = class(TMessage)
+  public
+    Valor : Integer;
+    Filter: String;
+
+    constructor Create(const AValue: Integer; const AFilter: String); overload;
+  end;
+
+  TTestMessageInteger_Filter_Listener = class(TMessageListener<TTestMessageInteger_Filter>)
+  private
+    FFilter: String;
+  protected
+    function GetConditionsMatch(AMessage: IMessage): Boolean; override;
+  public
+    constructor Create(const AFilter: string; const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
+                       const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
+
+    property Filter: string read FFilter write FFilter;
+  end;
+
+  ITest = interface
+    ['{621B7280-C06D-4123-B8DC-7BF02EA898E4}']
+  end;
+
+  TTest = class(TInterfacedObject, ITest)
+  public
+    constructor Create;
+    destructor Destroy; override;
+  end;
 
   TForm2 = class(TForm)
     Button1: TButton;
@@ -45,6 +79,16 @@ type
     CheckBox2: TCheckBox;
     CheckBox3: TCheckBox;
     CheckBox4: TCheckBox;
+    ToolBar2: TToolBar;
+    Rectangle1: TRectangle;
+    cbPooled: TCheckBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Memo3: TMemo;
+    Button7: TButton;
+    Button8: TButton;
+    Button9: TButton;
+    Button10: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -56,6 +100,11 @@ type
     procedure CheckBox2Change(Sender: TObject);
     procedure CheckBox3Change(Sender: TObject);
     procedure CheckBox4Change(Sender: TObject);
+    procedure cbPooledChange(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
   private
     { Private declarations }
     FValor            : Integer;
@@ -66,6 +115,10 @@ type
     FListenerGeneric  : IMessageListener<TTestMessageGeneric_Integer>;
 
     FListenerTest : IMessageListener<TTestMessageInteger>;
+
+    FListenerFilter1: IMessageListener<TTestMessageInteger_Filter>;
+    FListenerFilter2: IMessageListener<TTestMessageInteger_Filter>;
+
   protected
     procedure DisableChecks;
 
@@ -74,6 +127,9 @@ type
     procedure OnTestMessageString2(AMsg: IMessage);
     procedure OnTestMessageGeneric_Integer(AMsg: IMessage);
     procedure OnTestMessageIntegerMemo2(AMsg: IMessage);
+
+    procedure OnFilteredMessage1(AMsg: IMessage);
+    procedure OnFilteredMessage2(AMsg: IMessage);
   public
     { Public declarations }
   end;
@@ -90,6 +146,20 @@ uses
 {$R *.fmx}
 
 { TForm2 }
+
+procedure TForm2.Button10Click(Sender: TObject);
+var
+  FIntf  : ITest;
+
+  FLista : IList<Weak<ITest>>;
+begin
+  FIntf := TTest.Create;
+  FLista:= TCollections.CreateList<Weak<ITest>>;
+  FLista.Add(FIntf);
+  Memo1.Lines.Add(FLista[0].IsAlive.ToString);
+  FIntf := nil;
+  Memo1.Lines.Add(FLista[0].IsAlive.ToString);
+end;
 
 procedure TForm2.Button1Click(Sender: TObject);
 var
@@ -124,6 +194,11 @@ var
 begin
   DisableChecks;
   LPool := MVVMCore.IoC.Resolve<TMessageChannel_Main_SingleThreaded>;
+  if Assigned(FListenerTest) then
+  begin
+    FListenerTest.Unregister;
+    FListenerTest := nil;
+  end;
   FListenerTest := TMessageListener<TTestMessageInteger>.Create(LPool);
   FListenerTest.IsCodeToExecuteInUIMainThread := True;
   FListenerTest.OnMessage.Add(OnTestMessageIntegerMemo2);
@@ -135,6 +210,11 @@ var
 begin
   DisableChecks;
   LPool := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
+  if Assigned(FListenerTest) then
+  begin
+    FListenerTest.Unregister;
+    FListenerTest := nil;
+  end;
   FListenerTest := TMessageListener<TTestMessageInteger>.Create(LPool);
   FListenerTest.IsCodeToExecuteInUIMainThread := True;
   FListenerTest.OnMessage.Add(OnTestMessageIntegerMemo2);
@@ -144,9 +224,75 @@ procedure TForm2.Button6Click(Sender: TObject);
 var
   LThread: TThreadPublisher;
 begin
+  Memo2.Lines.Clear;
   LThread := TThreadPublisher.Create(True);
   LThread.FreeOnTerminate := True;
   LThread.Start;
+end;
+
+procedure TForm2.Button7Click(Sender: TObject);
+begin
+  FListenerFilter1 := TTestMessageInteger_Filter_Listener.Create('Filter1');
+  FListenerFilter1.IsCodeToExecuteInUIMainThread := True;
+  FListenerFilter1.OnMessage.Add(OnFilteredMessage1);
+  FListenerFilter2 := TTestMessageInteger_Filter_Listener.Create('Filter2');
+  FListenerFilter2.IsCodeToExecuteInUIMainThread := True;
+  FListenerFilter2.OnMessage.Add(OnFilteredMessage2);
+end;
+
+procedure TForm2.Button8Click(Sender: TObject);
+var
+  LMsg: IMessage;
+  I   : Integer;
+begin
+  for I := 1 to 10 do
+  begin
+    case I Mod 2 of
+      0:
+        begin
+          LMsg := TTestMessageInteger_Filter.Create(I, 'Filter2');
+          LMsg.Queue;
+        end
+      else begin
+             LMsg := TTestMessageInteger_Filter.Create(I, 'Filter1');
+             LMsg.Queue;
+           end;
+    end;
+  end;
+end;
+
+procedure TForm2.Button9Click(Sender: TObject);
+var
+  FWeak  : Weak<ITest>;
+  FIntf  : ITest;
+  weak: Weak<IInterface>;
+  intf: IInterface;
+begin
+  intf := TInterfacedObject.Create;
+  weak := intf;
+  Memo1.Lines.Add(weak.IsAlive.ToString);
+  intf := nil;
+  Memo1.Lines.Add(weak.IsAlive.ToString);
+
+  FIntf := TTest.Create;
+  FWeak := FIntf;
+  Memo1.Lines.Add(FWeak.IsAlive.ToString);
+  FIntf := nil;
+  Memo1.Lines.Add(FWeak.IsAlive.ToString);
+end;
+
+procedure TForm2.cbPooledChange(Sender: TObject);
+begin
+  case cbPooled.IsChecked of
+    True:
+      begin
+        MessageBus.MessageDeploymentKind := EMessageDeploymentKind.mdkPooled
+      end;
+    False:
+      begin
+        MessageBus.MessageDeploymentKind := EMessageDeploymentKind.mdkFifo
+      end;
+  end;
 end;
 
 procedure TForm2.CheckBox1Change(Sender: TObject);
@@ -199,6 +345,18 @@ begin
   FListenerGeneric.OnMessage.Add(OnTestMessageGeneric_Integer);
 
   FValor := 1;
+
+  cbPooled.isChecked := (MessageBus.MessageDeploymentKind = EMessageDeploymentKind.mdkPooled);
+end;
+
+procedure TForm2.OnFilteredMessage1(AMsg: IMessage);
+begin
+  Memo3.Lines.Add('Filtered (Listener1): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
+end;
+
+procedure TForm2.OnFilteredMessage2(AMsg: IMessage);
+begin
+  Memo3.Lines.Add('Filtered (Listener2): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
 end;
 
 procedure TForm2.OnTestMessageGeneric_Integer(AMsg: IMessage);
@@ -254,6 +412,41 @@ begin
     LMsg := TTestMessageInteger.Create(I);
     LMsg.Queue;
   end;
+end;
+
+{ TTestMessageInteger_Filter }
+
+constructor TTestMessageInteger_Filter.Create(const AValue: Integer; const AFilter: String);
+begin
+  inherited Create;
+  Valor := AValue;
+  Filter:= AFilter;
+end;
+
+{ TTestMessageInteger_Filter_Listener }
+
+constructor TTestMessageInteger_Filter_Listener.Create(const AFilter: string; const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+begin
+  FFilter := AFilter;
+  Create(AChannel, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
+end;
+
+function TTestMessageInteger_Filter_Listener.GetConditionsMatch(AMessage: IMessage): Boolean;
+begin
+  Result := FFilter.Equals(TTestMessageInteger_Filter(AMessage).Filter)
+end;
+
+{ TTest }
+
+constructor TTest.Create;
+begin
+  inherited;
+end;
+
+destructor TTest.Destroy;
+begin
+
+  inherited;
 end;
 
 end.

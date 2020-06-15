@@ -15,6 +15,9 @@ uses
   MVVM.Interfaces.Architectural,
   MVVM.Types;
 
+const
+  MAX_DEFAULT_POOLED_THREADS = 2;
+
 type
 
 {$REGION 'IMessage'}
@@ -227,8 +230,7 @@ type
     constructor Create(const AChannel: TMessageChannel); overload;
     destructor Destroy; override;
 
-    procedure RegisterListener(const AMessageListener: IMessageListener);
-    // no reference counted
+    procedure RegisterListener(AMessageListener: IMessageListener);
     procedure UnregisterListener(AMessageListener: IMessageListener);
     property ListenersCount: Integer read GetListenersCount;
 
@@ -290,12 +292,14 @@ type
   TMessageChannel_Main                = class(TMessageChannel<TThreadMessageHandler>);
   TMessageChannel_Main_SingleThreaded = class(TMessageChannel<TThreadMessageHandler>);
 
-{$REGION 'Messages'}
+{$REGION 'MessageBus'}
+  EMessageDeploymentKind = (mdkFifo, mdkPooled);
 
   MessageBus = record
   private
-    class var FSynchronizerChannels: IReadWriteSync;
-    class var FChannels            : IList<TMessageChannel>;
+    class var FSynchronizerChannels  : IReadWriteSync;
+    class var FChannels              : IList<TMessageChannel>;
+    class var FMessageDeploymentKind : EMessageDeploymentKind;
 
     class procedure CreateIni; static;
     class procedure DestroyIni; static;
@@ -306,6 +310,8 @@ type
     class procedure UnregisterChannel(const AChannel: TMessageChannel); static;
 
     class procedure QueueMessage(AMessage: IMessage); static;
+
+    class property MessageDeploymentKind : EMessageDeploymentKind read FMessageDeploymentKind write FMessageDeploymentKind;
     // scheduler
   end;
 {$ENDREGION}
@@ -391,7 +397,16 @@ constructor TMessageListener.Create(const AChannel: TMessageChannel; const AFilt
 begin
   if AChannel = nil then
   begin
-    FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
+    case MessageBus.FMessageDeploymentKind of
+      EMessageDeploymentKind.mdkFifo:
+        begin
+          FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main_SingleThreaded>;
+        end;
+      EMessageDeploymentKind.mdkPooled:
+        begin
+          FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
+        end;
+    end;
   end
   else
     FChannel := AChannel;
@@ -745,7 +760,7 @@ begin
   FChannel.AddThreadMensajes(Self)
 end;
 
-procedure TThreadMessageHandler.RegisterListener(const AMessageListener: IMessageListener);
+procedure TThreadMessageHandler.RegisterListener(AMessageListener: IMessageListener);
 begin
   FSynchronizerListeners.BeginWrite;
   try
@@ -778,6 +793,7 @@ class procedure MessageBus.CreateIni;
 begin
   FChannels             := TCollections.CreateList<TMessageChannel>;
   FSynchronizerChannels := TMREWSync.Create;
+  FMessageDeploymentKind:= EMessageDeploymentKind.mdkPooled;
 end;
 
 class procedure MessageBus.DestroyIni;
@@ -943,13 +959,13 @@ var
 begin
   AdquireRead;
   try
-    FExecutors.Clear;
     FExecutors.AddRange(FThreadsMessajes.ToArray);
     FExecutors.Sort(Comparador_TThreadMessageHandler);
     if FExecutors.Count <> 0 then
     begin
       LSelected := FExecutors.First;
       LSelected.AddMessage(AMessage);
+      FExecutors.Clear;
     end;
   finally
     ReleaseRead;
@@ -1064,7 +1080,7 @@ initialization
 MVVMCore.IoC.RegisterType<TMessageChannel_Main>(
   function: TMessageChannel_Main
   begin
-    Result := TMessageChannel_Main.Create(Utils.iif<Integer>((TThread.ProcessorCount > 2), 2, TThread.ProcessorCount));
+    Result := TMessageChannel_Main.Create(Utils.iif<Integer>((TThread.ProcessorCount > MAX_DEFAULT_POOLED_THREADS), MAX_DEFAULT_POOLED_THREADS, TThread.ProcessorCount));
   end).AsSingleton;
 
 MVVMCore.IoC.RegisterType<TMessageChannel_Main_SingleThreaded>(
