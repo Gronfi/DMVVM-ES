@@ -171,18 +171,6 @@ object Form2: TForm2
       Text = 'Filtered Test - Publish'
       OnClick = Button8Click
     end
-    object Button9: TButton
-      Position.X = 1016.000000000000000000
-      Position.Y = 8.000000000000000000
-      Text = 'Button9'
-      OnClick = Button9Click
-    end
-    object Button10: TButton
-      Position.X = 1016.000000000000000000
-      Position.Y = 32.000000000000000000
-      Text = 'Button10'
-      OnClick = Button10Click
-    end
   end
   object ToolBar2: TToolBar
     Align = MostTop

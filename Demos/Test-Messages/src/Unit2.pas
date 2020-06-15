@@ -87,8 +87,6 @@ type
     Memo3: TMemo;
     Button7: TButton;
     Button8: TButton;
-    Button9: TButton;
-    Button10: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -103,8 +101,6 @@ type
     procedure cbPooledChange(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
-    procedure Button10Click(Sender: TObject);
   private
     { Private declarations }
     FValor            : Integer;
@@ -146,20 +142,6 @@ uses
 {$R *.fmx}
 
 { TForm2 }
-
-procedure TForm2.Button10Click(Sender: TObject);
-var
-  FIntf  : ITest;
-
-  FLista : IList<Weak<ITest>>;
-begin
-  FIntf := TTest.Create;
-  FLista:= TCollections.CreateList<Weak<ITest>>;
-  FLista.Add(FIntf);
-  Memo1.Lines.Add(FLista[0].IsAlive.ToString);
-  FIntf := nil;
-  Memo1.Lines.Add(FLista[0].IsAlive.ToString);
-end;
 
 procedure TForm2.Button1Click(Sender: TObject);
 var
@@ -259,26 +241,6 @@ begin
            end;
     end;
   end;
-end;
-
-procedure TForm2.Button9Click(Sender: TObject);
-var
-  FWeak  : Weak<ITest>;
-  FIntf  : ITest;
-  weak: Weak<IInterface>;
-  intf: IInterface;
-begin
-  intf := TInterfacedObject.Create;
-  weak := intf;
-  Memo1.Lines.Add(weak.IsAlive.ToString);
-  intf := nil;
-  Memo1.Lines.Add(weak.IsAlive.ToString);
-
-  FIntf := TTest.Create;
-  FWeak := FIntf;
-  Memo1.Lines.Add(FWeak.IsAlive.ToString);
-  FIntf := nil;
-  Memo1.Lines.Add(FWeak.IsAlive.ToString);
 end;
 
 procedure TForm2.cbPooledChange(Sender: TObject);
