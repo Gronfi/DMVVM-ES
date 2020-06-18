@@ -31,6 +31,11 @@ type
     function LoadBitmap(const AStream: TStream): TObject; overload;
     function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload;
     function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload;
+    function ElapsedMiliseconds: Int64;
+    function ElapsedTicks: Int64;
+    function GetTimeStamp: Int64;
+    function Elapsed: TTimeSpan;
+    function GetReferenceTime: Double;
   end;
 {$ENDREGION}
 {$REGION 'TPlatformServicesBase'}
@@ -47,6 +52,11 @@ type
     function LoadBitmap(const AStream: TStream): TObject; overload; virtual; abstract;
     function LoadBitmap(const AData: System.SysUtils.TBytes): TObject; overload; virtual; abstract;
     function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; virtual; abstract;
+    function ElapsedMiliseconds: Int64; virtual; abstract;
+    function ElapsedTicks: Int64; virtual; abstract;
+    function GetTimeStamp: Int64; virtual; abstract;
+    function Elapsed: TTimeSpan; virtual; abstract;
+    function GetReferenceTime: Double; virtual; abstract;
   end;
 {$ENDREGION}
 

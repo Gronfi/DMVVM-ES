@@ -7,11 +7,18 @@ uses
   System.Classes,
   System.SysUtils,
   System.UITypes,
+  System.Diagnostics,
+  System.TimeSpan,
 
   MVVM.Interfaces;
 
 type
   TFMXPlatformServices = class(TPlatformServicesBase)
+  private
+    class var Reference: TStopwatch;
+  protected
+    class constructor CreateC;
+    class destructor DestroyC;
   public
     function CreatePlatformEmptyForm: TComponent; override;
     procedure AssignParent(AChild, AParent: TComponent); override;
@@ -23,6 +30,11 @@ type
     function LoadBitmap(const AStream: TStream): TObject; overload; override;
     function LoadBitmap(const AData: TBytes): TObject; overload; override;
     function LoadBitmap(const AMemory: Pointer; const ASize: Integer): TObject; overload; override;
+    function ElapsedMiliseconds: Int64; override;
+    function ElapsedTicks: Int64; override;
+    function GetTimeStamp: Int64; override;
+    function Elapsed: TTimeSpan; override;
+    function GetReferenceTime: Double; override;
   end;
 
 procedure InitializePlatform;
@@ -46,9 +58,45 @@ begin
   else TControl(AChild).Parent := TControl(AParent)
 end;
 
+class constructor TFMXPlatformServices.CreateC;
+begin
+  Reference := TStopwatch.Create;
+  Reference.Start;
+end;
+
 function TFMXPlatformServices.CreatePlatformEmptyForm: TComponent;
 begin
   Result := TForm.Create(nil);
+end;
+
+class destructor TFMXPlatformServices.DestroyC;
+begin
+  //
+end;
+
+function TFMXPlatformServices.Elapsed: TTimeSpan;
+begin
+  Result := Reference.Elapsed;
+end;
+
+function TFMXPlatformServices.ElapsedTicks: Int64;
+begin
+  Result := Reference.ElapsedTicks;
+end;
+
+function TFMXPlatformServices.ElapsedMiliseconds: Int64;
+begin
+  Result := Reference.ElapsedMilliseconds;
+end;
+
+function TFMXPlatformServices.GetReferenceTime: Double;
+begin
+  Result := TStopwatch.GetTimeStamp / TStopwatch.Frequency;
+end;
+
+function TFMXPlatformServices.GetTimeStamp: Int64;
+begin
+  Result := Reference.GetTimeStamp
 end;
 
 function TFMXPlatformServices.IsMainThreadUI: Boolean;

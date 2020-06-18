@@ -11,7 +11,9 @@ uses
 
   Spring, Spring.Collections,
 
-  MVVM.Messages.Engine, MVVM.Types;
+  MVVM.Messages.Engine,
+  MVVM.Messages.Engine.Interfaces,
+  MVVM.Types;
 
 type
   TThreadPublisher = class(TThread)
@@ -87,6 +89,8 @@ type
     Memo3: TMemo;
     Button7: TButton;
     Button8: TButton;
+    Button9: TButton;
+    Button10: TButton;
     procedure FormCreate(Sender: TObject);
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -101,6 +105,8 @@ type
     procedure cbPooledChange(Sender: TObject);
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
+    procedure Button10Click(Sender: TObject);
   private
     { Private declarations }
     FValor            : Integer;
@@ -115,6 +121,7 @@ type
     FListenerFilter1: IMessageListener<TTestMessageInteger_Filter>;
     FListenerFilter2: IMessageListener<TTestMessageInteger_Filter>;
 
+    function LogTime: string;
   protected
     procedure DisableChecks;
 
@@ -136,12 +143,27 @@ var
 implementation
 
 uses
+  System.DateUtils,
+
   MVVM.Core,
   MVVM.Services.Platform.FMX;
 
 {$R *.fmx}
 
 { TForm2 }
+
+procedure TForm2.Button10Click(Sender: TObject);
+var
+  LHour, LMinute, LSecond, LMilliSecond: Word;
+  LMsg                                 : IMessage;
+  LNewDateTime                         : TDateTime;
+begin
+  DecodeTime(Now, LHour, LMinute, LSecond, LMilliSecond);
+  LNewDateTime := RecodeTime(Now, LHour, LMinute, LSecond + 3, LMilliSecond);
+  Memo1.Lines.Add(LogTime + 'Scheduled');
+  LMsg := TTestMessageInteger.Create(8888);
+  LMsg.Schedule(LNewDateTime);
+end;
 
 procedure TForm2.Button1Click(Sender: TObject);
 var
@@ -243,6 +265,15 @@ begin
   end;
 end;
 
+procedure TForm2.Button9Click(Sender: TObject);
+var
+  LMsg: IMessage;
+begin
+  Memo1.Lines.Add(LogTime + 'Scheduled');
+  LMsg := TTestMessageInteger.Create(9999);
+  LMsg.Schedule(2000);
+end;
+
 procedure TForm2.cbPooledChange(Sender: TObject);
 begin
   case cbPooled.IsChecked of
@@ -311,24 +342,29 @@ begin
   cbPooled.isChecked := (MessageBus.MessageDeploymentKind = EMessageDeploymentKind.mdkPooled);
 end;
 
+function TForm2.LogTime: string;
+begin
+  Result := FormatDateTime('hhnnss.zzz ', Now);
+end;
+
 procedure TForm2.OnFilteredMessage1(AMsg: IMessage);
 begin
-  Memo3.Lines.Add('Filtered (Listener1): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
+  Memo3.Lines.Add(LogTime + 'Filtered (Listener1): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
 end;
 
 procedure TForm2.OnFilteredMessage2(AMsg: IMessage);
 begin
-  Memo3.Lines.Add('Filtered (Listener2): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
+  Memo3.Lines.Add(LogTime + 'Filtered (Listener2): ' + TTestMessageInteger_Filter(AMsg).Valor.ToString)
 end;
 
 procedure TForm2.OnTestMessageGeneric_Integer(AMsg: IMessage);
 begin
-  Memo1.Lines.Add('Generic-Integer: ' + TMessage_Generic<Integer>(AMsg).Data.ToString)
+  Memo1.Lines.Add(LogTime + 'Generic-Integer: ' + TMessage_Generic<Integer>(AMsg).Data.ToString)
 end;
 
 procedure TForm2.OnTestMessageInteger(AMsg: IMessage);
 begin
-  Memo1.Lines.Add('Integer: ' + TTestMessageInteger(AMsg).Valor.ToString)
+  Memo1.Lines.Add(LogTime + 'Integer: ' + TTestMessageInteger(AMsg).Valor.ToString)
 end;
 
 procedure TForm2.OnTestMessageIntegerMemo2(AMsg: IMessage);
@@ -338,12 +374,12 @@ end;
 
 procedure TForm2.OnTestMessageString1(AMsg: IMessage);
 begin
-  Memo1.Lines.Add('String (Subscriber1): ' + TTestMessageString(AMsg).Valor)
+  Memo1.Lines.Add(LogTime + 'String (Subscriber1): ' + TTestMessageString(AMsg).Valor)
 end;
 
 procedure TForm2.OnTestMessageString2(AMsg: IMessage);
 begin
-  Memo1.Lines.Add('String (Subscriber2): ' + TTestMessageString(AMsg).Valor)
+  Memo1.Lines.Add(LogTime + 'String (Subscriber2): ' + TTestMessageString(AMsg).Valor)
 end;
 
 { TTestMessage }

@@ -6,69 +6,22 @@ uses
   System.Classes,
   System.SysUtils,
   System.Types,
-  System.Generics.Collections,
 
   Spring,
   Spring.Collections,
 
+  MVVM.Patched.ThreadedQueue,
+  MVVM.Messages.Engine.Scheduler,
   MVVM.Interfaces,
   MVVM.Interfaces.Architectural,
-  MVVM.Types;
+  MVVM.Types,
+
+  MVVM.Messages.Engine.Interfaces;
 
 const
   MAX_DEFAULT_POOLED_THREADS = 2;
 
 type
-
-{$REGION 'IMessage'}
-  IMessage = interface(IObject)
-    ['{8C6AE8E2-B18D-41B4-AAED-88CF3B110F1D}']
-    function GetCreationDateTime: TDateTime;
-    function GetSender: TObject;
-
-    procedure Queue;
-
-    property CreationDateTime: TDateTime read GetCreationDateTime;
-    property Sender: TObject read GetSender;
-  end;
-{$ENDREGION}
-
-  TNotifyMessage = procedure(AMessage: IMessage) of Object;
-
-  TListenerFilter = reference to function(AMessage: IMessage): Boolean;
-
-{$REGION 'IMessageListener'}
-
-  IMessageListener = interface(IObject)
-    ['{ABC992B0-4CB4-470A-BDCE-EBE6651C84DD}']
-    function GetIsCodeToExecuteInUIMainThread: Boolean;
-    procedure SetIsCodeToExecuteInUIMainThread(const AValue: Boolean);
-
-    function GetTypeRestriction: EMessageTypeRestriction;
-    procedure SetTypeRestriction(const ATypeRestriction: EMessageTypeRestriction);
-
-    function GetListenerFilter: TListenerFilter;
-    procedure SetListenerFilter(const AFilter: TListenerFilter);
-
-    function GetEnabled: Boolean;
-    procedure SetEnabled(const AValue: Boolean);
-
-    function GetMessajeClass: TClass;
-
-    function GetConditionsMatch(AMessage: IMessage): Boolean;
-
-    procedure Register;
-    procedure UnRegister;
-
-    procedure DoOnNewMessage(AMessage: IMessage);
-
-    property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
-    property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
-    property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
-    property Enabled        : Boolean read GetEnabled write SetEnabled;
-  end;
-{$ENDREGION}
-
   { Forward Declarations }
   TMessage                  = class;
   TThreadMessageHandlerBase = class;
@@ -91,6 +44,9 @@ type
     destructor Destroy; override;
 
     procedure Queue; virtual;
+    procedure Schedule(const AMilisecondsToExecute: Int64); overload; virtual;
+    procedure Schedule(const ADateTimeWhenExecute: TDateTime); overload; virtual;
+
     function GetAsObject: TObject;
 
     property CreationDateTime: TDateTime read GetCreationDateTime;
@@ -148,15 +104,7 @@ type
     property Enabled        : Boolean read GetEnabled write SetEnabled;
   end;
 
-  IMessageListener<T: TMessage> = interface(IMessageListener)
-    ['{CA3B8245-46E2-4827-B7D4-B3CAA91EE965}']
-    function GetOnMessage: IEvent<TNotifyMessage>;
-    function GetMessajeClass: TClass;
-
-    property OnMessage: IEvent<TNotifyMessage> read GetOnMessage;
-  end;
-
-  TMessageListener<T: TMessage> = class abstract(TMessageListener, IMessageListener<T>)
+  TMessageListener<T: IMessage> = class abstract(TMessageListener, IMessageListener<T>)
   private
     FOnMessage: IEvent<TNotifyMessage>;
   protected
@@ -297,6 +245,7 @@ type
 
   MessageBus = record
   private
+    class var FScheduler             : TMessagesScheduler;
     class var FSynchronizerChannels  : IReadWriteSync;
     class var FChannels              : IList<TMessageChannel>;
     class var FMessageDeploymentKind : EMessageDeploymentKind;
@@ -312,7 +261,7 @@ type
     class procedure QueueMessage(AMessage: IMessage); static;
 
     class property MessageDeploymentKind : EMessageDeploymentKind read FMessageDeploymentKind write FMessageDeploymentKind;
-    // scheduler
+    class property Scheduler: TMessagesScheduler read FScheduler;
   end;
 {$ENDREGION}
 {$REGION 'TMessage_Generic'}
@@ -384,6 +333,17 @@ procedure TMessage.Queue;
 begin
   MessageBus.QueueMessage(Self)
 end;
+
+procedure TMessage.Schedule(const ADateTimeWhenExecute: TDateTime);
+begin
+  MessageBus.Scheduler.ScheduleMessage(Self, ADateTimeWhenExecute);
+end;
+
+procedure TMessage.Schedule(const AMilisecondsToExecute: Int64);
+begin
+  MessageBus.Scheduler.ScheduleMessage(Self, AMilisecondsToExecute);
+end;
+
 {$ENDREGION}
 {$REGION 'TMessageListener'}
 
@@ -516,7 +476,7 @@ end;
 
 function TMessageListener<T>.GetMessajeClass: TClass;
 begin
-  Result := T;
+  Result := PTypeInfo(TypeInfo(T))^.TypeData.ClassType;
 end;
 
 function TMessageListener<T>.GetOnMessage: IEvent<TNotifyMessage>;
@@ -794,10 +754,12 @@ begin
   FChannels             := TCollections.CreateList<TMessageChannel>;
   FSynchronizerChannels := TMREWSync.Create;
   FMessageDeploymentKind:= EMessageDeploymentKind.mdkPooled;
+  FScheduler            := TMessagesScheduler.Create;
 end;
 
 class procedure MessageBus.DestroyIni;
 begin
+  FScheduler.Destroy;
   FSynchronizerChannels := nil;
   FChannels             := nil;
 end;

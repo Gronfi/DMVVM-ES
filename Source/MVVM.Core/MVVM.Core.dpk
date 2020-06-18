@@ -48,6 +48,9 @@ contains
   MVVM.CommandFactory in 'Src\MVVM.CommandFactory.pas',
   MVVM.Rtti in 'Src\MVVM.Rtti.pas',
   MVVM.Messages.Engine in 'Src\MVVM.Messages.Engine.pas',
-  MonitorWaitStackFix in 'Src\MonitorWaitStackFix.pas';
+  MonitorWaitStackFix in 'Src\MonitorWaitStackFix.pas',
+  MVVM.Messages.Engine.Scheduler in 'Src\MVVM.Messages.Engine.Scheduler.pas',
+  MVVM.Messages.Engine.Interfaces in 'Src\MVVM.Messages.Engine.Interfaces.pas',
+  MVVM.Patched.ThreadedQueue in 'Src\MVVM.Patched.ThreadedQueue.pas';
 
 end.

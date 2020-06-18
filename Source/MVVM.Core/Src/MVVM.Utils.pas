@@ -69,7 +69,7 @@ end;
 class procedure Utils.IdeDebugMsg(const AMsg: String);
 begin
 {$IFDEF MSWINDOWS}
-  OutputDebugString(PChar(AMsg));
+  OutputDebugString(PChar(FormatDateTime('hhnnss.zzz', Now) + AMsg));
 {$ENDIF}
 end;
 
