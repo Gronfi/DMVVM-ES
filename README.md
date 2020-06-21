@@ -45,16 +45,16 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 * No se realiza clonación de los mensajes al estar basado en interfaces, ni requiere de una destrucción explícita de los mismos.
 * Thread Safe
 * Qué es el canal:
-	** equivalente a un threadpool especializado en la distribución de mensajes a los listeners
-	** puede tener 1 ó 'n' threads
+	1. equivalente a un threadpool especializado en la distribución de mensajes a los listeners
+	2. puede tener 1 ó 'n' threads
 * Los subscriptores:
-	** se subscriben a un canal, ya sea a uno de los existentes o a uno nuevo customizado
-	** se subscriben a un tipo de mensaje (con genéricos), ya sea al tipo base o también al base y heredados (configuración)
-	** pueden filtrar los mensajes para quedarse solo con aquellos de su interés
-	** pueden configurar la ejecución de la recepción del mensaje:
-		*** en el main thread
-		*** en el thread del bus de mensajes
-	** se configura un método que se llamará cuando un mensaje del tipo 
+	1. se subscriben a un canal, ya sea a uno de los existentes o a uno nuevo customizado
+	2. se subscriben a un tipo de mensaje (con genéricos), ya sea al tipo base o también al base y heredados (configuración)
+	3. pueden filtrar los mensajes para quedarse solo con aquellos de su interés
+	4. pueden configurar la ejecución de la recepción del mensaje:
+		a. en el main thread
+		b. en el thread del bus de mensajes
+	5. se configura un método que se llamará cuando un mensaje del tipo 
 * Algoritmo:
 	1. Cuando se subscribe un listener a un canal (solo puede subscribirse a un canal), se subscribe implicitamente a todos los threads del mismo
 	2. Cuando se hace un post de un mensaje:
