@@ -170,7 +170,7 @@ var
   LMsg: IMessage;
 begin
   LMsg := TTestMessageInteger.Create(FValor);
-  LMsg.Queue;
+  LMsg.Post;
   Inc(FValor);
 end;
 
@@ -179,7 +179,7 @@ var
   LMsg: IMessage;
 begin
   LMsg := TTestMessageString.Create('Este es un mensaje de prueba de tipo <string>');
-  LMsg.Queue;
+  LMsg.Post;
 end;
 
 procedure TForm2.Button3Click(Sender: TObject);
@@ -188,7 +188,7 @@ var
 begin
   LMsg := TTestMessageGeneric_Integer.Create;
   TTestMessageGeneric_Integer(LMsg).Data := FValor;
-  LMsg.Queue;
+  LMsg.Post;
   Inc(FValor);
 end;
 
@@ -255,11 +255,11 @@ begin
       0:
         begin
           LMsg := TTestMessageInteger_Filter.Create(I, 'Filter2');
-          LMsg.Queue;
+          LMsg.Post;
         end
       else begin
              LMsg := TTestMessageInteger_Filter.Create(I, 'Filter1');
-             LMsg.Queue;
+             LMsg.Post;
            end;
     end;
   end;
@@ -408,7 +408,7 @@ begin
   for I := 1 to 1000 do
   begin
     LMsg := TTestMessageInteger.Create(I);
-    LMsg.Queue;
+    LMsg.Post;
   end;
 end;
 

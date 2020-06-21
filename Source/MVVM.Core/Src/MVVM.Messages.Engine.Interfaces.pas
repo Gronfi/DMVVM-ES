@@ -18,7 +18,7 @@ type
     function GetCreationDateTime: TDateTime;
     function GetSender: TObject;
 
-    procedure Queue;
+    procedure Post;
     procedure Schedule(const AMilisecondsToExecute: Int64); overload;
     procedure Schedule(const ADateTimeWhenExecute: TDateTime); overload;
 

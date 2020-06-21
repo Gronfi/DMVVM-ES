@@ -256,7 +256,7 @@ var
 begin
   LPassedMiliseconds := MilliSecondsBetween(Now, AWhenPassedNextDateTime);
   if (LPassedMiliseconds <= 0) then
-    AMessage.Queue
+    AMessage.Post
   else ScheduleMessage(AMessage, LPassedMiliseconds);
 end;
 
@@ -336,7 +336,7 @@ end;
 
 procedure TSchedulerTask.Notify;
 begin
-  FMessage.Queue;
+  FMessage.Post;
 end;
 
 end.

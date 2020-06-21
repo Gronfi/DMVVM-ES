@@ -33,6 +33,38 @@ Ejercicios de práctica para tratar de comprender el patrón **MVVM** y quizás 
 
 Somos un pequeño grupo de programadores que nos juntamos por Telegram (grupo *Delphi MVVM en Español*) y allí compartimos nuestras ideas y dudas
 
+## Bus de mensajes
+
+Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
+
+![overview bus de mensajes](Overview-Bus-Mensajes.png)
+
+### Caracteristicas
+
+* Basado en interfaces. Todos los mensajes implementan la interface IMessage. Lo normal es que los nuevos mensajes hereden de TMessage
+* No se realiza clonación de los mensajes al estar basado en interfaces, ni requiere de una destrucción explícita de los mismos.
+* Thread Safe
+* Qué es el canal:
+	** equivalente a un threadpool especializado en la distribución de mensajes a los listeners
+	** puede tener 1 ó 'n' threads
+* Los subscriptores:
+	** se subscriben a un canal, ya sea a uno de los existentes o a uno nuevo customizado
+	** se subscriben a un tipo de mensaje (con genéricos), ya sea al tipo base o también al base y heredados (configuración)
+	** pueden filtrar los mensajes para quedarse solo con aquellos de su interés
+	** pueden configurar la ejecución de la recepción del mensaje:
+		*** en el main thread
+		*** en el thread del bus de mensajes
+	** se configura un método que se llamará cuando un mensaje del tipo 
+* Algoritmo:
+	1. Cuando se subscribe un listener a un canal (solo puede subscribirse a un canal), se subscribe implicitamente a todos los threads del mismo
+	2. Cuando se hace un post de un mensaje:
+		a. se pasa el mensaje a todos los canales creados
+		b. en cada canal se elige uno de sus threads como transmisor de dicho mensaje, normalmente al que menos mensajes haya transmitido
+		c. el thread seleccionado recorre todos los listeners y a aquellos que estén subscritos a ese tipo de mensaje se les pasa el mensaje
+		d. el listener puede tener un filtro, por lo que al recibir el mensaje si pasa dicho filtro finalmente se ejecuta el método
+
+
+
 ## Links de interes
 
 https://www.youtube.com/watch?v=Ci1HP8ZBJxk

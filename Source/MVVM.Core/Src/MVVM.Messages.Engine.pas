@@ -19,7 +19,7 @@ uses
   MVVM.Messages.Engine.Interfaces;
 
 const
-  MAX_DEFAULT_POOLED_THREADS = 2;
+  MAX_DEFAULT_POOLED_THREADS = 4;
 
 type
   { Forward Declarations }
@@ -43,7 +43,7 @@ type
     constructor Create(ASender: TObject); overload;
     destructor Destroy; override;
 
-    procedure Queue; virtual;
+    procedure Post; virtual;
     procedure Schedule(const AMilisecondsToExecute: Int64); overload; virtual;
     procedure Schedule(const ADateTimeWhenExecute: TDateTime); overload; virtual;
 
@@ -329,7 +329,7 @@ begin
   Result := FSender;
 end;
 
-procedure TMessage.Queue;
+procedure TMessage.Post;
 begin
   MessageBus.QueueMessage(Self)
 end;
