@@ -41,13 +41,13 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 
 ### Caracteristicas
 
-* Basado en interfaces. Todos los mensajes implementan la interface IMessage. Lo normal es que los nuevos mensajes hereden de TMessage
+* Basado en interfaces. Todos los mensajes implementan la interface **IMessage**. Lo normal es que los nuevos mensajes hereden de **TMessage**
 * No se realiza clonación de los mensajes al estar basado en interfaces, ni requiere de una destrucción explícita de los mismos.
 * Thread Safe
-* Qué es el canal:
+* Qué es el **canal**:
 	1. equivalente a un threadpool especializado en la distribución de mensajes a los listeners
 	2. puede tener 1 ó 'n' threads
-* Los subscriptores:
+* Los **subscriptores**:
 	1. se subscriben a un canal, ya sea a uno de los existentes o a uno nuevo customizado
 	2. se subscriben a un tipo de mensaje (con genéricos), ya sea al tipo base o también al base y heredados (configuración)
 	3. pueden filtrar los mensajes para quedarse solo con aquellos de su interés
