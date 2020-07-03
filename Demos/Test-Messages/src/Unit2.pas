@@ -51,7 +51,7 @@ type
   protected
     function GetConditionsMatch(AMessage: IMessage): Boolean; override;
   public
-    constructor Create(const AFilter: string; const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
+    constructor Create(const AFilter: string; const AChannel: String = ''; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
                        const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
 
     property Filter: string read FFilter write FFilter;
@@ -193,33 +193,27 @@ begin
 end;
 
 procedure TForm2.Button4Click(Sender: TObject);
-var
-  LPool: TMessageChannel_Main_SingleThreaded;
 begin
   DisableChecks;
-  LPool := MVVMCore.IoC.Resolve<TMessageChannel_Main_SingleThreaded>;
   if Assigned(FListenerTest) then
   begin
     FListenerTest.Unregister;
     FListenerTest := nil;
   end;
-  FListenerTest := TMessageListener<TTestMessageInteger>.Create(LPool);
+  FListenerTest := TMessageListener<TTestMessageInteger>.Create(DEFAULT_CHANNEL_SINGLED_THREADED);
   FListenerTest.IsCodeToExecuteInUIMainThread := True;
   FListenerTest.OnMessage.Add(OnTestMessageIntegerMemo2);
 end;
 
 procedure TForm2.Button5Click(Sender: TObject);
-var
-  LPool: TMessageChannel_Main;
 begin
   DisableChecks;
-  LPool := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
   if Assigned(FListenerTest) then
   begin
     FListenerTest.Unregister;
     FListenerTest := nil;
   end;
-  FListenerTest := TMessageListener<TTestMessageInteger>.Create(LPool);
+  FListenerTest := TMessageListener<TTestMessageInteger>.Create(DEFAULT_CHANNEL_MULTI_THREADED);
   FListenerTest.IsCodeToExecuteInUIMainThread := True;
   FListenerTest.OnMessage.Add(OnTestMessageIntegerMemo2);
 end;
@@ -423,7 +417,7 @@ end;
 
 { TTestMessageInteger_Filter_Listener }
 
-constructor TTestMessageInteger_Filter_Listener.Create(const AFilter: string; const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TTestMessageInteger_Filter_Listener.Create(const AFilter: string; const AChannel: String; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
 begin
   FFilter := AFilter;
   Create(AChannel, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);

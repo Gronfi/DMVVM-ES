@@ -20,6 +20,8 @@ uses
 
 const
   MAX_DEFAULT_POOLED_THREADS = 4;
+  DEFAULT_CHANNEL_SINGLED_THREADED = 'CHANNEL.DEFAULT.SINGLE';
+  DEFAULT_CHANNEL_MULTI_THREADED   = 'CHANNEL.DEFAULT.MULTI';
 
 type
   { Forward Declarations }
@@ -27,6 +29,7 @@ type
   TThreadMessageHandlerBase = class;
   TThreadMessageHandler     = class;
   TMessageChannel           = class;
+  TChannel                  = class;
   TThreadMessageHandlerType = class of TThreadMessageHandler;
 
 {$REGION 'TMessage'}
@@ -59,6 +62,7 @@ type
   private
     FRegistered                   : Boolean;
     FIsCodeToExecuteInUIMainThread: Boolean;
+    FChannelName                  : String;
     FChannel                      : TMessageChannel;
     FTypeRestriction              : EMessageTypeRestriction;
     FFilterCondition              : TListenerFilter;
@@ -76,13 +80,14 @@ type
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
 
+    function GetChannel: String;
   protected
     function GetDefaultTypeRestriction: EMessageTypeRestriction; virtual;
     function GetDefaultEnabled: Boolean; virtual;
   public
     procedure AfterConstruction; override;
 
-    constructor Create(const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); reintroduce;
+    constructor Create(const AChannel: String = ''; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); reintroduce;
       overload; virtual;
 
     destructor Destroy; override;
@@ -102,6 +107,7 @@ type
     property FilterCondition: TListenerFilter read GetListenerFilter write SetListenerFilter;
     property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
     property Enabled        : Boolean read GetEnabled write SetEnabled;
+    property Channel        : String read GetChannel;
   end;
 
   TMessageListener<T: IMessage> = class abstract(TMessageListener, IMessageListener<T>)
@@ -111,7 +117,7 @@ type
     function GetOnMessage: IEvent<TNotifyMessage>;
     procedure DoOnNewMessage(AMessage: IMessage); override; final;
   public
-    constructor Create(const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload; override;
+    constructor Create(const AChannel: String = ''; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False; const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload; override;
     destructor Destroy; override;
 
     function GetMessajeClass: TClass; override; final;
@@ -190,11 +196,11 @@ type
 
   TMessageChannel = class abstract(TThreadMessageHandlerBase)
   private
+    FName             : string;
     FSynchronizer     : IReadWriteSync;
     FThreadsMessajes  : IList<TThreadMessageHandler>;
     FExecutors        : IList<TThreadMessageHandler>;
     FThreadCount      : Integer;
-    FThreadCountTarget: Integer;
 
     procedure AddThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
     procedure RemoveThreadMensajes(const AThreadMensajes: TThreadMessageHandler);
@@ -203,30 +209,32 @@ type
     procedure DestroyThreads;
 
     function GetThreadCount: Integer;
-    procedure SetThreadCount(const AThreadCount: Integer);
 
     procedure AdquireWrite;
     procedure ReleaseWrite;
     procedure AdquireRead;
     procedure ReleaseRead;
+
+    function GetName: string;
   protected
     function GetMessajeThreadType: TThreadMessageHandlerType; virtual; abstract;
 
     procedure ProcessMessage(AMessage: IMessage); override;
     procedure PoolMessage(AMessage: IMessage); virtual;
   public
-    constructor Create(const AThreadCount: Integer); reintroduce;
+    constructor Create(const AName: string; const AThreadCount: Integer); reintroduce;
     destructor Destroy; override;
 
     procedure AfterConstruction; override;
 
-    procedure Register;
-    procedure UnRegister;
+    //procedure Register;
+    //procedure UnRegister;
 
     procedure RegisterListener(AMessageListener: IMessageListener);
     procedure UnregisterListener(AMessageListener: IMessageListener);
 
-    property ThreadCount: Integer read GetThreadCount write SetThreadCount;
+    property ThreadCount: Integer read GetThreadCount;
+    property Name: string read GetName;
   end;
 {$ENDREGION}
 {$REGION 'TMessageChannel<T>'}
@@ -237,8 +245,11 @@ type
   end;
 {$ENDREGION}
 
-  TMessageChannel_Main                = class(TMessageChannel<TThreadMessageHandler>);
-  TMessageChannel_Main_SingleThreaded = class(TMessageChannel<TThreadMessageHandler>);
+  TMessageChannelBase = class(TMessageChannel<TThreadMessageHandler>);
+  TChannel = class(TMessageChannelBase);
+
+  //TMessageChannel_Main                = class(TMessageChannel<TThreadMessageHandler>);
+  //TMessageChannel_Main_SingleThreaded = class(TMessageChannel<TThreadMessageHandler>);
 
 {$REGION 'MessageBus'}
   EMessageDeploymentKind = (mdkFifo, mdkPooled);
@@ -248,6 +259,7 @@ type
     class var FScheduler             : TMessagesScheduler;
     class var FSynchronizerChannels  : IReadWriteSync;
     class var FChannels              : IList<TMessageChannel>;
+    class var FChannelsByName        : IDictionary<String, TMessageChannel>;
     class var FMessageDeploymentKind : EMessageDeploymentKind;
 
     class procedure CreateIni; static;
@@ -255,8 +267,9 @@ type
 
     class procedure QueueInchannels(AMessage: IMessage); static;
   public
-    class procedure RegisterChannel(const AChannel: TMessageChannel); static;
-    class procedure UnregisterChannel(const AChannel: TMessageChannel); static;
+    class procedure RegisterChannel(const AChannelName: String; const AThreadCount: Integer); static;
+    class procedure UnregisterChannel(const AChannelName: String); static;
+    class function GetChannel(const AChannelName: String; out AChannel: TMessageChannel): Boolean; static;
 
     class procedure QueueMessage(AMessage: IMessage); static;
 
@@ -280,7 +293,7 @@ type
   protected
     function GetConditionsMatch(AMessage: IMessage): Boolean; override;
   public
-    constructor Create(AViewModel: IViewModel; const AChannel: TMessageChannel = nil; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
+    constructor Create(AViewModel: IViewModel; const AChannel: String = ''; const AFilterCondition: TListenerFilter = nil; const ACodeExecutesInMainUIThread: Boolean = False;
       const ATypeRestriction: EMessageTypeRestriction = EMessageTypeRestriction.mtrAllowDescendants); overload;
   end;
 
@@ -353,23 +366,26 @@ begin
   Register;
 end;
 
-constructor TMessageListener.Create(const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListener.Create(const AChannel: String; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
 begin
-  if AChannel = nil then
+  FChannelName := AChannel;
+  if AChannel.IsEmpty then
   begin
     case MessageBus.FMessageDeploymentKind of
       EMessageDeploymentKind.mdkFifo:
         begin
-          FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main_SingleThreaded>;
+          MessageBus.GetChannel(DEFAULT_CHANNEL_SINGLED_THREADED, FChannel);
         end;
       EMessageDeploymentKind.mdkPooled:
         begin
-          FChannel := MVVMCore.IoC.Resolve<TMessageChannel_Main>;
+          MessageBus.GetChannel(DEFAULT_CHANNEL_MULTI_THREADED, FChannel);
         end;
     end;
   end
-  else
-    FChannel := AChannel;
+  else begin
+         if not MessageBus.GetChannel(AChannel, FChannel) then
+           raise Exception.Create('The channel ' + AChannel + '  is not registered');
+       end;
   inherited Create;
   FEnabled                       := GetDefaultEnabled;
   FIsCodeToExecuteInUIMainThread := ACodeExecutesInMainUIThread;
@@ -390,6 +406,11 @@ end;
 function TMessageListener.GetAsObject: TObject;
 begin
   Result := Self
+end;
+
+function TMessageListener.GetChannel: String;
+begin
+  Result := FChannelName
 end;
 
 function TMessageListener.GetConditionsMatch(AMessage: IMessage): Boolean;
@@ -462,7 +483,7 @@ end;
 {$ENDREGION}
 {$REGION 'TMessageListener<T>'}
 
-constructor TMessageListener<T>.Create(const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListener<T>.Create(const AChannel: String; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
 begin
   inherited;
   FOnMessage := Utils.CreateEvent<TNotifyMessage>;
@@ -752,16 +773,30 @@ end;
 class procedure MessageBus.CreateIni;
 begin
   FChannels             := TCollections.CreateList<TMessageChannel>;
+  FChannelsByName       := TCollections.CreateDictionary<String, TMessageChannel>;
   FSynchronizerChannels := TMREWSync.Create;
   FMessageDeploymentKind:= EMessageDeploymentKind.mdkPooled;
   FScheduler            := TMessagesScheduler.Create;
+
+  RegisterChannel(DEFAULT_CHANNEL_SINGLED_THREADED, 1);
+  RegisterChannel(DEFAULT_CHANNEL_MULTI_THREADED, Utils.iif<Integer>((TThread.ProcessorCount > MAX_DEFAULT_POOLED_THREADS), MAX_DEFAULT_POOLED_THREADS, TThread.ProcessorCount));
 end;
 
 class procedure MessageBus.DestroyIni;
+var
+  LChannel: TMessageChannel;
 begin
   FScheduler.Destroy;
   FSynchronizerChannels := nil;
+  for LChannel in FChannelsByName.Values do
+    LChannel.Free;
+  FChannelsByName       := nil;
   FChannels             := nil;
+end;
+
+class function MessageBus.GetChannel(const AChannelName: String; out AChannel: TMessageChannel): Boolean;
+begin
+  Result   := FChannelsByName.TryGetValue(AChannelName, AChannel);
 end;
 
 class procedure MessageBus.QueueMessage(AMessage: IMessage);
@@ -785,26 +820,38 @@ begin
   end;
 end;
 
-class procedure MessageBus.RegisterChannel(const AChannel: TMessageChannel);
+class procedure MessageBus.RegisterChannel(const AChannelName: String; const AThreadCount: Integer);
+var
+  LChannel: TChannel;
 begin
   FSynchronizerChannels.BeginWrite;
   try
-    if (not FChannels.Contains(AChannel)) then
-      FChannels.Add(AChannel);
+    if (not FChannelsByName.ContainsKey(AChannelName)) then
+    begin
+      LChannel := TChannel.Create(AChannelName, AThreadCount);
+      FChannels.Add(LChannel);
+      FChannelsByName.Add(AChannelName, LChannel);
+    end
+    else raise Exception.Create('The channel ' + AChannelName + ' already is registered!');
   finally
     FSynchronizerChannels.EndWrite
   end;
 end;
 
-class procedure MessageBus.UnregisterChannel(const AChannel: TMessageChannel);
+class procedure MessageBus.UnregisterChannel(const AChannelName: String);
 var
-  LIndex: Integer;
+  LIndex  : Integer;
+  LChannel: TMessageChannel;
 begin
   FSynchronizerChannels.BeginWrite;
   try
-    LIndex := FChannels.IndexOf(AChannel);
-    if LIndex > -1 then
-      FChannels.Delete(LIndex);
+    if FChannelsByName.TryGetValue(AChannelName, LChannel) then
+    begin
+      FChannelsByName.Remove(AChannelName);
+      LIndex := FChannels.IndexOf(LChannel);
+      if LIndex > -1 then
+        FChannels.Delete(LIndex);
+    end;
   finally
     FSynchronizerChannels.EndWrite;
   end;
@@ -839,14 +886,14 @@ procedure TMessageChannel.AfterConstruction;
 begin
   inherited;
   CreateThreads;
-  Register;
+  //Register;
 end;
 
-constructor TMessageChannel.Create(const AThreadCount: Integer);
+constructor TMessageChannel.Create(const AName: string; const AThreadCount: Integer);
 begin
   inherited Create;
+  FName              := AName;
   FThreadCount       := AThreadCount;
-  FThreadCountTarget := AThreadCount;
   FThreadsMessajes   := TCollections.CreateList<TThreadMessageHandler>;
   FExecutors         := TCollections.CreateList<TThreadMessageHandler>;
   FSynchronizer      := TMREWSync.Create;
@@ -875,8 +922,7 @@ var
 begin
   AdquireWrite;
   try
-    FThreadCount       := 0;
-    FThreadCountTarget := 0;
+    FThreadCount := 0;
     AdquireWrite;
     try
       LCount := FThreadsMessajes.Count;
@@ -888,6 +934,11 @@ begin
   finally
     ReleaseWrite;
   end;
+end;
+
+function TMessageChannel.GetName: string;
+begin
+  Result := FName;
 end;
 
 function TMessageChannel.GetThreadCount: Integer;
@@ -940,10 +991,12 @@ begin
     PoolMessage(AMessage);
 end;
 
+(*
 procedure TMessageChannel.Register;
 begin
   MessageBus.RegisterChannel(Self);
 end;
+*)
 
 procedure TMessageChannel.RegisterListener(AMessageListener: IMessageListener);
 var
@@ -984,20 +1037,12 @@ begin
   end;
 end;
 
-procedure TMessageChannel.SetThreadCount(const AThreadCount: Integer);
-begin
-  AdquireWrite;
-  try
-    FThreadCountTarget := AThreadCount;
-  finally
-    ReleaseWrite;
-  end;
-end;
-
+(*
 procedure TMessageChannel.UnRegister;
 begin
   MessageBus.UnregisterChannel(Self);
 end;
+*)
 
 procedure TMessageChannel.UnregisterListener(AMessageListener: IMessageListener);
 var
@@ -1023,7 +1068,7 @@ end;
 {$ENDREGION}
 {$REGION 'TMessageListenerViewModel<T>'}
 
-constructor TMessageListenerViewModel<T>.Create(AViewModel: IViewModel; const AChannel: TMessageChannel; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
+constructor TMessageListenerViewModel<T>.Create(AViewModel: IViewModel; const AChannel: String; const AFilterCondition: TListenerFilter; const ACodeExecutesInMainUIThread: Boolean; const ATypeRestriction: EMessageTypeRestriction);
 begin
   FViewModel := AViewModel;
   Create(AChannel, AFilterCondition, ACodeExecutesInMainUIThread, ATypeRestriction);
@@ -1038,18 +1083,6 @@ begin
 end;
 
 initialization
-
-MVVMCore.IoC.RegisterType<TMessageChannel_Main>(
-  function: TMessageChannel_Main
-  begin
-    Result := TMessageChannel_Main.Create(Utils.iif<Integer>((TThread.ProcessorCount > MAX_DEFAULT_POOLED_THREADS), MAX_DEFAULT_POOLED_THREADS, TThread.ProcessorCount));
-  end).AsSingleton;
-
-MVVMCore.IoC.RegisterType<TMessageChannel_Main_SingleThreaded>(
-  function: TMessageChannel_Main_SingleThreaded
-  begin
-    Result := TMessageChannel_Main_SingleThreaded.Create(1)
-  end).AsSingleton;
 
 MessageBus.CreateIni;
 

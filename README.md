@@ -47,6 +47,7 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 * Qué es el **canal**:
 	1. equivalente a un threadpool especializado en la distribución de mensajes a los listeners
 	2. puede tener 1 ó 'n' threads
+	3. se identifican por un nombre
 * Los **subscriptores**:
 	1. se subscriben a un canal, ya sea a uno de los existentes o a uno nuevo customizado
 	2. se subscriben a un tipo de mensaje (con genéricos), ya sea al tipo base o también al base y heredados (configuración)
@@ -62,8 +63,42 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 		b. en cada canal se elige uno de sus threads como transmisor de dicho mensaje, normalmente al que menos mensajes haya transmitido
 		c. el thread seleccionado recorre todos los listeners y a aquellos que estén subscritos a ese tipo de mensaje se les pasa el mensaje
 		d. el listener puede tener un filtro, por lo que al recibir el mensaje si pasa dicho filtro finalmente se ejecuta el método
+* Uso:
+	1. Registrar un canal nuevo: MeesageBus.RegisterChannel('Channel 1', 2);  // con 2 threads de trabajo
+	2. Publicar un mensaje:
+        // Definir mensaje, en este caso transporta un integer
+		TTestMessageInteger = class(TMessage)
+		public
+		Valor: Integer;
 
-
+		constructor Create(const AValue: Integer); overload;
+		end;
+		
+		//en codigo
+		procedure TForm2.Button1Click(Sender: TObject);
+		var
+		  LMsg: IMessage;
+		begin
+		  LMsg := TTestMessageInteger.Create(5);
+		  LMsg.Post;
+		end;
+	3. Definir el subscriptor al tipo de mensaje
+		//definicion del listener, en la clase donde queremos subscribirnos al mensaje
+		TForm2 = class(TForm)
+		private
+		  ...
+		  FListenerInteger  : IMessageListener<TTestMessageInteger>; //interface que define un subscriptor a ese tipo de mensaje
+		  ... 
+		//en el create de la clase
+		FListenerInteger := TMessageListener<TTestMessageInteger>.Create;  //implementacion de listener genérico si no hay necesidad de filtros
+		FListenerInteger.IsCodeToExecuteInUIMainThread := True; //se va a ejecutar en el main thread
+		FListenerInteger.OnMessage.Add(OnTestMessageInteger); //asignamos el metodo
+		
+		//en la clase tendremos el método así
+		procedure TForm2.OnTestMessageInteger(AMsg: IMessage);
+		begin
+		  Memo1.Lines.Add(LogTime + 'Integer: ' + TTestMessageInteger(AMsg).Valor.ToString)
+		end;
 
 ## Links de interes
 

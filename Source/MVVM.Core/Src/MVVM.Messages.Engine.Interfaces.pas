@@ -46,6 +46,8 @@ type
     function GetEnabled: Boolean;
     procedure SetEnabled(const AValue: Boolean);
 
+    function GetChannel: String;
+
     function GetMessajeClass: TClass;
 
     function GetConditionsMatch(AMessage: IMessage): Boolean;
@@ -59,6 +61,7 @@ type
     property IsCodeToExecuteInUIMainThread: Boolean read GetIsCodeToExecuteInUIMainThread write SetIsCodeToExecuteInUIMainThread;
     property TypeRestriction: EMessageTypeRestriction read GetTypeRestriction write SetTypeRestriction;
     property Enabled        : Boolean read GetEnabled write SetEnabled;
+    property Channel        : String read GetChannel;
   end;
 {$ENDREGION}
 {$REGION 'IMessageListener<T: TMessage>'}
