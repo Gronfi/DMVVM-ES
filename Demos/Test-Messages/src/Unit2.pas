@@ -111,6 +111,7 @@ type
     { Private declarations }
     FValor            : Integer;
     FListenerInteger  : IMessageListener<TTestMessageInteger>;
+    FListenerInteger2 : IMessageListener<TTestMessageInteger>;
     FListenerString1  : IMessageListener<TTestMessageString>;
     FListenerString2  : IMessageListener<TTestMessageString>;
 
@@ -126,6 +127,7 @@ type
     procedure DisableChecks;
 
     procedure OnTestMessageInteger(AMsg: IMessage);
+    procedure OnTestMessageInteger2(AMsg: IMessage);
     procedure OnTestMessageString1(AMsg: IMessage);
     procedure OnTestMessageString2(AMsg: IMessage);
     procedure OnTestMessageGeneric_Integer(AMsg: IMessage);
@@ -319,6 +321,10 @@ begin
   FListenerInteger.IsCodeToExecuteInUIMainThread := True;
   FListenerInteger.OnMessage.Add(OnTestMessageInteger);
 
+  FListenerInteger2 := TMessageListener<TTestMessageInteger>.Create;
+  FListenerInteger2.IsCodeToExecuteInUIMainThread := False;
+  FListenerInteger2.OnMessage.Add(OnTestMessageInteger2);
+
   FListenerString1 := TMessageListener<TTestMessageString>.Create;
   FListenerString1.IsCodeToExecuteInUIMainThread := True;
   FListenerString1.OnMessage.Add(OnTestMessageString1);
@@ -359,6 +365,16 @@ end;
 procedure TForm2.OnTestMessageInteger(AMsg: IMessage);
 begin
   Memo1.Lines.Add(LogTime + 'Integer: ' + TTestMessageInteger(AMsg).Valor.ToString)
+end;
+
+procedure TForm2.OnTestMessageInteger2(AMsg: IMessage);
+begin
+  Sleep(10000);
+  TThread.Queue(nil,
+    procedure
+    begin
+      Memo1.Lines.Add(LogTime + ' Fin!');
+    end);
 end;
 
 procedure TForm2.OnTestMessageIntegerMemo2(AMsg: IMessage);

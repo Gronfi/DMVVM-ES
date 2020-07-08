@@ -64,8 +64,12 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 		c. el thread seleccionado recorre todos los listeners y a aquellos que estén subscritos a ese tipo de mensaje se les pasa el mensaje
 		d. el listener puede tener un filtro, por lo que al recibir el mensaje si pasa dicho filtro finalmente se ejecuta el método
 * Uso:
-	1. Registrar un canal nuevo: MeesageBus.RegisterChannel('Channel 1', 2);  // con 2 threads de trabajo
+	1. Registrar un canal nuevo: 
+	   ```delphi
+	   MessageBus.RegisterChannel('Channel 1', 2);  // con 2 threads de trabajo
+	   ```
 	2. Publicar un mensaje:
+	   ```delphi
         // Definir mensaje, en este caso transporta un integer
 		TTestMessageInteger = class(TMessage)
 		public
@@ -82,7 +86,9 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 		  LMsg := TTestMessageInteger.Create(5);
 		  LMsg.Post;
 		end;
+		```
 	3. Definir el subscriptor al tipo de mensaje
+		```delphi
 		//definicion del listener, en la clase donde queremos subscribirnos al mensaje
 		TForm2 = class(TForm)
 		private
@@ -99,6 +105,7 @@ Es un bus de mensajes (eventos) basado en el patrón publicador/subscriptor
 		begin
 		  Memo1.Lines.Add(LogTime + 'Integer: ' + TTestMessageInteger(AMsg).Valor.ToString)
 		end;
+		```
 
 ## Links de interes
 

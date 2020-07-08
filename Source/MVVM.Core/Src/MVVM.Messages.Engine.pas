@@ -6,6 +6,7 @@ uses
   System.Classes,
   System.SysUtils,
   System.Types,
+  System.SyncObjs,
 
   Spring,
   Spring.Collections,
@@ -134,8 +135,10 @@ type
     CTE_PUSH_TIMEOUT       = 100;
   private
     FSynchronizer: IReadWriteSync;
+    FLock        : TSpinLock;
     FMessageCount: Int64;
     FMessages    : TThreadedQueue<IMessage>;
+    FIsBusy      : Boolean;
 
     procedure AdquireWrite;
     procedure ReleaseWrite;
@@ -147,6 +150,9 @@ type
 
     function GetNextMessage(out AQueueSize: Integer; var AMessage: IMessage): TWaitResult;
   protected
+    procedure SetIsBusy(const AValue: Boolean);
+    function GetIsBusy: Boolean;
+
     procedure Execute; override;
 
     function GetProcessedMessageCount: Int64;
@@ -159,6 +165,7 @@ type
     procedure AddMessage(AMessage: IMessage); virtual;
 
     property ProcessedMessageCount: Int64 read GetProcessedMessageCount;
+    property IsBusy: Boolean read GetIsBusy;
   end;
 
 {$ENDREGION}
@@ -539,6 +546,7 @@ constructor TThreadMessageHandlerBase.Create;
 begin
   inherited Create(False);
   FSynchronizer := TMREWSync.Create;
+  FLock         := TSpinLock.Create(False);
   FMessages     := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
   FMessageCount := 0;
 end;
@@ -556,6 +564,16 @@ end;
 function TThreadMessageHandlerBase.GetProcessedMessageCount: Int64;
 begin
   Result := FMessageCount
+end;
+
+function TThreadMessageHandlerBase.GetIsBusy: Boolean;
+begin
+  FLock.Enter;
+  try
+    Result := FIsBusy;
+  finally
+    FLock.Exit;
+  end;
 end;
 
 function TThreadMessageHandlerBase.GetNextMessage(out AQueueSize: Integer; var AMessage: IMessage): TWaitResult;
@@ -579,7 +597,12 @@ begin
             if not Terminated then
             begin
               try
-                ProcessQueuedMessage(LMsg);
+                try
+                  SetIsBusy(True);
+                  ProcessQueuedMessage(LMsg);
+                finally
+                  SetIsBusy(False);
+                end;
               except
                 on E: Exception do
                 begin
@@ -633,6 +656,16 @@ end;
 procedure TThreadMessageHandlerBase.ReleaseWrite;
 begin
   FSynchronizer.EndWrite;
+end;
+
+procedure TThreadMessageHandlerBase.SetIsBusy(const AValue: Boolean);
+begin
+  FLock.Enter;
+  try
+    FIsBusy :=  AValue;
+  finally
+    FLock.Exit;
+  end;
 end;
 
 procedure TThreadMessageHandlerBase.Execute;
@@ -954,10 +987,22 @@ end;
 function Comparador_TThreadMessageHandler(const DatoI, DatoD: TThreadMessageHandler): Integer;
 var
   LThisThreadEventCountI, LThisThreadEventCountD: Int64;
+  LBusyI, LBusyD                                : Boolean;
 begin
   Result := 0;
   if (DatoI = DatoD) then
     Exit(0);
+  LBusyI                 := DatoI.IsBusy;
+  LBusyD                 := DatoD.IsBusy;
+  if (LBusyI or LBusyD) then
+  begin
+    if not (LBusyI and LBusyD) then
+    begin
+      if LBusyI then
+        Exit(1)
+      else Exit(-1);
+    end;
+  end;
   LThisThreadEventCountI := DatoI.ProcessedMessageCount;
   LThisThreadEventCountD := DatoD.ProcessedMessageCount;
   if LThisThreadEventCountI < LThisThreadEventCountD then
