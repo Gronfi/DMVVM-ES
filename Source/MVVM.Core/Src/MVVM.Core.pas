@@ -5,8 +5,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
-
-  MonitorWaitStackFix,
+  System.SyncObjs,
 
   Spring,
   Spring.Container,
@@ -31,7 +30,7 @@ type
     FContainer: TContainer;
     FDefaultBindingStrategyName: String;
     FDefaultViewPlatform: string;
-    FSynchronizer: IReadWriteSync;
+    FSynchronizer: TLightweightMREW;
 
     class constructor CreateC;
     class destructor DestroyC;
@@ -227,7 +226,6 @@ end;
 class constructor MVVMCore.CreateC;
 begin
   FContainer                  := TContainer.Create;
-  FSynchronizer               := TMREWSync.Create;
   FDefaultBindingStrategyName := '';
   FDefaultViewPlatform        := '';
 end;

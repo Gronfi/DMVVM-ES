@@ -6,6 +6,7 @@ uses
   System.RTTI,
   System.Classes,
   System.SysUtils,
+  System.SyncObjs,
   System.Generics.Collections,
   System.UITypes,
   Data.DB,
@@ -256,7 +257,7 @@ type
   protected
     FID: string;
     FEnabled: Integer;
-    FSynchronizer: IReadWriteSync;
+    FSynchronizer: TLightweightMREW;
     FOnBindingAssignedValueEvent: TOnBindingAssignedValueEvent;
 
     function GetID: string;
@@ -514,7 +515,7 @@ type
   TBindingStrategyBase = class abstract(TInterfacedObject, IBindingStrategy)
   protected
     FBindings: TBindingList;
-    FSynchronizer: IReadWriteSync;
+    FSynchronizer: TLightweightMREW;
 
     function GetEnabled: Boolean; virtual; abstract;
     procedure SetEnabled(const AValue: Boolean); virtual; abstract;
@@ -630,7 +631,6 @@ end;
 constructor TBindingStrategyBase.Create;
 begin
   inherited;
-  FSynchronizer := TMREWSync.Create;
   FBindings     := TCollections.CreateList<IBinding>;
 end;
 
@@ -638,7 +638,6 @@ destructor TBindingStrategyBase.Destroy;
 begin
   ClearBindings;
   FBindings     := nil;
-  FSynchronizer := nil;
   inherited;
 end;
 
@@ -691,12 +690,10 @@ begin
   inherited Create;
   FID           := GUIDToString(TGuid.NewGuid);
   FEnabled      := ENABLED_STATE;
-  FSynchronizer := TMREWSync.Create;
 end;
 
 destructor TBindingBase.Destroy;
 begin
-  FSynchronizer := nil;
   inherited;
 end;
 

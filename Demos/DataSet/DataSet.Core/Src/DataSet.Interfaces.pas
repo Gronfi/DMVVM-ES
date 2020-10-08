@@ -8,6 +8,7 @@ uses
 
   Spring,
   MVVM.Interfaces,
+  MVVM.Interfaces.Architectural,
   MVVM.Bindings;
 
 type

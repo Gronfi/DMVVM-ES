@@ -276,18 +276,42 @@ end;
 
 procedure TBindingManager.Notify(const AObject: TObject; const APropertiesNames: TArray<String>);
 var
-  LEstrategia: String;
+  LProc : TProc;
 begin
-  for LEstrategia in FDictionaryStrategies.Keys do
-    FDictionaryStrategies[LEstrategia].Notify(AObject, APropertiesNames);
+  LProc := procedure
+           var
+             LEstrategia: String;
+           begin
+             for LEstrategia in FDictionaryStrategies.Keys do
+               FDictionaryStrategies[LEstrategia].Notify(AObject, APropertiesNames);
+           end;
+  if MVVMCore.PlatformServices.IsMainThreadUI then
+  begin
+    LProc();
+  end
+  else begin
+         MVVMCore.DelegateExecution(LProc, EDelegatedExecutionMode.medQueue);
+       end;
 end;
 
 procedure TBindingManager.Notify(const AObject: TObject; const APropertyName: String);
 var
-  LEstrategia: String;
+  LProc : TProc;
 begin
-  for LEstrategia in FDictionaryStrategies.Keys do
-    FDictionaryStrategies[LEstrategia].Notify(AObject, APropertyName);
+  LProc := procedure
+           var
+             LEstrategia: String;
+           begin
+             for LEstrategia in FDictionaryStrategies.Keys do
+               FDictionaryStrategies[LEstrategia].Notify(AObject, APropertyName);
+           end;
+  if MVVMCore.PlatformServices.IsMainThreadUI then
+  begin
+    LProc();
+  end
+  else begin
+         MVVMCore.DelegateExecution(LProc, EDelegatedExecutionMode.medQueue);
+       end;
 end;
 
 class function TBindingManager.GetDefaultRegisteredBindingStrategy: IBindingStrategy;

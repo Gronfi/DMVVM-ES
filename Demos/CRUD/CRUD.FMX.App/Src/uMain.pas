@@ -12,7 +12,7 @@ uses
   FireDAC.Phys, FireDAC.FMXUI.Wait, FireDAC.Stan.ExprFuncs,
   FireDAC.Phys.SQLiteDef, FMX.Controls.Presentation, FMX.StdCtrls,
   FireDAC.Phys.SQLite, Data.DB, FireDAC.Comp.Client, FireDAC.Comp.UI,
-  FMX.Objects, FMX.Effects, FMX.Layouts;
+  FMX.Objects, FMX.Effects, FMX.Layouts, FireDAC.Phys.SQLiteWrapper.Stat;
 
 type
   TfrmMain = class(TForm)

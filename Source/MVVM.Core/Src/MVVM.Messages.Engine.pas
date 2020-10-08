@@ -134,7 +134,7 @@ type
     CTE_INITIAL_QUEUE_SIZE = 10;
     CTE_PUSH_TIMEOUT       = 100;
   private
-    FSynchronizer: IReadWriteSync;
+    FSynchronizer: TLightweightMREW;
     FLock        : TSpinLock;
     FMessageCount: Int64;
     FMessages    : TThreadedQueue<IMessage>;
@@ -174,7 +174,7 @@ type
   TThreadMessageHandler = class(TThreadMessageHandlerBase)
   private
     FListeners            : IList<IMessageListener>;
-    FSynchronizerListeners: IReadWriteSync;
+    FSynchronizerListeners: TLightweightMREW;
     FChannel              : TMessageChannel;
   protected
     procedure ProcessMessage(AMessage: IMessage); override;
@@ -193,6 +193,7 @@ type
 
     procedure RegisterListener(AMessageListener: IMessageListener);
     procedure UnregisterListener(AMessageListener: IMessageListener);
+
     property ListenersCount: Integer read GetListenersCount;
 
     procedure Register;
@@ -204,7 +205,7 @@ type
   TMessageChannel = class abstract(TThreadMessageHandlerBase)
   private
     FName             : string;
-    FSynchronizer     : IReadWriteSync;
+    FSynchronizer     : TLightweightMREW;
     FThreadsMessajes  : IList<TThreadMessageHandler>;
     FExecutors        : IList<TThreadMessageHandler>;
     FThreadCount      : Integer;
@@ -264,7 +265,7 @@ type
   MessageBus = record
   private
     class var FScheduler             : TMessagesScheduler;
-    class var FSynchronizerChannels  : IReadWriteSync;
+    class var FSynchronizerChannels  : TLightweightMREW;
     class var FChannels              : IList<TMessageChannel>;
     class var FChannelsByName        : IDictionary<String, TMessageChannel>;
     class var FMessageDeploymentKind : EMessageDeploymentKind;
@@ -545,7 +546,6 @@ end;
 constructor TThreadMessageHandlerBase.Create;
 begin
   inherited Create(False);
-  FSynchronizer := TMREWSync.Create;
   FLock         := TSpinLock.Create(False);
   FMessages     := TThreadedQueue<IMessage>.Create(CTE_INITIAL_QUEUE_SIZE, CTE_PUSH_TIMEOUT, Cardinal.MaxValue);
   FMessageCount := 0;
@@ -557,7 +557,6 @@ begin
   FMessages.DoShutDown;
   WaitFor;
   FMessages.Free;
-  FSynchronizer := nil;
   inherited Destroy;
 end;
 
@@ -684,7 +683,6 @@ end;
 constructor TThreadMessageHandler.Create;
 begin
   inherited Create;
-  FSynchronizerListeners := TMREWSync.Create;
   FChannel               := nil;
   FListeners             := TCollections.CreateList<IMessageListener>;
   InitializeListeners;
@@ -702,7 +700,6 @@ begin
   FinalizeListeners;
   FListeners := nil;
 
-  FSynchronizerListeners := nil;
   inherited Destroy;
 end;
 
@@ -807,7 +804,6 @@ class procedure MessageBus.CreateIni;
 begin
   FChannels             := TCollections.CreateList<TMessageChannel>;
   FChannelsByName       := TCollections.CreateDictionary<String, TMessageChannel>;
-  FSynchronizerChannels := TMREWSync.Create;
   FMessageDeploymentKind:= EMessageDeploymentKind.mdkPooled;
   FScheduler            := TMessagesScheduler.Create;
 
@@ -820,7 +816,6 @@ var
   LChannel: TMessageChannel;
 begin
   FScheduler.Destroy;
-  FSynchronizerChannels := nil;
   for LChannel in FChannelsByName.Values do
     LChannel.Free;
   FChannelsByName       := nil;
@@ -929,7 +924,6 @@ begin
   FThreadCount       := AThreadCount;
   FThreadsMessajes   := TCollections.CreateList<TThreadMessageHandler>;
   FExecutors         := TCollections.CreateList<TThreadMessageHandler>;
-  FSynchronizer      := TMREWSync.Create;
 end;
 
 procedure TMessageChannel.CreateThreads;
@@ -937,7 +931,9 @@ var
   I: Integer;
 begin
   for I := 1 to FThreadCount do
+  begin
     GetMessajeThreadType.Create(Self);
+  end;
 end;
 
 destructor TMessageChannel.Destroy;
@@ -945,7 +941,6 @@ begin
   DestroyThreads;
   FThreadsMessajes := nil;
   FExecutors       := nil;
-  FSynchronizer    := nil;
   inherited;
 end;
 
